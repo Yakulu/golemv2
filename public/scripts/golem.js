@@ -776,7 +776,8 @@
         }
       }).bind(this);
       this.itemsPerPage = 4;
-      this.currentPage = m.prop(1);
+      // Cast to Integer or 1
+      this.currentPage = m.prop(m.route.param('page') | 0 || 1);
       this.skipItems = (function () {
         return (this.currentPage() - 1) * this.itemsPerPage;
       }).bind(this);
@@ -814,21 +815,6 @@
           this.items = results.rows;
           m.endComputation();
           }).bind(this));
-      }).bind(this);
-      this.setCurrentPage = (function (i) {
-        m.startComputation();
-        this.currentPage(i);
-        getContacts();
-      }).bind(this);
-      this.getPreviousPage = (function () {
-        if (this.currentPage() > 1) {
-          this.setCurrentPage(this.currentPage() - 1);
-        }
-      }).bind(this);
-      this.getNextPage = (function () {
-        if (this.currentPage() < this.numberOfPages) {
-          this.setCurrentPage(this.currentPage() + 1);
-        }
       }).bind(this);
       // Init
       m.startComputation();
@@ -883,27 +869,33 @@
         }
         var pagesDom = [];
         if (!ctrl.filteredItems && !ctrl.tagFilter) {
-          pagesDom = [
-            m('a', {
-              class: 'icon item',
-              onclick: ctrl.getPreviousPage
-            }, [
+          var aProps = function (cond, page) {
+            if (cond) {
+              return { class: 'disabled item' };
+            } else {
+              return {
+                class: 'icon item',
+                href: '#/contact/list/page/' + page
+              };
+            }
+          };
+          var aPrevProps = aProps(ctrl.currentPage() <= 1, ctrl.currentPage() - 1);
+          pagesDom.push(
+            m('a', aPrevProps, [
               m('i', { class: 'left arrow icon' })
-            ]),
-          ];
+            ])
+          );
           for (var pi = 1; pi <= ctrl.numberOfPages; pi++) {
             if (pi === ctrl.currentPage()) {
               pagesDom.push(m('div', { class: 'disabled item' }, pi));
             } else {
               pagesDom.push(m('a.item', {
-                onclick: ctrl.setCurrentPage.bind(null, pi)
+                href: '#/contact/list/page/' + pi
               }, pi));
             }
           }
-          pagesDom.push(m('a', {
-            class: 'icon item',
-            onclick: ctrl.getNextPage
-          }, [
+          var aNextProps = aProps(ctrl.currentPage() === ctrl.numberOfPages, ctrl.currentPage() + 1);
+          pagesDom.push(m('a', aNextProps, [
             m('i', { class: 'right arrow icon' })
           ]));
         }
@@ -1549,6 +1541,7 @@
         '/contact': contact.modules.list,
         '/contact/list': contact.modules.list,
         '/contact/list/filter/tag/:tag': contact.modules.list,
+        '/contact/list/page/:page': contact.modules.list,
         '/contact/tags': contact.modules.tags,
         '/contact/show/:contactId': contact.modules.show,
         '/contact/add': contact.modules.form,
