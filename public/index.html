@@ -4,22 +4,34 @@
     <meta charset='utf-8'>
     <link async rel='stylesheet' href='vendor/semantic.css'>
     <link async rel='stylesheet' href='vendor/open-sans.css'>
-    <link async rel='stylesheet' href='vendor/hint.css'>
     <link async rel='stylesheet' href='css/golem.css'>
     <style >
       html, body {
         font-family: 'Open Sans', sans-serif;
       }
     </style>
-    <script async src='vendor/mithril.js'></script>
-    <script async src='vendor/notify.js'></script>
-    <script async src='vendor/pouchdb-2.2.3.min.js'></script>
+    <!-- Script loader -->
+    <script src='vendor/script.js'></script>
+    <script>
+      // Global namespace
+      var golem = {
+        config: {},
+        module: {},
+        widgets: {}
+      };
+      // App dependencies
+      $script([
+      'vendor/mithril.js',
+      'vendor/notify.js',
+      'vendor/pouchdb-2.2.3.min.js',
+      'l10n/locale_fr-FR.js'
+      ], 'startpack');
+
+      // Main Script
+      $script('scripts/golem.js');
+    </script>
   </head>
   <body>
-    <!-- app -->
-    <script src='i18n/locale_fr-FR.js'></script>
-    <script async src='scripts/golem.js'></script>
-    <!-- end -->
   </body>
 </html>
 

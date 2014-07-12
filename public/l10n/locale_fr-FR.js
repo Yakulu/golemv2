@@ -29,7 +29,6 @@
 */
 
 // Localization, french
-var golem = { config: {}};
 (function () {
   golem.config.locale = {
     AUTHENTIFICATION: 'Authentification',
