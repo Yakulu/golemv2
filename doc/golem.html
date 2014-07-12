@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>golem.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>golem.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+<span class="hljs-pi">  'use strict'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>GOLEM</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  golem.utils = {
+    locale: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(str)</span> {</span> <span class="hljs-keyword">return</span> golem.config.locale[str]; },
+    sendNotification: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(title, options, callback)</span> {</span>
+      <span class="hljs-keyword">var</span> _send = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+        <span class="hljs-keyword">var</span> notif = <span class="hljs-keyword">new</span> Notify(title, options);
+        notif.show();
+        callback();
+      };
+      <span class="hljs-keyword">var</span> _alert = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+        alert(title + <span class="hljs-string">' : '</span> + options.body); 
+        callback();
+      };
+      <span class="hljs-keyword">if</span> (!Notify.isSupported()) {
+        _alert();
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">if</span> (Notify.needsPermission()) {
+          Notify.requestPermission(_send, _alert);
+        } <span class="hljs-keyword">else</span> {
+          _send();
+        }
+      }
+    }
+  };
+
+  golem.model = {
+    db: <span class="hljs-keyword">new</span> PouchDB(<span class="hljs-string">'golem'</span>),
+    queries: {
+      all: {
+        _id: <span class="hljs-string">'_design/all'</span>,
+        views: {
+          bySchema: {
+            map: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(doc)</span> {</span>
+              <span class="hljs-keyword">if</span> (doc.schema) {
+                emit([doc.schema, doc.creationDate], <span class="hljs-literal">null</span>);
+              }
+            }.toString()
+          }
+        }
+      },
+      tags: {
+        _id: <span class="hljs-string">'_design/tags'</span>,
+        views: {
+          count: {
+            map: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(doc)</span> {</span>
+              <span class="hljs-keyword">var</span> emitProp = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(schema, prop)</span> {</span>
+                schema = schema || doc.schema;
+                prop = prop || <span class="hljs-string">'tags'</span>;
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = doc[prop].length; i &lt; l; i++) {
+                  emit([schema, doc[prop][i]]);
+                }
+              };
+              <span class="hljs-keyword">if</span> (doc.tags) {
+                emitProp();
+              }
+              <span class="hljs-keyword">if</span> ((doc.schema === <span class="hljs-string">'member'</span>) &amp;&amp; doc.skills) {
+                emitProp(<span class="hljs-string">'memberskills'</span>, <span class="hljs-string">'skills'</span>);
+              }
+            }.toString(), reduce: <span class="hljs-string">'_count'</span>
+          }
+        }
+      }
+    }
+  };
+
+  golem.controller = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">this</span>.docTitle = golem.utils.locale(<span class="hljs-string">'TITLE'</span>) + <span class="hljs-string">' - '</span>;
+    document.title =  <span class="hljs-keyword">this</span>.docTitle + golem.utils.locale(<span class="hljs-string">'MENU_HOME'</span>);
+
+    <span class="hljs-keyword">this</span>.mainMenu = <span class="hljs-keyword">new</span> menus.main.controller();
+    <span class="hljs-keyword">this</span>.secondaryMenu = <span class="hljs-keyword">new</span> menus.secondary.controller();
+  };
+  golem.view = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+    <span class="hljs-keyword">var</span> l = golem.utils.locale;
+    <span class="hljs-keyword">var</span> dom = {
+      header: m(<span class="hljs-string">'header'</span>, [
+        m(<span class="hljs-string">'h1'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui inverted black block small header center aligned'</span> }, l(<span class="hljs-string">'TITLE'</span>) + <span class="hljs-string">' : '</span> + l(<span class="hljs-string">'HEADER'</span>))
+      ]),
+      bottomDivider: m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui horizontal icon divider'</span> }, [ m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'icon html5'</span> })]),
+      footer: m(<span class="hljs-string">'footer'</span>, [
+        m(<span class="hljs-string">'p'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui horizontal segment center aligned'</span> }, [
+          m(<span class="hljs-string">'span'</span>, l(<span class="hljs-string">'FOOTER'</span>) + <span class="hljs-string">'('</span>),
+          m(<span class="hljs-string">'a'</span>, { href: l(<span class="hljs-string">'SOURCE_CODE_URL'</span>) }, l(<span class="hljs-string">'SOURCE_CODE'</span>)),
+          m(<span class="hljs-string">'span'</span>, <span class="hljs-string">')'</span>)
+        ])
+      ])
+    };
+
+    <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.mainContent) {
+      <span class="hljs-keyword">this</span>.mainContent = m(<span class="hljs-string">'article'</span>, <span class="hljs-string">'HOME, DEFAULT TMP'</span>);
+    }
+    <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.contextMenuContent) {
+      <span class="hljs-keyword">this</span>.contextMenuContent = m(<span class="hljs-string">'p'</span>, <span class="hljs-string">'contextual menu'</span>);
+    }
+
+    dom.main = m(<span class="hljs-string">'main'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui grid'</span> }, [
+      m(<span class="hljs-string">'section'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'two wide column'</span> }, [ <span class="hljs-keyword">new</span> menus.main.view(ctrl.mainMenu) ]),
+      m(<span class="hljs-string">'section'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'eleven wide column'</span> }, [
+        <span class="hljs-keyword">new</span> menus.secondary.view(ctrl.secondaryMenu), <span class="hljs-keyword">this</span>.mainContent
+      ]),
+      m(<span class="hljs-string">'section'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'three wide column'</span> }, [ <span class="hljs-keyword">this</span>.contextMenuContent ])
+    ]);
+
+    <span class="hljs-keyword">return</span> [
+      dom.header, dom.main, dom.bottomDivider, dom.footer
+    ];
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Model Validations
+TODO, and types like url, email and co</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> validations = {
+    required: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(val)</span> {</span>
+      <span class="hljs-keyword">return</span> (val &amp;&amp; val.length !== <span class="hljs-number">0</span>);
+    },
+    min: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(val, rule)</span> {</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">parseInt</span>(val) &gt;= rule;
+    },
+    max: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(val, rule)</span> {</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">parseInt</span>(val) &lt;= rule;
+    },
+    minlength: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(val, rule)</span> {</span>
+      <span class="hljs-keyword">return</span> val.length &gt;= rule;
+    },
+    maxlength: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(val, rule)</span> {</span>
+      <span class="hljs-keyword">return</span> val.length &lt;= rule;
+    },
+    pattern: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(val)</span> {</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Regexp(pattern).test(val);
+    },
+    contact: {
+      rules : {
+        firstname: {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>…</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      },
+      messages: {
+        firstname: {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>…</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      }
+    }
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Menus</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> menus = {
+    Item: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(title, baseUrl, icon, cls)</span> {</span>
+      <span class="hljs-keyword">this</span>.title = title;
+      <span class="hljs-keyword">this</span>.baseUrl = baseUrl;
+      <span class="hljs-keyword">this</span>.icon = icon;
+      <span class="hljs-keyword">this</span>.cls = cls || <span class="hljs-string">'item'</span>;
+      <span class="hljs-keyword">this</span>.url = <span class="hljs-keyword">this</span>.baseUrl;
+    },
+    itemDom: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> {</span>
+      <span class="hljs-keyword">var</span> cls = item.cls;
+      <span class="hljs-keyword">if</span> (window.location.hash.indexOf(item.url) !== -<span class="hljs-number">1</span>) {
+        cls += <span class="hljs-string">' active'</span>;
+      }
+      <span class="hljs-keyword">return</span> m(<span class="hljs-string">'a'</span>,
+        {
+          <span class="hljs-keyword">class</span>: cls,
+          href: <span class="hljs-string">'#'</span> + item.url,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Temp fix for laggy rendering
+config: m.route</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        },
+        [
+          m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: item.icon + <span class="hljs-string">' icon'</span> }),
+          item.title
+        ]
+      );
+    },
+    main: {
+      controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+        <span class="hljs-keyword">var</span> l = golem.utils.locale;
+        <span class="hljs-keyword">this</span>.items = [
+          <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'MENU_HOME'</span>), <span class="hljs-string">'/home'</span>, <span class="hljs-string">'home'</span>),
+          <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'MENU_CONTACTS'</span>), <span class="hljs-string">'/contact'</span>, <span class="hljs-string">'book'</span>),
+          <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'MENU_MEMBERS'</span>), <span class="hljs-string">'/member'</span>, <span class="hljs-string">'user'</span>),
+          <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'MENU_MESSAGES'</span>), <span class="hljs-string">'/mail'</span>, <span class="hljs-string">'mail'</span>, <span class="hljs-string">'item disabled'</span>),
+          <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'MENU_ACTIVITIES'</span>), <span class="hljs-string">'/activity'</span>, <span class="hljs-string">'globe'</span>),
+          <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'MENU_STATISTICS'</span>), <span class="hljs-string">'/stats'</span>, <span class="hljs-string">'pie chart basic'</span>, <span class="hljs-string">'item disabled'</span>)
+          ];
+
+          <span class="hljs-keyword">this</span>.addItem = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(title, baseUrl, icon, cls)</span> {</span>
+            <span class="hljs-keyword">this</span>.items.push(<span class="hljs-keyword">new</span> menus.Item(title, baseUrl, icon, cls));
+          };
+      },
+      view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+        <span class="hljs-keyword">return</span> m(<span class="hljs-string">'nav'</span>, [
+          m(<span class="hljs-string">'menu'</span>, {
+              id: <span class="hljs-string">'main-menu'</span>,
+              <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui vertical labeled icon menu'</span>
+            },
+            ctrl.items.map(menus.itemDom)
+          )
+        ]);
+      }
+    },
+    secondary: {
+      controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+        <span class="hljs-keyword">this</span>.items = [];
+
+        <span class="hljs-keyword">this</span>.replace = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(items)</span> {</span>
+          <span class="hljs-keyword">this</span>.items = items;
+        };
+      },
+      view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+        <span class="hljs-keyword">return</span> m(<span class="hljs-string">'nav'</span>, [
+          m(<span class="hljs-string">'menu'</span>, {
+              <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui small secondary pointing menu'</span>
+            },
+            ctrl.items.map(menus.itemDom)
+          )
+        ]);
+      }
+    }
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Global Widgets</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> widgets = {
+    modal: {
+      controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config)</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Defaults</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.active = config.active || <span class="hljs-literal">false</span>;
+        <span class="hljs-keyword">this</span>.toggle = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+          <span class="hljs-keyword">this</span>.active = !<span class="hljs-keyword">this</span>.active;
+        }).bind(<span class="hljs-keyword">this</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Init</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.title = config.title;
+        <span class="hljs-keyword">this</span>.content = config.content;
+        <span class="hljs-keyword">this</span>.cancelFn = config.cancelFn || <span class="hljs-keyword">this</span>.toggle;
+        <span class="hljs-keyword">this</span>.acceptFn = config.acceptFn;
+      },
+      view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+        <span class="hljs-keyword">var</span> l = golem.utils.locale;
+        <span class="hljs-keyword">var</span> cls = <span class="hljs-string">''</span>;
+        <span class="hljs-keyword">if</span> (ctrl.active) { cls += <span class="hljs-string">' active visible'</span>; }
+        <span class="hljs-keyword">return</span> m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui dimmer page'</span> + cls }, [
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui basic modal'</span> + cls }, [
+            m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'close icon'</span>, onclick: ctrl.cancelFn }),
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'header'</span> }, ctrl.title),
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'content'</span> }, ctrl.content),
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'actions'</span> }, [
+              m(<span class="hljs-string">'button'</span>,
+                {
+                  <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui negative button'</span>,
+                  type: <span class="hljs-string">'button'</span>,
+                  onclick: ctrl.cancelFn
+                } , l(<span class="hljs-string">'CANCEL'</span>)),
+                m(<span class="hljs-string">'button'</span>,
+                  {
+                    <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui positive button'</span>,
+                    type: <span class="hljs-string">'button'</span>,
+                    onclick: ctrl.acceptFn
+                  }, l(<span class="hljs-string">'OK'</span>))
+            ])
+          ])
+        ]);
+      }
+    }
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Form commons</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> form = {
+    addButton: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(clickAction, text)</span> {</span>
+     <span class="hljs-keyword">return</span> m(<span class="hljs-string">'button'</span>, {
+       <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui right attached tiny button'</span>,
+       type: <span class="hljs-string">'button'</span>,
+       onclick: clickAction,
+       }, [ m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'add sign icon'</span> }), text ]
+     );
+    },
+    helpButton: {
+      controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(title, content, extra)</span> {</span>
+        <span class="hljs-keyword">this</span>.title = title;
+        <span class="hljs-keyword">this</span>.content = content;
+        <span class="hljs-keyword">this</span>.extra = extra;
+        <span class="hljs-keyword">this</span>.isPopupVisible = <span class="hljs-literal">false</span>;
+        <span class="hljs-keyword">this</span>.togglePopup = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+          <span class="hljs-keyword">this</span>.isPopupVisible = !<span class="hljs-keyword">this</span>.isPopupVisible;
+        }).bind(<span class="hljs-keyword">this</span>);
+      },
+      view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+        <span class="hljs-keyword">var</span> l = golem.utils.locale;
+        <span class="hljs-keyword">var</span> box = [];
+        <span class="hljs-keyword">var</span> cls = <span class="hljs-string">'ui tiny button'</span>;
+        <span class="hljs-keyword">if</span> (ctrl.extra) {
+          cls += <span class="hljs-string">' left attached'</span>;
+          box.push(ctrl.extra);
+        }
+        box.unshift(
+          m(<span class="hljs-string">'button'</span>,
+            {
+              <span class="hljs-keyword">class</span>: ctrl.isPopupVisible ? cls + <span class="hljs-string">' black'</span> : cls,
+              type: <span class="hljs-string">'button'</span>,
+              <span class="hljs-string">'data-title'</span>: ctrl.title,
+              <span class="hljs-string">'data-content'</span>: ctrl.content,
+              onclick: ctrl.togglePopup
+            },
+            [ m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'help icon'</span> }), l(<span class="hljs-string">'HELP'</span>) ]
+          )
+        );
+        <span class="hljs-keyword">var</span> popup = m(<span class="hljs-string">'div'</span>, {
+            <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui visible center right inverted popup helper'</span>
+          }, [
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'header'</span> }, [
+              m(<span class="hljs-string">'i'</span>,
+                {
+                  role: <span class="hljs-string">'button'</span>,
+                  <span class="hljs-keyword">class</span>: <span class="hljs-string">'close icon'</span>,
+                  onclick: ctrl.togglePopup
+                }
+              ),
+              ctrl.title
+            ]),
+            m(<span class="hljs-string">'p'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'content'</span> }, m.trust(ctrl.content))
+          ]
+        );
+        <span class="hljs-keyword">if</span> (ctrl.isPopupVisible) { box.unshift(popup); }
+        <span class="hljs-keyword">return</span> m(<span class="hljs-string">'div'</span>, box);
+      }
+    },
+    inputHelper: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config)</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Defaults</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> placeholder = config.placeholder || config.label;
+      <span class="hljs-keyword">var</span> type = config.type || <span class="hljs-string">'text'</span>;
+      <span class="hljs-keyword">var</span> name = config.name + (config.suffix || <span class="hljs-string">''</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Attributes</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> inputAttr = {
+        id: name,
+        name: name,
+        type: type,
+        placeholder: placeholder,
+        value: config.value
+      };
+      <span class="hljs-keyword">if</span> (config.maxlength) { inputAttr.maxlength = config.maxlength; }
+      <span class="hljs-keyword">if</span> (config.minlength) { inputAttr.minlength = config.minlength; }
+      <span class="hljs-keyword">if</span> (config.size) { inputAttr.size = config.size; }
+      <span class="hljs-keyword">if</span> (config.required) { inputAttr.required = <span class="hljs-string">'required'</span>; }
+      <span class="hljs-keyword">if</span> (config.onchange) { inputAttr.onchange = config.onchange; }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Element</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span> m(<span class="hljs-string">'input'</span>, inputAttr);
+    },
+    textHelper: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config)</span> {</span>
+      <span class="hljs-keyword">var</span> labelText;
+      <span class="hljs-keyword">if</span> (config.required) {
+        labelText = <span class="hljs-string">'* '</span> + config.label;
+      } <span class="hljs-keyword">else</span> {
+        labelText = config.label;
+      }
+      <span class="hljs-keyword">var</span> label = m(<span class="hljs-string">'label'</span>, { <span class="hljs-keyword">for</span>: config.name }, labelText);
+      <span class="hljs-keyword">return</span> m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'field small input'</span> }, [
+        label,
+        form.inputHelper(config)
+      ]);
+    },
+    multiFieldWidget: {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>TODO : non trivial, make fidel representation of fields in reactive elements for m.withAttr…</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config)</span> {</span>
+        <span class="hljs-keyword">var</span> l = golem.utils.locale;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Internal state</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.type = config.type;
+        <span class="hljs-keyword">this</span>.label = config.label;
+        <span class="hljs-keyword">this</span>.name = config.name;
+        <span class="hljs-keyword">this</span>.size = config.size;
+        <span class="hljs-keyword">this</span>.maxlength = config.maxlength;
+        <span class="hljs-keyword">this</span>.minlength = config.minlength;
+        <span class="hljs-keyword">this</span>.content = config.content;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Defaults</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.required = config.required || <span class="hljs-string">'required'</span>;
+        <span class="hljs-keyword">this</span>.placeholder = config.placeholder || <span class="hljs-string">''</span>;
+        <span class="hljs-keyword">this</span>.radioField = config.radioField || <span class="hljs-literal">false</span>;
+        <span class="hljs-keyword">this</span>.labelField = config.labelField || <span class="hljs-literal">false</span>;
+        <span class="hljs-keyword">this</span>.removeNum = m.prop();
+        <span class="hljs-keyword">this</span>.suffix = m.prop();
+        <span class="hljs-keyword">this</span>.value = <span class="hljs-string">''</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Reactive element</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.current = config.current;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Methods</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.setSuffix = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(num)</span> {</span>
+          <span class="hljs-keyword">this</span>.suffix = <span class="hljs-string">'-'</span> + num;
+        }).bind(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.setValue = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(obj)</span> {</span>
+          <span class="hljs-keyword">if</span> (obj.value !== <span class="hljs-literal">undefined</span>) {
+            <span class="hljs-keyword">this</span>.value = obj.value;
+          } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">this</span>.value = obj;
+          }
+        }).bind(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.addField = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+          <span class="hljs-keyword">var</span> field;
+          <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.labelField) {
+            field = <span class="hljs-string">''</span>;
+          } <span class="hljs-keyword">else</span> {
+            field = { label: <span class="hljs-string">''</span>, value: <span class="hljs-string">''</span> };
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.radioField) { field.default = <span class="hljs-literal">false</span>; }
+          }
+          <span class="hljs-keyword">this</span>.current.push(field);
+        }).bind(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.change = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(num, field, e)</span> {</span>
+          <span class="hljs-keyword">switch</span> (field) {
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'default'</span>:
+              <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = <span class="hljs-keyword">this</span>.current.length; i &lt; l; i++) {
+                <span class="hljs-keyword">this</span>.current[i].default = (i === num);
+              }
+              <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'www'</span>:
+              <span class="hljs-keyword">this</span>.current[num] = e.target.value;
+              <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">default</span>: <span class="hljs-comment">// Label and classic value</span>
+              <span class="hljs-keyword">this</span>.current[num][field] = e.target.value;
+          }
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>Children Modules</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.helpButton = <span class="hljs-keyword">new</span> form.helpButton.controller(
+          <span class="hljs-keyword">this</span>.label,
+          <span class="hljs-keyword">this</span>.content,
+          form.addButton(<span class="hljs-keyword">this</span>.addField, l(<span class="hljs-string">'MENU_NEW'</span>))
+        );</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Remove Modal</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> removeField = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+          <span class="hljs-keyword">this</span>.current.splice(<span class="hljs-keyword">this</span>.removeNum(), <span class="hljs-number">1</span>);
+          <span class="hljs-keyword">this</span>.removeModalCtrl.toggle();
+        }).bind(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.removeModalCtrl = <span class="hljs-keyword">new</span> widgets.modal.controller({
+          title: l(<span class="hljs-string">'SURE'</span>),
+          content: l(<span class="hljs-string">'REMOVE_FIELD_CONFIRM_MSG'</span>),
+          acceptFn: removeField
+        });
+      },
+      view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+        <span class="hljs-keyword">var</span> l = golem.utils.locale;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Buttons
+Input and remove fields</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> inputRemoveFields = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(num)</span> {</span>
+          ctrl.setSuffix(num);
+          <span class="hljs-keyword">var</span> fields = [];
+          <span class="hljs-keyword">var</span> sel = ctrl.current[num];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>Radio field</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> (ctrl.radioField) {
+            <span class="hljs-keyword">var</span> checked;
+            <span class="hljs-keyword">if</span> (sel) {
+              checked = sel.default;
+            } <span class="hljs-keyword">else</span> {
+              checked = <span class="hljs-literal">false</span>;
+            }
+            <span class="hljs-keyword">var</span> radioField = m(<span class="hljs-string">'input'</span>,
+              {
+                <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui radio checkbox'</span>,
+                title: l(<span class="hljs-string">'DEFAULT'</span>),
+                type: <span class="hljs-string">'radio'</span>,
+                name: ctrl.name + <span class="hljs-string">'-default'</span>,
+                required: <span class="hljs-string">'required'</span>,
+                value: num,
+                checked: checked,
+                onchange: ctrl.change.bind(ctrl, num, <span class="hljs-string">'default'</span>)
+            });
+
+            fields.push(m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'field'</span> }, [
+              radioField,
+              m(<span class="hljs-string">'label'</span>,
+                { <span class="hljs-keyword">class</span>: <span class="hljs-string">'small'</span>, <span class="hljs-keyword">for</span>: ctrl.name },
+                l(<span class="hljs-string">'DEFAULT'</span>))
+            ]));
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>Label field</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> (ctrl.labelField) {
+            <span class="hljs-keyword">var</span> fieldId = ctrl.name + <span class="hljs-string">'-label-'</span> + num;
+            <span class="hljs-keyword">var</span> labelField = m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'field'</span> }, [
+              m(<span class="hljs-string">'input'</span>, {
+                type: <span class="hljs-string">'text'</span>,
+                list: fieldId,
+                name: fieldId,
+                placeholder: l(<span class="hljs-string">'TYPE'</span>),
+                size: <span class="hljs-number">15</span>,
+                value: sel ? sel.label : <span class="hljs-string">''</span>,
+                onchange: ctrl.change.bind(ctrl, num, <span class="hljs-string">'label'</span>)
+              }),
+              m(<span class="hljs-string">'datalist'</span>, { id: fieldId },
+                contact.data.labels[ctrl.name].map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(label)</span> {</span>
+                  <span class="hljs-keyword">return</span> m(<span class="hljs-string">'option'</span>, { value: label });
+                })
+              )
+            ]);
+            fields.push(labelField);
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Remove button</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> removeField = m(<span class="hljs-string">'div'</span>, {
+            role: <span class="hljs-string">'button'</span>,
+            <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui tiny red icon button'</span>,
+            title: l(<span class="hljs-string">'DELETE'</span>),
+            onclick: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+              ctrl.removeNum(num);
+              ctrl.removeModalCtrl.toggle();
+            }
+          }, [ m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'remove sign icon'</span> }) ]);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>All fields</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          ctrl.setValue(sel);
+
+
+          <span class="hljs-keyword">if</span> (!ctrl.labelField) {
+            ctrl.onchange = ctrl.change.bind(ctrl, num, <span class="hljs-string">'www'</span>);
+          } <span class="hljs-keyword">else</span> { <span class="hljs-comment">// Complex fields like mail and tel</span>
+            ctrl.onchange = ctrl.change.bind(ctrl, num, <span class="hljs-string">'value'</span>);
+          }
+          fields.push(m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'field'</span> }, [
+              m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui action input'</span> }, [
+                form.inputHelper(ctrl),
+                removeField
+              ])
+            ])
+          );
+          <span class="hljs-keyword">return</span> m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'multitext fields inline'</span> }, fields);
+        };
+
+        <span class="hljs-keyword">var</span> fieldset = m(<span class="hljs-string">'fieldset'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui segment'</span> }, [
+          m(<span class="hljs-string">'legend'</span>, ctrl.label),
+          <span class="hljs-keyword">new</span> form.helpButton.view(ctrl.helpButton),
+          m(<span class="hljs-string">'div'</span>, ctrl.current.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item, i)</span> {</span>
+            <span class="hljs-keyword">return</span> inputRemoveFields(i);
+          })),
+          <span class="hljs-keyword">new</span> widgets.modal.view(ctrl.removeModalCtrl)
+        ]);
+
+        <span class="hljs-keyword">return</span> m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'field'</span> }, [ fieldset ]);
+      }
+    },
+    tagWidget: {
+      controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config)</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Initialization</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.label = config.label;
+        <span class="hljs-keyword">this</span>.placeholder = config.placeholder;
+        <span class="hljs-keyword">this</span>.content = config.content;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Defaults</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.size = config.size || <span class="hljs-number">10</span>;
+        <span class="hljs-keyword">this</span>.name = config.name || <span class="hljs-string">'tags'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>All tags except those already selected</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> tags = config.tags.filter(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+          <span class="hljs-keyword">return</span> (config.current.indexOf(tag) === -<span class="hljs-number">1</span>);
+        });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Reactive elements</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.tags = tags;
+        <span class="hljs-keyword">this</span>.current = config.current;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>Children modules</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.helpButton = <span class="hljs-keyword">new</span> form.helpButton.controller(<span class="hljs-keyword">this</span>.label, <span class="hljs-keyword">this</span>.content);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>Methods</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.add = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(input)</span> {</span>
+          <span class="hljs-keyword">var</span> v = input.value;
+          <span class="hljs-keyword">if</span> (v &amp;&amp; <span class="hljs-keyword">this</span>.current.indexOf(v) === -<span class="hljs-number">1</span>) {
+            <span class="hljs-keyword">this</span>.current.push(v);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>config.model[this.name].push(v); </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          }
+          <span class="hljs-keyword">var</span> vIdx = <span class="hljs-keyword">this</span>.tags.indexOf(v);
+          <span class="hljs-keyword">if</span> (vIdx !== -<span class="hljs-number">1</span>) {
+            <span class="hljs-keyword">this</span>.tags.splice(vIdx, <span class="hljs-number">1</span>);
+          }
+          input.value = <span class="hljs-string">''</span>;
+        }).bind(<span class="hljs-keyword">this</span>);
+      },
+      view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+        <span class="hljs-keyword">var</span> l = golem.utils.locale;
+        <span class="hljs-keyword">return</span> m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'field tagfield'</span> }, [
+          m(<span class="hljs-string">'fieldset'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui segment'</span> }, [
+            m(<span class="hljs-string">'legend'</span>, ctrl.label),
+            <span class="hljs-keyword">new</span> form.helpButton.view(ctrl.helpButton),
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui action input multitext'</span> }, [
+              m(<span class="hljs-string">'input'</span>, {
+                id: ctrl.name + <span class="hljs-string">'-input'</span>,
+                name: ctrl.name,
+                type: <span class="hljs-string">'text'</span>,
+                list: ctrl.name,
+                placeholder: ctrl.placeholder,
+                size: ctrl.size,
+                onkeydown: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> {</span>
+                  <span class="hljs-keyword">if</span> (e.keyCode === <span class="hljs-number">13</span>) { <span class="hljs-comment">// Enter</span>
+                    e.preventDefault();
+                    ctrl.add(e.target);
+                  }
+                },
+                onchange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> {</span> ctrl.add(e.target); }
+              }),
+              m(<span class="hljs-string">'div'</span>, {
+                role: <span class="hljs-string">'button'</span>,
+                <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui mini purple button'</span>,
+                onclick: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> {</span>
+                  <span class="hljs-keyword">var</span> ipt = document.getElementById(ctrl.name + <span class="hljs-string">'-input'</span>);
+                  ctrl.add(ipt);
+                }
+              }, l(<span class="hljs-string">'OK'</span>))
+            ]),
+            m(<span class="hljs-string">'datalist'</span>, { id: ctrl.name }, ctrl.tags.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+              <span class="hljs-keyword">return</span> m(<span class="hljs-string">'option'</span>, { value: tag });
+            })),
+            m(<span class="hljs-string">'p'</span>, ctrl.current.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+              <span class="hljs-keyword">return</span> m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui label purple golem-tag'</span> }, [
+                tag,
+                m(<span class="hljs-string">'i'</span>, {
+                  role: <span class="hljs-string">'button'</span>,
+                  <span class="hljs-keyword">class</span>: <span class="hljs-string">'delete icon'</span>,
+                  onclick: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> {</span>
+                    <span class="hljs-keyword">var</span> value = e.target.parentElement.textContent;
+                    <span class="hljs-keyword">var</span> idx = ctrl.current.indexOf(value);
+                    ctrl.current.splice(idx, <span class="hljs-number">1</span>);
+                    ctrl.tags.push(value);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>$target.empty()</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                  }
+                })
+              ]);
+            }))
+          ])
+        ]);
+      }
+    }
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>Contacts</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> contact = {
+    modules: {},
+    data: {}
+  };
+  window.contact = contact;
+
+  contact.data.menuItems = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">var</span> l = golem.utils.locale;
+    <span class="hljs-keyword">return</span> {
+      list: <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'MENU_LIST'</span>), <span class="hljs-string">'/contact/list'</span>, <span class="hljs-string">'list'</span>),
+      add: <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'MENU_NEW'</span>), <span class="hljs-string">'/contact/add'</span>, <span class="hljs-string">'add sign'</span>),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>groups: new menus.Item(l(‘MENU_GROUPS’), ‘/contact/groups’, ‘users’),</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      tags: <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'MENU_TAGS'</span>), <span class="hljs-string">'/contact/tags'</span>, <span class="hljs-string">'tags'</span>),
+      show: <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'VIEW'</span>), <span class="hljs-string">'/contact/show'</span>, <span class="hljs-string">'search'</span>),
+      edit: <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'EDIT'</span>), <span class="hljs-string">'/contact/edit'</span>, <span class="hljs-string">'edit'</span>),
+      remove: <span class="hljs-keyword">new</span> menus.Item(l(<span class="hljs-string">'DELETE'</span>), <span class="hljs-string">'/contact/remove'</span>, <span class="hljs-string">'remove'</span>)
+    };
+  }).call();
+
+  contact.model = {
+    create: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> {</span>
+      <span class="hljs-keyword">return</span> {
+        schema: <span class="hljs-string">'contact'</span>,
+        creationDate: <span class="hljs-built_in">Date</span>.now(),
+        firstname: props.firstname || <span class="hljs-string">''</span>,
+        lastname: props.lastname || <span class="hljs-string">''</span>,
+        address: props.address || <span class="hljs-string">''</span>,
+        postalCode: props.postalCode || <span class="hljs-string">''</span>,
+        city: props.city || <span class="hljs-string">''</span>,
+        note: props.note || <span class="hljs-string">''</span>,
+        tels: props.tels || [],
+        mails: props.mails || [],
+        www: props.www || [],
+        tags: props.tags || [],
+        groups: props.groups || []
+      };
+    },
+    fullname: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(c)</span> {</span>
+      <span class="hljs-keyword">return</span> c.firstname + <span class="hljs-string">' '</span> + c.lastname;
+    },
+    fulladdress: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(c)</span> {</span>
+      <span class="hljs-keyword">if</span> (c.city) {
+        <span class="hljs-keyword">return</span> c.address + <span class="hljs-string">' '</span> + c.postalCode + <span class="hljs-string">' '</span> + c.city;
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
+      }
+    },
+  };
+  <span class="hljs-comment">/*
+  contact.Contact = function (props) {
+    this.schema = 'contact';
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>TMP</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (!props.key) {
+      props.key = contact.Contact.key;
+      contact.Contact.key = props.key + <span class="hljs-number">1</span>;
+    }
+    <span class="hljs-keyword">this</span>.key = props.key;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>End TMP</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> _populate = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(k, fallback)</span> {</span>
+      <span class="hljs-keyword">this</span>[k] = props[k] ?props[k] : fallback;
+    }).bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.firstname = props.firstname;
+    <span class="hljs-keyword">this</span>.lastname = props.lastname;
+    [<span class="hljs-string">'address'</span>, <span class="hljs-string">'postalCode'</span>, <span class="hljs-string">'city'</span>, <span class="hljs-string">'note'</span>].forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(k)</span> {</span>
+      _populate(k, <span class="hljs-string">''</span>);
+    });
+    [<span class="hljs-string">'tels'</span>, <span class="hljs-string">'mails'</span>, <span class="hljs-string">'www'</span>, <span class="hljs-string">'groups'</span>, <span class="hljs-string">'tags'</span>].forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(k)</span> {</span>
+      _populate(k, []);
+    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p>Extra properties</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    this.fullname = function () {
+      return this.firstname + ' ' + this.lastname;
+    };
+    this.fulladdress = function () {
+      if (this.city) {
+        return this.address + ' ' + this.postalCode + ' ' + this.city;
+      }
+    };
+  };
+  contact.Contact.key = 0; // TMP
+  */
+
+  contact.data.items = [
+    contact.model.create({
+        firstname: 'Laurent',
+        lastname: 'Costy',
+        postalCode: '21000',
+        city: 'Dijon',
+        note: 'Délégué régional',
+        groups: ['ffmjc', 'ffmjc-bourgogne', 'libre', 'libre-april'],
+        tags: ['à rappeler']
+    }),
+    contact.model.create({
+        firstname: 'Fabien',
+        lastname: 'Bourgeois',
+        address: '10bis rue Jangot',
+        postalCode: '69003',
+        city: 'Lyon',
+        note: '&lt;p&gt;Fait partie d\'une coopérative d\'activités et d\'emplois.&lt;/p&gt;',
+        tels: [
+          { label: 'pro', value: '0482531547', default: false },
+          { label: 'mobile', value: '0652816984', default: true },
+          { label: 'fax', value: '0482531565', default: false }
+        ],
+        mails: [
+          { label: 'pro', value: 'fbourgeois@yaltik.com', default: true },
+          { label: 'perso', value: 'fabien@yakulu.net', default: false },
+          { label: 'jabber', value: 'fabien@yakulu.net', default: false }
+        ],
+        www: ['http://www.yaltik.com', 'http://yakulu.net'],
+        groups: ['computer', 'computer-ssll', 'computer-ssll-yaltik', 'libre', 'libre-april', 'libre-aldil'],
+        tags: ['freelance', 'ess', 'web']
+    }),
+    contact.model.create({
+        firstname: 'Richard Matthew',
+        lastname: 'Stallman',
+        mails: [ { label: 'pro', value: 'rms@gnu.org', default: true } ],
+        www: ['http://stallman.org'],
+        groups: ['libre', 'libre-fsf'],
+        tags: ['gnu', 'militant', 'à rappeler', 'anglophone'],
+    }),
+    contact.model.create({
+        firstname: 'Linus',
+        lastname: 'Torvalds',
+        city: 'Portland',
+        note: 'Concepteur originel du noyau Linux',
+        www: ['http://torvalds-family.blogspot.com', 'http://www.cs.helsinki.fi/u/torvalds'],
+        groups: ['libre'],
+        tags: ['linux', 'anglophone', 'à rappeler']
+    }),
+    contact.model.create({
+        firstname: 'Jean',
+        lastname: 'Dupont',
+        address: '19 rue de la Platitude',
+        postalCode: '69001',
+        city: 'Lyon',
+        tags: ['militant', 'ess']
+    })
+  ];
+
+  contact.modules.list = {
+    controller: function () {
+      golem.controller.call(this);
+      var l = golem.utils.locale;
+      var cmi = contact.data.menuItems;
+      this.secondaryMenu.replace([
+        cmi.list, cmi.add, cmi.tags
+      ]);
+      document.title = this.docTitle + l('CONTACTS_LIST');
+      this.search = (function (e) {
+        var val = e.target.value;
+        if (val === '') {
+          this.filteredItems = false;
+        }
+        if (val.length &gt; 3) {
+          this.filteredItems = this.items.filter(function (item) {
+            var json = JSON.stringify(item).toLowerCase();
+            return (json.indexOf(val.toLowerCase()) !== -1);
+          });
+        }
+      }).bind(this);
+      this.itemsPerPage = 4;
+      this.currentPage = m.prop(1);
+      this.skipItems = (function () {
+        return (this.currentPage() - 1) * this.itemsPerPage;
+      }).bind(this);
+      this.tagFilter = m.route.param('tag');
+      var _getContacts;
+      if (!this.tagFilter) {
+        _getContacts = (function (cb) {
+          golem.model.db.query(
+            'all/bySchema', {
+              startKey: ['contact'],
+              endKey: ['contact', {}],
+              limit: this.itemsPerPage,
+              skip: this.skipItems(),
+              include_docs: true 
+            }, cb
+          );
+        }).bind(this);
+      } else {
+        _getContacts = (function (cb) {
+          golem.model.db.query(
+            'tags/count',
+            {
+              reduce: false,
+              key: ['contact', this.tagFilter],
+              include_docs: true
+            },
+            cb
+          );
+        }).bind(this);
+      }
+      var getContacts = (function () {
+        _getContacts((function (err, results) {
+          this.totalRows = results.total_rows;
+          this.numberOfPages = Math.ceil(this.totalRows / this.itemsPerPage);
+          this.items = results.rows;
+          m.endComputation();
+          }).bind(this));
+      }).bind(this);
+      this.setCurrentPage = (function (i) {
+        m.startComputation();
+        this.currentPage(i);
+        getContacts();
+      }).bind(this);
+      this.getPreviousPage = (function () {
+        if (this.currentPage() &gt; 1) {
+          this.setCurrentPage(this.currentPage() - 1);
+        }
+      }).bind(this);
+      this.getNextPage = (function () {
+        if (this.currentPage() &lt; this.numberOfPages) {
+          this.setCurrentPage(this.currentPage() + 1);
+        }
+      }).bind(this);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p>Init</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      m.startComputation();
+      contact.data.getTags(getContacts);
+    },
+    view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+      <span class="hljs-keyword">var</span> l = golem.utils.locale;
+      <span class="hljs-keyword">var</span> contactItemDom = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(c)</span> {</span>
+        c = c.doc;
+        <span class="hljs-keyword">var</span> showURL = <span class="hljs-string">'#/contact/show/'</span> + c._id;
+        <span class="hljs-keyword">var</span> editURL = <span class="hljs-string">'#/contact/edit/'</span> + c._id;
+        <span class="hljs-keyword">var</span> removeURL = <span class="hljs-string">'#/contact/remove/'</span> + c._id;
+
+        <span class="hljs-keyword">return</span> m(<span class="hljs-string">'li'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'contact item'</span> }, [
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'content'</span> }, [
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'meta'</span> }, [
+              m(<span class="hljs-string">'a'</span>, { href: showURL, <span class="hljs-comment">/*config: m.route*/</span> }, [
+                m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'unhide icon'</span> })
+              ]),
+              m(<span class="hljs-string">'a'</span>, { href: editURL, <span class="hljs-comment">/*config: m.route*/</span> }, [
+                m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'edit icon'</span> })
+              ]),
+              m(<span class="hljs-string">'a'</span>, { href: removeURL, <span class="hljs-comment">/*config: m.route*/</span> }, [
+                m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'remove icon'</span> })
+              ])
+            ]),
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'name'</span> }, contact.model.fullname(c)),
+            m(<span class="hljs-string">'p'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'description'</span> }, [
+              m(<span class="hljs-string">'p'</span>, c.postalCode + <span class="hljs-string">' '</span> + c.city),
+              m(<span class="hljs-string">'p'</span>, [
+                m(<span class="hljs-string">'div'</span>, c.tels.map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(tel)</span> {</span>
+                  <span class="hljs-keyword">if</span> (tel.default) {
+                    <span class="hljs-keyword">return</span> tel.value.match(<span class="hljs-regexp">/\d{2}/g</span>).join(<span class="hljs-string">'.'</span>);
+                  }
+                })),
+                m(<span class="hljs-string">'div'</span>, c.mails.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(mail)</span> {</span>
+                  <span class="hljs-keyword">if</span> (mail.default) {
+                    <span class="hljs-keyword">return</span> m(<span class="hljs-string">'a'</span>, { href: <span class="hljs-string">'mailto:'</span> + mail.value }, mail.value);
+                  }
+                }))
+              ])
+            ])
+          ])
+        ]);
+      };
+      <span class="hljs-keyword">this</span>.mainContent = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+        <span class="hljs-keyword">var</span> itemsDom;
+        <span class="hljs-keyword">if</span> (ctrl.filteredItems) {
+          itemsDom = ctrl.filteredItems.map(contactItemDom);
+        } <span class="hljs-keyword">else</span> {
+          itemsDom = ctrl.items.map(contactItemDom);
+        }
+        <span class="hljs-keyword">var</span> pagesDom = [];
+        <span class="hljs-keyword">if</span> (!ctrl.filteredItems &amp;&amp; !ctrl.tagFilter) {
+          pagesDom = [
+            m(<span class="hljs-string">'a'</span>, {
+              <span class="hljs-keyword">class</span>: <span class="hljs-string">'icon item'</span>,
+              onclick: ctrl.getPreviousPage
+            }, [
+              m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'left arrow icon'</span> })
+            ]),
+          ];
+          <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> pi = <span class="hljs-number">1</span>; pi &lt;= ctrl.numberOfPages; pi++) {
+            <span class="hljs-keyword">if</span> (pi === ctrl.currentPage()) {
+              pagesDom.push(m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'disabled item'</span> }, pi));
+            } <span class="hljs-keyword">else</span> {
+              pagesDom.push(m(<span class="hljs-string">'a.item'</span>, {
+                onclick: ctrl.setCurrentPage.bind(<span class="hljs-literal">null</span>, pi)
+              }, pi));
+            }
+          }
+          pagesDom.push(m(<span class="hljs-string">'a'</span>, {
+            <span class="hljs-keyword">class</span>: <span class="hljs-string">'icon item'</span>,
+            onclick: ctrl.getNextPage
+          }, [
+            m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'right arrow icon'</span> })
+          ]));
+        }
+        <span class="hljs-keyword">return</span> m(<span class="hljs-string">'p'</span>, [
+          m(<span class="hljs-string">'ul'</span>, {
+            id: <span class="hljs-string">'contacts'</span>,
+            <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui one items'</span>
+            }, itemsDom),
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui pagination menu'</span> }, pagesDom)
+        ]);
+      }).call(<span class="hljs-keyword">this</span>);
+      <span class="hljs-keyword">this</span>.contextMenuContent = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+        <span class="hljs-keyword">var</span> searchBox = {
+          head: m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'header item'</span> }, l(<span class="hljs-string">'GLOBAL_SEARCH'</span>)),
+          content: m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'item'</span> }, [
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui small icon input'</span> }, [
+              m(<span class="hljs-string">'input'</span>, {
+                type: <span class="hljs-string">'search'</span>,
+                placeholder: l(<span class="hljs-string">'TYPE_HERE'</span>),
+                title: l(<span class="hljs-string">'SEARCH_ERROR_TOO_SHORT'</span>),
+                oninput: ctrl.search
+              }),
+              m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'unhide icon'</span> })
+            ])
+          ])
+        };
+
+        <span class="hljs-keyword">var</span> activeFilter = (window.location.hash.indexOf(<span class="hljs-string">'filter'</span>) !== -<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">var</span> tagsIconAttrs = { <span class="hljs-keyword">class</span>: <span class="hljs-string">'tags icon'</span> };
+        <span class="hljs-keyword">var</span> tagsClass = <span class="hljs-string">''</span>;
+        <span class="hljs-keyword">if</span> (activeFilter) {
+          tagsIconAttrs = { <span class="hljs-keyword">class</span>: <span class="hljs-string">'eraser icon'</span>, title: l(<span class="hljs-string">'FILTERS_REMOVE'</span>) };
+          tagsClass = <span class="hljs-string">' active'</span>;
+        }
+        <span class="hljs-keyword">var</span> filtersBox = {
+          head: m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'header item'</span> }, l(<span class="hljs-string">'FILTERS'</span>)),
+          groups: m(<span class="hljs-string">'a'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'item'</span> }, [
+            m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'users icon'</span> }),
+            l(<span class="hljs-string">'BY_GROUPS'</span>)
+          ]),
+          tags: m(<span class="hljs-string">'div'</span>, [
+            m(<span class="hljs-string">'a'</span>, {
+              <span class="hljs-keyword">class</span>: <span class="hljs-string">'item'</span> + tagsClass,
+              href: <span class="hljs-string">'#/contact/list'</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>config: m.route</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            }, [
+              m(<span class="hljs-string">'i'</span>, tagsIconAttrs),
+              l(<span class="hljs-string">'BY_TAGS'</span>)
+            ]),
+            m(<span class="hljs-string">'a'</span>, contact.data.tags.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+              <span class="hljs-keyword">var</span> items = [
+                tag.key[<span class="hljs-number">1</span>],
+                m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui small teal label'</span> }, tag.value)
+              ];
+              <span class="hljs-keyword">var</span> classTag = <span class="hljs-string">''</span>;
+              <span class="hljs-keyword">var</span> searchURI = <span class="hljs-built_in">decodeURI</span>(window.location.hash);
+              <span class="hljs-keyword">if</span> (searchURI.indexOf(tag.key[<span class="hljs-number">1</span>]) !== -<span class="hljs-number">1</span>) {
+                classTag = <span class="hljs-string">' active'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p>items.push(m(‘i’, { class: ‘edit icon’ }));</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>              }
+              <span class="hljs-keyword">return</span> m(<span class="hljs-string">'a'</span>, {
+                  <span class="hljs-keyword">class</span>: <span class="hljs-string">'item'</span> + classTag,
+                  href: <span class="hljs-string">'#/contact/list/filter/tag/'</span> + tag.key[<span class="hljs-number">1</span>],</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>config: m.route</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                }, items);
+            })
+            )
+          ])
+        };
+        <span class="hljs-keyword">return</span> m(<span class="hljs-string">'nav'</span>, [
+          m(<span class="hljs-string">'menu'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui small vertical menu'</span> }, [
+            searchBox.head,
+            searchBox.content,
+            filtersBox.head,
+            filtersBox.tags
+          ])
+        ]);
+      }).call(<span class="hljs-keyword">this</span>);
+      <span class="hljs-keyword">return</span> golem.view.call(<span class="hljs-keyword">this</span>, ctrl);
+    }
+  };
+
+  contact.modules.show = {
+    controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">var</span> l = golem.utils.locale;
+      golem.controller.call(<span class="hljs-keyword">this</span>);
+      <span class="hljs-keyword">var</span> key = m.route.param(<span class="hljs-string">'contactId'</span>);
+      m.startComputation();
+      golem.model.db.get(key, (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, res)</span> {</span>
+        <span class="hljs-keyword">this</span>.contact = res;
+        document.title = <span class="hljs-keyword">this</span>.docTitle + l(<span class="hljs-string">'CONTACTS_DETAIL'</span>) +
+          contact.model.fullname(<span class="hljs-keyword">this</span>.contact);
+        <span class="hljs-keyword">var</span> cmi = contact.data.menuItems;
+        [<span class="hljs-string">'show'</span>, <span class="hljs-string">'edit'</span>, <span class="hljs-string">'remove'</span>].forEach((<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(v)</span> {</span>
+          cmi[v].url = cmi[v].baseUrl + <span class="hljs-string">'/'</span> + <span class="hljs-keyword">this</span>.contact._id;
+        }).bind(<span class="hljs-keyword">this</span>));
+        <span class="hljs-keyword">this</span>.secondaryMenu.replace([
+          cmi.list, cmi.add, cmi.show, cmi.edit, cmi.remove
+        ]);
+        m.endComputation();
+      }).bind(<span class="hljs-keyword">this</span>));
+    },
+    view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+      <span class="hljs-keyword">var</span> l = golem.utils.locale;
+      <span class="hljs-keyword">var</span> c = ctrl.contact;
+      <span class="hljs-keyword">var</span> format = {
+        <span class="hljs-keyword">default</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
+          <span class="hljs-keyword">if</span> (def) {
+            <span class="hljs-keyword">return</span> m(<span class="hljs-string">'span'</span>, [
+              m(<span class="hljs-string">'i'</span>, {
+                <span class="hljs-keyword">class</span>: <span class="hljs-string">'checkmark icon green'</span>,
+                title: l(<span class="hljs-string">'DEFAULT'</span>)
+                }
+              )
+            ]);
+          }
+        },
+        tels: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> {</span>
+          <span class="hljs-keyword">return</span> m(<span class="hljs-string">'li'</span>, [
+            item.label + <span class="hljs-string">' : '</span>,
+            m(<span class="hljs-string">'a'</span>, { href: <span class="hljs-string">'tel:'</span> + item.value },
+              item.value.match(<span class="hljs-regexp">/\d{2}/g</span>).join(<span class="hljs-string">'.'</span>)),
+            format.default(item.default)
+          ]);
+        },
+        mails: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> {</span>
+          <span class="hljs-keyword">return</span> m(<span class="hljs-string">'li'</span>, [
+            item.label + <span class="hljs-string">' : '</span>,
+            m(<span class="hljs-string">'a'</span>, { href: <span class="hljs-string">'mailto:'</span> + item.value }, item.value),
+            format.default(item.default)
+          ]);
+        },
+        www: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> {</span>
+          <span class="hljs-keyword">return</span> m(<span class="hljs-string">'li'</span>, [ m(<span class="hljs-string">'a'</span>, { href: item }, item) ]);
+        }
+      };
+      <span class="hljs-keyword">var</span> groupsBox = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+        <span class="hljs-keyword">if</span> (c.groups.length === <span class="hljs-number">0</span>) {
+          <span class="hljs-keyword">return</span> m(<span class="hljs-string">'p'</span>, l(<span class="hljs-string">'GROUPS_NONE'</span>));
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> m(<span class="hljs-string">'p'</span>, [
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui green label'</span>}, l(<span class="hljs-string">'MENU_GROUPS'</span>)),
+            m(<span class="hljs-string">'ul'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui horizontal bulleted list'</span> }, c.groups.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(group)</span> {</span>
+              <span class="hljs-keyword">return</span> m(<span class="hljs-string">'li'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'item'</span> }, group);
+            }))
+          ]);
+        }
+      }).call();
+      <span class="hljs-keyword">var</span> multiBox = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(items, header, formatFn)</span> {</span>
+        <span class="hljs-keyword">if</span> (items.length &gt; <span class="hljs-number">0</span>) {
+          <span class="hljs-keyword">return</span> m(<span class="hljs-string">'div'</span>, [
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui black label'</span> }, header),
+            m(<span class="hljs-string">'ul'</span>, items.map(formatFn))
+          ]);
+        }
+      };
+      <span class="hljs-keyword">this</span>.mainContent = m(<span class="hljs-string">'section'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui piled segment'</span> }, [
+        m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui floated right basic segment'</span> },
+          c.tags.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+            <span class="hljs-keyword">return</span> m(<span class="hljs-string">'a'</span>, {
+                <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui small teal label golem-tag'</span>,
+                href: <span class="hljs-string">'#/contact/list/filter/tag/'</span> + tag,
+                title: l(<span class="hljs-string">'CONTACTS_BY_TAGS'</span>),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <p>config: m.route</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>              }, [
+              m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'tag icon'</span> }),
+              tag
+            ]);
+          })
+        ),
+        m(<span class="hljs-string">'h2'</span>, contact.model.fullname(c)),
+        m(<span class="hljs-string">'p'</span>, m.trust(c.note)),
+        m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui two column grid'</span> }, [
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'column'</span> }, [
+            m(<span class="hljs-string">'p'</span>, [
+              m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui label'</span> }, l(<span class="hljs-string">'CONTACT_DETAILS'</span>)),
+              m(<span class="hljs-string">'div'</span>, contact.model.fulladdress(c))
+            ]),
+            m(<span class="hljs-string">'div'</span>, groupsBox)
+          ]),
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'column'</span> }, [
+            m(<span class="hljs-string">'p'</span>, [
+              multiBox(c.tels, l(<span class="hljs-string">'TELS'</span>), format.tels),
+              multiBox(c.mails, l(<span class="hljs-string">'MAILS'</span>), format.mails),
+              multiBox(c.www, l(<span class="hljs-string">'WWW'</span>), format.www)
+            ])
+          ])
+        ])
+      ]);
+      <span class="hljs-keyword">return</span> golem.view.call(<span class="hljs-keyword">this</span>, ctrl);
+    }
+  };
+
+  contact.modules.form = {
+    controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <p>Init</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> l = golem.utils.locale;
+      golem.controller.call(<span class="hljs-keyword">this</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
+              </div>
+              <p>Menus</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> cmi = contact.data.menuItems;
+      <span class="hljs-keyword">this</span>.secondaryMenu.replace([ cmi.list, cmi.add ]);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <p>Model</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> key = m.route.param(<span class="hljs-string">'contactId'</span>);
+      m.startComputation();
+      contact.data.getTags((<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+        golem.model.db.get(key, (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, res)</span> {</span>
+          <span class="hljs-keyword">this</span>.contact = res;
+          <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.contact) {
+            <span class="hljs-keyword">this</span>.add = <span class="hljs-literal">true</span>;
+            <span class="hljs-keyword">this</span>.contact = contact.model.create({
+              firstname: <span class="hljs-string">''</span>,
+              lastname: <span class="hljs-string">''</span>
+            });
+          } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">this</span>.add = <span class="hljs-literal">false</span>;
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-48">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p>Widgets</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">this</span>.telsWidget = <span class="hljs-keyword">new</span> form.multiFieldWidget.controller({
+            label: l(<span class="hljs-string">'TELS'</span>),
+            name: <span class="hljs-string">'tels'</span>,
+            maxlength: <span class="hljs-number">10</span>,
+            size: <span class="hljs-number">15</span>,
+            radioField: <span class="hljs-literal">true</span>,
+            labelField: <span class="hljs-literal">true</span>,
+            placeholder: l(<span class="hljs-string">'TEL_PLACEHOLDER'</span>),
+            content: l(<span class="hljs-string">'INFO_FORM_TELS'</span>),
+            current: <span class="hljs-keyword">this</span>.contact.tels
+          });
+          <span class="hljs-keyword">this</span>.mailsWidget = <span class="hljs-keyword">new</span> form.multiFieldWidget.controller({
+            type: <span class="hljs-string">'email'</span>,
+            label: l(<span class="hljs-string">'MAILS'</span>),
+            name: <span class="hljs-string">'mails'</span>,
+            size: <span class="hljs-number">25</span>,
+            radioField: <span class="hljs-literal">true</span>,
+            labelField: <span class="hljs-literal">true</span>,
+            placeholder: l(<span class="hljs-string">'MAIL_PLACEHOLDER'</span>),
+            content: l(<span class="hljs-string">'INFO_FORM_MAILS'</span>),
+            current: <span class="hljs-keyword">this</span>.contact.mails
+          });
+          <span class="hljs-keyword">this</span>.wwwWidget = <span class="hljs-keyword">new</span> form.multiFieldWidget.controller({
+            type: <span class="hljs-string">'url'</span>,
+            label: l(<span class="hljs-string">'WWW'</span>),
+            name: <span class="hljs-string">'www'</span>,
+            placeholder: l(<span class="hljs-string">'WWW_PLACEHOLDER'</span>),
+            content: l(<span class="hljs-string">'INFO_FORM_WWW'</span>),
+            current: <span class="hljs-keyword">this</span>.contact.www
+          });
+          <span class="hljs-keyword">this</span>.tagWidget = <span class="hljs-keyword">new</span> form.tagWidget.controller({
+            name: <span class="hljs-string">'tags'</span>,
+            label: l(<span class="hljs-string">'MENU_TAGS'</span>),
+            placeholder: l(<span class="hljs-string">'TAGS_PLACEHOLDER'</span>),
+            content: l(<span class="hljs-string">'INFO_FORM_TAGS'</span>),
+            size: <span class="hljs-number">25</span>,
+            tags: contact.data.tags.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span> <span class="hljs-keyword">return</span> tag.key[<span class="hljs-number">1</span>]; }),
+            current: <span class="hljs-keyword">this</span>.contact.tags
+          });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <p>Add or edit</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.add) {
+            document.title = <span class="hljs-keyword">this</span>.docTitle + l(<span class="hljs-string">'CONTACTS_NEW'</span>);
+          } <span class="hljs-keyword">else</span> {
+            document.title = <span class="hljs-keyword">this</span>.docTitle + l(<span class="hljs-string">'CONTACTS_EDIT'</span>) +
+              contact.model.fullname(<span class="hljs-keyword">this</span>.contact);
+            [<span class="hljs-string">'show'</span>, <span class="hljs-string">'edit'</span>, <span class="hljs-string">'remove'</span>].forEach((<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(v)</span> {</span>
+              cmi[v].url = cmi[v].baseUrl + <span class="hljs-string">'/'</span> + <span class="hljs-keyword">this</span>.contact._id;
+            }).bind(<span class="hljs-keyword">this</span>));
+            <span class="hljs-keyword">this</span>.secondaryMenu.items.splice(<span class="hljs-number">2</span>, <span class="hljs-number">0</span>,
+              cmi.show, cmi.edit, cmi.remove);
+          }
+          m.endComputation();
+        }).bind(<span class="hljs-keyword">this</span>));
+      }).bind(<span class="hljs-keyword">this</span>));</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>Methods</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">this</span>.submit = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> {</span>
+        e.preventDefault();
+        <span class="hljs-keyword">var</span> _submit = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(verb)</span> {</span>
+          golem.model.db[verb](<span class="hljs-keyword">this</span>.contact, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, res)</span> {</span>
+            golem.utils.sendNotification(
+              l(<span class="hljs-string">'SUCCESS'</span>),
+              { body: l(<span class="hljs-string">'SUCCESS_UPDATE'</span>) },
+              m.route.bind(<span class="hljs-literal">null</span>, <span class="hljs-string">'/contact/list'</span>)
+            );
+          });
+        }).bind(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">var</span> verb = <span class="hljs-keyword">this</span>.contact_id ? <span class="hljs-string">'put'</span> : <span class="hljs-string">'post'</span>;
+        _submit(verb);
+      }).bind(<span class="hljs-keyword">this</span>);
+    },
+    view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+      <span class="hljs-keyword">var</span> l = golem.utils.locale;
+      <span class="hljs-keyword">var</span> c = ctrl.contact;
+      <span class="hljs-keyword">var</span> h2 = ctrl.add ? l(<span class="hljs-string">'CONTACTS_NEW'</span>) : l(<span class="hljs-string">'CONTACTS_EDIT'</span>) + <span class="hljs-string">' '</span> + contact.model.fullname(c);
+      <span class="hljs-keyword">this</span>.mainContent = m(<span class="hljs-string">'section'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui piled segment'</span> }, [
+        m(<span class="hljs-string">'h2'</span>, h2),
+        m(<span class="hljs-string">'form'</span>, {
+          id: <span class="hljs-string">'contact-form'</span>,
+          <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui small form'</span>,
+          onsubmit: ctrl.submit.bind(ctrl) }, [
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'two fields'</span> }, [
+            form.textHelper({
+              name: <span class="hljs-string">'lastname'</span>,
+              label: l(<span class="hljs-string">'LASTNAME'</span>),
+              minlength: <span class="hljs-number">2</span>,
+              maxlength: <span class="hljs-number">100</span>,
+              required: <span class="hljs-literal">true</span>,
+              value: c.lastname,
+              onchange: m.withAttr(<span class="hljs-string">'value'</span>,
+                <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(v)</span> {</span> c.lastname = v; })
+            }),
+            form.textHelper({
+              name: <span class="hljs-string">'firstname'</span>,
+              label: l(<span class="hljs-string">'FIRSTNAME'</span>),
+              minlength: <span class="hljs-number">2</span>,
+              maxlength: <span class="hljs-number">100</span>,
+              required: <span class="hljs-literal">true</span>,
+              value: c.firstname,
+              onchange: m.withAttr(<span class="hljs-string">'value'</span>,
+                <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(v)</span> {</span> c.firstname = v; })
+            })
+          ]),
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'three fields'</span> }, [
+            form.textHelper({
+              name: <span class="hljs-string">'address'</span>,
+              label: l(<span class="hljs-string">'ADDRESS'</span>),
+              value: c.address,
+              onchange: m.withAttr(<span class="hljs-string">'value'</span>,
+                <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(v)</span> {</span> c.address = v; })
+            }),
+            form.textHelper({
+              name: <span class="hljs-string">'postalCode'</span>,
+              label: l(<span class="hljs-string">'POSTAL_CODE'</span>),
+              value: c.postalCode,
+              onchange: m.withAttr(<span class="hljs-string">'value'</span>,
+                <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(v)</span> {</span> c.postalCode = v; })
+            }),
+            form.textHelper({
+              name: <span class="hljs-string">'city'</span>,
+              label: l(<span class="hljs-string">'CITY'</span>),
+              value: c.city,
+              onchange: m.withAttr(<span class="hljs-string">'value'</span>,
+                <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(v)</span> {</span> c.city = v; })
+            })
+          ]),
+          m(<span class="hljs-string">'div'</span>, [
+            <span class="hljs-keyword">new</span> form.multiFieldWidget.view(ctrl.telsWidget),
+            <span class="hljs-keyword">new</span> form.multiFieldWidget.view(ctrl.mailsWidget)
+          ]),
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'two fields'</span> }, [
+            <span class="hljs-keyword">new</span> form.multiFieldWidget.view(ctrl.wwwWidget),
+            <span class="hljs-keyword">new</span> form.tagWidget.view(ctrl.tagWidget),
+          ]),
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'field'</span> }, [
+            m(<span class="hljs-string">'label'</span>, { <span class="hljs-keyword">for</span>: <span class="hljs-string">'note'</span> }, l(<span class="hljs-string">'NOTE'</span>)),
+            m(<span class="hljs-string">'textarea'</span>, {
+                name: <span class="hljs-string">'note'</span>,
+                onchange: m.withAttr(<span class="hljs-string">'value'</span>,
+                  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(v)</span> {</span> c.note = v; })
+              }, c.note)
+          ]),
+          m(<span class="hljs-string">'input'</span>, {
+              id: <span class="hljs-string">'contact-submit'</span>,
+              <span class="hljs-keyword">class</span>:<span class="hljs-string">'ui teal submit button'</span>,
+              type: <span class="hljs-string">'submit'</span>,
+              form: <span class="hljs-string">'contact-form'</span>,
+              value: ctrl.add ? l(<span class="hljs-string">'SAVE'</span>) : l(<span class="hljs-string">'UPDATE'</span>)
+          }),
+          m(<span class="hljs-string">'button'</span>, {
+              name: <span class="hljs-string">'cancel'</span>,
+              <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui button'</span>,
+              type: <span class="hljs-string">'button'</span>,
+              onclick: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span> 
+                window.location.hash = <span class="hljs-string">'#/contact/list'</span>;
+              }
+            }, l(<span class="hljs-string">'CANCEL'</span>))
+        ])
+      ]);
+      <span class="hljs-keyword">this</span>.contextMenuContent = m(<span class="hljs-string">'nav'</span>, [
+        m(<span class="hljs-string">'menu'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui buttons fixed-right'</span> }, [
+          m(<span class="hljs-string">'input'</span>, {
+            <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui fluid teal submit button'</span>,
+            type: <span class="hljs-string">'submit'</span>,
+            value: ctrl.add ? l(<span class="hljs-string">'SAVE'</span>) : l(<span class="hljs-string">'UPDATE'</span>),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-51">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <p>FIXME : here’s a hack, to fix properly</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            onclick: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+              document.getElementById(<span class="hljs-string">'contact-submit'</span>).click();
+            }
+          }),
+          m(<span class="hljs-string">'div'</span>, {
+            role: <span class="hljs-string">'button'</span>,
+          <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui fluid button'</span>,
+          onclick: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> {</span> window.location = <span class="hljs-string">'#/contact/list'</span>; }
+          }, l(<span class="hljs-string">'CANCEL'</span>))
+        ])
+      ]);
+      <span class="hljs-keyword">return</span> golem.view.call(<span class="hljs-keyword">this</span>, ctrl);
+    }
+  };
+
+  contact.modules.remove = {
+    controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">var</span> l = golem.utils.locale;
+      golem.controller.call(<span class="hljs-keyword">this</span>);
+      <span class="hljs-keyword">var</span> key = m.route.param(<span class="hljs-string">'contactId'</span>);
+      m.startComputation();
+      golem.model.db.get(key, (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, res)</span> {</span>
+        <span class="hljs-keyword">this</span>.contact = res;
+        document.title = <span class="hljs-keyword">this</span>.docTitle + l(<span class="hljs-string">'CONTACTS_REMOVE'</span>) +
+          contact.model.fullname(<span class="hljs-keyword">this</span>.contact);
+        <span class="hljs-keyword">this</span>.removeModalCtrl = <span class="hljs-keyword">new</span> widgets.modal.controller({
+          active: <span class="hljs-literal">true</span>,
+          title: l(<span class="hljs-string">'SURE'</span>),
+          content: l(<span class="hljs-string">'CONTACTS_REMOVE_CONFIRM_MSG'</span>),
+          acceptFn: (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+            golem.model.db.remove(<span class="hljs-keyword">this</span>.contact, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, res)</span> {</span>
+              m.route(<span class="hljs-string">'/contact/list'</span>);
+            });
+          }).bind(<span class="hljs-keyword">this</span>),
+          cancelFn: (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+            <span class="hljs-keyword">this</span>.removeModalCtrl.toggle();
+            m.route(<span class="hljs-string">'/contact/list'</span>);
+          }).bind(<span class="hljs-keyword">this</span>)
+        });
+        m.endComputation();
+      }).bind(<span class="hljs-keyword">this</span>));
+    },
+    view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+      <span class="hljs-keyword">this</span>.mainContent = <span class="hljs-keyword">new</span> widgets.modal.view(ctrl.removeModalCtrl);
+      <span class="hljs-keyword">return</span> golem.view.call(<span class="hljs-keyword">this</span>, ctrl);
+    }
+  };
+
+  contact.modules.tags = {
+    controller: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">var</span> l = golem.utils.locale;
+      golem.controller.call(<span class="hljs-keyword">this</span>);
+      <span class="hljs-keyword">var</span> cmi = contact.data.menuItems;
+      <span class="hljs-keyword">this</span>.secondaryMenu.replace([ cmi.list, cmi.add, cmi.tags ]);
+      document.title = <span class="hljs-keyword">this</span>.docTitle + l(<span class="hljs-string">'TAGS_MANAGEMENT'</span>);
+      <span class="hljs-keyword">this</span>.tags = [];
+      m.startComputation();
+      contact.data.getTags((<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, res)</span> {</span>
+        <span class="hljs-keyword">this</span>.tags = res.rows.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+          <span class="hljs-keyword">return</span> tag.key[<span class="hljs-number">1</span>];
+        });
+        m.endComputation();
+      }).bind(<span class="hljs-keyword">this</span>));
+      <span class="hljs-keyword">this</span>._updateTag = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(input, removal)</span> {</span>
+        m.startComputation();
+        <span class="hljs-keyword">var</span> oldVal = input.getAttribute(<span class="hljs-string">'data-value'</span>);
+        <span class="hljs-keyword">var</span> newVal;
+        <span class="hljs-keyword">if</span> (removal) {
+          newVal = <span class="hljs-literal">false</span>;
+        } <span class="hljs-keyword">else</span> {
+          newVal = input.value;
+          <span class="hljs-keyword">if</span> (newVal.length === <span class="hljs-number">0</span>) {
+            input.value = oldVal;
+            <span class="hljs-keyword">return</span>;
+          }
+        }
+        golem.model.db.query(<span class="hljs-string">'tags/count'</span>, {
+          reduce: <span class="hljs-literal">false</span>,
+          key: [<span class="hljs-string">'contact'</span>, oldVal],
+          include_docs: <span class="hljs-literal">true</span>
+        }, (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, res)</span> {</span>
+          <span class="hljs-keyword">var</span> docs = [];
+          res.rows.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(row)</span> {</span>
+            <span class="hljs-keyword">var</span> idx = row.doc.tags.indexOf(oldVal);
+            <span class="hljs-keyword">if</span> (newVal) {
+              row.doc.tags[idx] = newVal;
+            } <span class="hljs-keyword">else</span> {
+              row.doc.tags.splice(idx, <span class="hljs-number">1</span>);
+            }
+            docs.push(row.doc);
+          });
+          golem.model.db.bulkDocs(docs, (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, res)</span> {</span>
+            golem.utils.sendNotification(
+              l(<span class="hljs-string">'SUCCESS'</span>),
+              { body: l(<span class="hljs-string">'SUCCESS_UPDATE'</span>) },
+              (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+                <span class="hljs-keyword">if</span> (!newVal) {
+                  <span class="hljs-keyword">var</span> tagsIdx = <span class="hljs-keyword">this</span>.tags.indexOf(oldVal);
+                  <span class="hljs-keyword">this</span>.tags.splice(tagsIdx, <span class="hljs-number">1</span>); 
+                  <span class="hljs-keyword">this</span>.removeModalCtrl.toggle();
+                }
+                m.endComputation();
+              }).bind(<span class="hljs-keyword">this</span>)
+            );
+          }).bind(<span class="hljs-keyword">this</span>));
+        }).bind(<span class="hljs-keyword">this</span>));
+      }).bind(<span class="hljs-keyword">this</span>);
+      <span class="hljs-keyword">this</span>.updateTagFromClick = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> {</span>
+        <span class="hljs-keyword">var</span> input = e.target.parentElement.parentElement.children[<span class="hljs-number">0</span>].children[<span class="hljs-number">0</span>];
+        <span class="hljs-keyword">this</span>._updateTag(input);
+      }).bind(<span class="hljs-keyword">this</span>);
+      <span class="hljs-keyword">var</span> input = <span class="hljs-literal">null</span>;
+      <span class="hljs-keyword">this</span>.removeModalCtrl = <span class="hljs-keyword">new</span> widgets.modal.controller({
+        title: l(<span class="hljs-string">'SURE'</span>),
+        content: l(<span class="hljs-string">'TAGS_DELETE_CONFIRM_MSG'</span>),
+        acceptFn: (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+          <span class="hljs-keyword">this</span>._updateTag(input, <span class="hljs-literal">true</span>);
+        }).bind(<span class="hljs-keyword">this</span>)
+      });
+      <span class="hljs-keyword">this</span>.removeTag = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> {</span>
+        input = e.target.parentElement.parentElement.children[<span class="hljs-number">0</span>].children[<span class="hljs-number">0</span>];
+        <span class="hljs-keyword">this</span>.removeModalCtrl.toggle();
+      }).bind(<span class="hljs-keyword">this</span>);
+    },
+    view: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ctrl)</span> {</span>
+      <span class="hljs-keyword">var</span> l = golem.utils.locale;
+      <span class="hljs-keyword">this</span>.mainContent = m(<span class="hljs-string">'section'</span>, [
+        m(<span class="hljs-string">'h2'</span>, l(<span class="hljs-string">'TAGS_MANAGEMENT'</span>)),
+        m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui grid'</span> }, [
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ten wide column'</span>}, [
+            m(<span class="hljs-string">'ul'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui bulleted list'</span> }, ctrl.tags.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+              <span class="hljs-keyword">return</span> m(<span class="hljs-string">'li'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'item golem-tag'</span> }, [
+                m(<span class="hljs-string">'span'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui small input'</span> }, [
+                  m(<span class="hljs-string">'input'</span>, {
+                    size: <span class="hljs-number">10</span>,
+                    value: tag,
+                    <span class="hljs-string">'data-value'</span>: tag
+                  })
+                ]),
+                m(<span class="hljs-string">'span'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui buttons'</span> }, [
+                  m(<span class="hljs-string">'button'</span>, {
+                    type:<span class="hljs-string">'button'</span>,
+                    <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui tiny blue button'</span>,
+                    onclick: ctrl.updateTagFromClick
+                  }, l(<span class="hljs-string">'RENAME'</span>)),
+                  m(<span class="hljs-string">'span.or'</span>),
+                  m(<span class="hljs-string">'button'</span>, {
+                    type:<span class="hljs-string">'button'</span>,
+                    <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui tiny red button'</span>,
+                    onclick: ctrl.removeTag
+                  }, l(<span class="hljs-string">'DELETE'</span>))
+                ])
+              ]);
+            }))
+          ]),
+          m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'six wide column'</span> }, [
+            m(<span class="hljs-string">'div'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'ui purple inverted segment'</span> }, [
+              m(<span class="hljs-string">'h3'</span>, [
+                m(<span class="hljs-string">'i'</span>, { <span class="hljs-keyword">class</span>: <span class="hljs-string">'info icon'</span> }),
+                m(<span class="hljs-string">'span'</span>, l(<span class="hljs-string">'HELP'</span>))
+              ]),
+              m(<span class="hljs-string">'p'</span>, m.trust(l(<span class="hljs-string">'TAGS_MANAGEMENT_HELP_MSG'</span>)))
+            ])
+          ])
+        ]),
+        <span class="hljs-keyword">new</span> widgets.modal.view(ctrl.removeModalCtrl)
+      ]);
+      <span class="hljs-keyword">return</span> golem.view.call(<span class="hljs-keyword">this</span>, ctrl);
+    }
+  };
+
+  contact.data.getTags = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(callback)</span> {</span>
+    golem.model.db.query(
+      <span class="hljs-string">'tags/count'</span>,
+      {
+        group: <span class="hljs-literal">true</span>,
+        startKey: [<span class="hljs-string">'contact'</span>],
+        endKey: [<span class="hljs-string">'contact'</span>, {}]
+      },
+      <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, res)</span> {</span>
+        contact.data.tags = res.rows;
+        contact.data.tags.sort(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(a, b)</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
+              </div>
+              <p>Sort by value DESC</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">return</span> b.value - a.value;
+        });
+        callback(err, res);
+      }
+    );
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-53">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-53">&#182;</a>
+              </div>
+              <p>TODO : remove &amp; edit tag (contenteditable on click ?)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  contact.data.tags = [];
+  <span class="hljs-comment">/*
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              <p>FIXME: falsy, don’t update in case of removes</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  contact.tags = (function () {
+    var _tags = {};
+    contact.data.items.forEach(function (c) {
+      c.tags.forEach(function (tag) {
+        if (!_tags[tag]) {
+          _tags[tag] = 1;
+        } else {
+          _tags[tag] += 1;
+        }
+      });
+    });
+    return _tags;
+  }).call();
+  */
+
+  contact.data.labels = (function () {
+    var _labels = { tels: [], mails: [] };
+    contact.data.items.forEach(function (c) {
+      c.tels.forEach(function (tel) {
+        if (_labels.tels.indexOf(tel.label) === -1) {
+        _labels.tels.push(tel.label);
+        }
+      });
+      c.mails.forEach(function (mail) {
+        if (_labels.mails.indexOf(mail.label) === -1) {
+        _labels.mails.push(mail.label);
+        }
+      });
+    });
+    return _labels;
+  }).call();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p>End of FIXME</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+  <span class="hljs-comment">/*var menus
+  window.onhashchange = function () {
+    menus.foreach(function (m) {
+      m.render();
+    });
+  };*/</span>
+
+  window.onload = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-56">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-56">&#182;</a>
+              </div>
+              <p>Database</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> db = golem.model.db;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
+              </div>
+              <p>TMP DEV : Repopulate at launch…
+db.destroy(function () {
+ golem.model.db = new PouchDB(‘golem’);
+ db = golem.model.db;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      window.db = db;
+      db.allDocs(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, response)</span> {</span>
+        <span class="hljs-keyword">if</span> (err || response.rows.length === <span class="hljs-number">0</span>) {
+          db.bulkDocs(contact.data.items, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, response)</span> {</span>
+            <span class="hljs-keyword">var</span> gmq = golem.model.queries;
+            <span class="hljs-keyword">var</span> queries = [gmq.all, gmq.tags];
+            db.bulkDocs(queries, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, response)</span> {</span>
+              init();
+            });
+          });
+        } <span class="hljs-keyword">else</span> {
+          init();
+        }
+      });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-58">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-58">&#182;</a>
+              </div>
+              <p>});</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> init = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-59">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-59">&#182;</a>
+              </div>
+              <p>Routing</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      m.route.mode = <span class="hljs-string">'hash'</span>;
+      m.route(document.body, <span class="hljs-string">'/'</span>, {
+        <span class="hljs-string">'/'</span>: golem,
+        <span class="hljs-string">'/contact'</span>: contact.modules.list,
+        <span class="hljs-string">'/contact/list'</span>: contact.modules.list,
+        <span class="hljs-string">'/contact/list/filter/tag/:tag'</span>: contact.modules.list,
+        <span class="hljs-string">'/contact/tags'</span>: contact.modules.tags,
+        <span class="hljs-string">'/contact/show/:contactId'</span>: contact.modules.show,
+        <span class="hljs-string">'/contact/add'</span>: contact.modules.form,
+        <span class="hljs-string">'/contact/edit/:contactId'</span>: contact.modules.form,
+        <span class="hljs-string">'/contact/remove/:contactId'</span>: contact.modules.remove
+      });
+    };
+  };
+}).call(<span class="hljs-keyword">this</span>);</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

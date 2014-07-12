@@ -1,0 +1,28 @@
+{
+  "name": "golem",
+  "version": "0.0.1",
+  "privat": "true",
+  "description": "GOLEM signifie Gestion, Organisation Libres Et Modulaires. It can mean Good Old and Libre Entity Management or Group Organization with Libre, Especially Modular software.",
+  "main": "golem.js",
+  "scripts": {
+    "copy": "./scripts/copy.sh",
+    "lint": "jshint ./public/scripts/*.js",
+    "doc": "docco -o doc ./public/scripts/*.js",
+    "test": "node ./tests/*.js",
+    "default": "npm run copy && npm run lint"
+  },
+  "keywords": [
+    "webapp"
+  ],
+  "author": "Fabien Bourgeois",
+  "license": "MPL",
+  "dependencies": {
+    "express": "^4.1.0",
+    "validate.js": "^0.2.0"
+  },
+  "devDependencies": {
+    "docco": "^0.6.3",
+    "jshint": "^2.5.0",
+    "sink-test": "^1.0.2"
+  }
+}

@@ -1,0 +1,78 @@
+header img {
+  margin: 1%
+}
+
+#main-menu a.disabled {
+  color: #ccc;
+}
+
+nav ul, nav menu {
+  padding-left: 0;
+}
+
+ul#contacts > li {
+  min-height: 0%;
+  margin-left: 0%;
+  margin-bottom: 2%;
+}
+
+ul#contacts a {
+  text-decoration: none;
+  color: #157FCC;
+}
+
+fieldset {
+  border: 0;
+}
+
+div.multitext {
+  margin-top: 3% !important;
+}
+
+.multitext .field {
+  margin-bottom: 0 !important;
+}
+
+div.tagfield div.action {
+  margin-left: 3% !important;
+  width: 70% !important;
+  display: inline-table !important;
+}
+
+div.tagfield p div {
+  margin: 1% !important;
+}
+
+.golem-tag {
+  text-transform: none !important;
+}
+
+li.golem-tag span.buttons {
+  margin-left: 3% !important;
+}
+
+div.helper {
+  margin: 0 !important;
+  max-width: none !important;
+  top: -3em !important;
+  left: 8em !important;
+}
+
+div.helper i.close {
+  float: right;
+  cursor: pointer;
+}
+
+li.contact div.content {
+  cursor: auto !important;
+}
+
+.ui.buttons .or:before {
+  content: 'ou';
+  /* Localization problem */
+}
+
+menu.fixed-right {
+  position: fixed;
+  margin-right: 1%;
+}
