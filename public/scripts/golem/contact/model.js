@@ -1,21 +1,13 @@
 (function () {
-  golem.module.contact.model = {
+  var gm = golem.module;
+  gm.contact.model = {
     create: function (props) {
-      return {
-        schema: 'contact',
-        creationDate: Date.now(),
-        firstname: props.firstname || '',
-        lastname: props.lastname || '',
-        address: props.address || '',
-        postalCode: props.postalCode || '',
-        city: props.city || '',
-        note: props.note || '',
-        tels: props.tels || [],
-        mails: props.mails || [],
-        www: props.www || [],
-        tags: props.tags || [],
-        groups: props.groups || []
-      };
+      var contact = gm.family.model.create(props);
+      contact.schema = 'contact';
+      contact.firstname = props.firstname || '';
+      contact.tags = props.tags || [];
+      delete contact.movements;
+      return contact;
     },
     fullname: function (c) {
       return c.firstname + ' ' + c.lastname;

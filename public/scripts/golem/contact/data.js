@@ -94,6 +94,7 @@
   };
   contact.data.tags = [];
 
+  // TODO: make it like tags : from database
   contact.data.labels = (function () {
     var _labels = { tels: [], mails: [] };
     contact.data.items.forEach(function (c) {

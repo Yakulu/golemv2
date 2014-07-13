@@ -47,9 +47,10 @@
     m.route.mode = 'hash';
     m.route(roots.main, '/', {
       '/': golem.home.main,
+      '/family': gm.family.component.list,
+      '/family/list': gm.family.component.list,
       '/contact': gm.contact.component.list,
       '/contact/list': gm.contact.component.list,
-      '/contact/list/filter/tag/:tag': gm.contact.component.list,
       '/contact/list/page/:page': gm.contact.component.list,
       '/contact/tags': gm.contact.component.tags,
       '/contact/show/:contactId': gm.contact.component.show,

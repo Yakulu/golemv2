@@ -29,7 +29,11 @@
       // Global namespace
       var golem = {
         config: {},
-        module: {},
+        module: { // Official
+          family: { component: {} },
+          contact: { component: {} },
+          member: { component: {} }
+        },
         widgets: {}
       };
       // Main Script
@@ -43,7 +47,11 @@
     <script src='scripts/golem/home.js'></script>
     <script src='scripts/golem/header.js'></script>
     <script src='scripts/golem/footer.js'></script>
-    <script src='scripts/golem/contact/init.js'></script>
+    <!-- Family Module -->
+    <script src='scripts/golem/family/model.js'></script>
+    <script src='scripts/golem/family/data.js'></script>
+    <script src='scripts/golem/family/component/list.js'></script>
+    <!-- Contact Module -->
     <script src='scripts/golem/contact/model.js'></script>
     <script src='scripts/golem/contact/data.js'></script>
     <script src='scripts/golem/contact/component/list.js'></script>
@@ -51,6 +59,10 @@
     <script src='scripts/golem/contact/component/form.js'></script>
     <script src='scripts/golem/contact/component/remove.js'></script>
     <script src='scripts/golem/contact/component/tags.js'></script>
+    <!-- Member Module -->
+    <script src='scripts/golem/member/model.js'></script>
+    <script src='scripts/golem/member/data.js'></script>
+    <!-- Bootstrap Application -->
     <script src='scripts/golem.js'></script>
   </body>
 </html>

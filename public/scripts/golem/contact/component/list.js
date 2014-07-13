@@ -1,9 +1,9 @@
 (function () {
-  var contact = golem.module.contact;
-  contact.component.list = {
+  var module = golem.module.contact;
+  module.component.list = {
     controller: function () {
       var l = golem.utils.locale;
-      var cmi = contact.data.menuItems;
+      var cmi = module.data.menuItems;
       golem.menus.secondary.items = [cmi.list, cmi.add, cmi.tags];
       document.title = golem.model.title(l('CONTACTS_LIST'));
       this.search = (function (e) {
@@ -24,44 +24,45 @@
       this.skipItems = (function () {
         return (this.currentPage() - 1) * this.itemsPerPage;
       }).bind(this);
-      this.tagFilter = m.route.param('tag');
-      var _getContacts;
-      if (!this.tagFilter) {
-        _getContacts = (function (cb) {
-          golem.model.db.query(
-            'all/bySchema', {
-              startKey: ['contact'],
-              endKey: ['contact', {}],
-              limit: this.itemsPerPage,
-              skip: this.skipItems(),
-              include_docs: true 
-            }, cb
-          );
-        }).bind(this);
-      } else {
-        _getContacts = (function (cb) {
-          golem.model.db.query(
-            'tags/count',
-            {
-              reduce: false,
-              key: ['contact', this.tagFilter],
-              include_docs: true
-            },
-            cb
-          );
-        }).bind(this);
-      }
-      var getContacts = (function () {
-        _getContacts((function (err, results) {
-          this.totalRows = results.total_rows;
-          this.numberOfPages = Math.ceil(this.totalRows / this.itemsPerPage);
-          this.items = results.rows;
-          m.endComputation();
-          }).bind(this));
+      var callback = (function (err, results) {
+        this.totalRows = results.rows.length;
+        this.numberOfPages = Math.ceil(this.totalRows / this.itemsPerPage);
+        this.items = results.rows;
+        m.endComputation();
       }).bind(this);
+      //this.tagFilter = m.route.param('tag');
+      this.tagFilter = this.tagFilter || false;
+      this.setTagFilter = (function (tag) {
+        this.tagFilter = tag;
+        m.startComputation();
+        golem.model.db.query(
+          'tags/count',
+          {
+            reduce: false,
+            key: ['contact', this.tagFilter],
+            include_docs: true
+          }, callback
+        );
+      }).bind(this);
+      this.unsetTagFilter = (function () {
+        this.tagFilter = false;
+        getContacts();
+      }).bind(this);
+
       // Init
-      m.startComputation();
-      contact.data.getTags(getContacts);
+      var getContacts = (function() {
+        m.startComputation();
+        golem.model.db.query(
+          'all/bySchema', {
+            startKey: ['contact'],
+            endKey: ['contact', {}],
+            limit: this.itemsPerPage,
+            skip: this.skipItems(),
+            include_docs: true 
+          }, callback
+        );
+      }).bind(this);
+      module.data.getTags(getContacts);
     },
     view: function (ctrl) {
       var l = golem.utils.locale;
@@ -84,7 +85,7 @@
                 m('i', { class: 'remove icon' })
               ])
             ]),
-            m('div', { class: 'name' }, contact.model.fullname(c)),
+            m('div', { class: 'name' }, module.model.fullname(c)),
             m('p', { class: 'description' }, [
               m('p', c.postalCode + ' ' + c.city),
               m('p', [
@@ -167,10 +168,9 @@
           ])
         };
 
-        var activeFilter = (window.location.hash.indexOf('filter') !== -1);
         var tagsIconAttrs = { class: 'tags icon' };
         var tagsClass = '';
-        if (activeFilter) {
+        if (ctrl.tagFilter) {
           tagsIconAttrs = { class: 'eraser icon', title: l('FILTERS_REMOVE') };
           tagsClass = ' active';
         }
@@ -183,27 +183,22 @@
           tags: m('div', [
             m('a', {
               class: 'item' + tagsClass,
-              href: '#/contact/list',
+              onclick: ctrl.unsetTagFilter
               //config: m.route
             }, [
               m('i', tagsIconAttrs),
               l('BY_TAGS')
             ]),
-            m('a', contact.data.tags.map(function (tag) {
+            m('a', module.data.tags.map(function (tag) {
               var items = [
                 tag.key[1],
                 m('div', { class: 'ui small teal label' }, tag.value)
               ];
-              var classTag = '';
-              var searchURI = decodeURI(window.location.hash);
-              if (searchURI.indexOf(tag.key[1]) !== -1) {
-                classTag = ' active';
-                //items.push(m('i', { class: 'edit icon' }));
-              }
+              var classTag = 'item';
+              if (ctrl.tagFilter === tag.key[1]) { classTag += ' active'; }
               return m('a', {
-                  class: 'item' + classTag,
-                  href: '#/contact/list/filter/tag/' + tag.key[1],
-                  //config: m.route
+                  class: classTag,
+                  onclick: ctrl.setTagFilter.bind(ctrl, tag.key[1])
                 }, items);
             })
             )
