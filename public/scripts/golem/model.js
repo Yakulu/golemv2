@@ -38,6 +38,23 @@
             }.toString(), reduce: '_count'
           }
         }
+      },
+      labels: {
+        _id: '_design/labels',
+        views: {
+          all: {
+            map: function (doc) {
+              var emitProp = function (type, prop, coll) {
+                for (var i = 0, l = coll.length; i < l; i++) {
+                  //emit([type, coll[i][prop]], null);
+                  emit([type, coll[i][prop]]);
+                }
+              };
+              if (doc.tels) { emitProp('tels', 'label', doc.tels); }
+              if (doc.mails) { emitProp('mails', 'label', doc.mails); }
+            }.toString(), reduce: '_count'
+          }
+        }
       }
     }
   };

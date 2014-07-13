@@ -111,6 +111,7 @@
         this.placeholder = config.placeholder || '';
         this.radioField = config.radioField || false;
         this.labelField = config.labelField || false;
+        this.labels = config.labels || [];
         this.removeNum = m.prop();
         this.suffix = m.prop();
         this.value = '';
@@ -218,8 +219,8 @@
                 onchange: ctrl.change.bind(ctrl, num, 'label')
               }),
               m('datalist', { id: fieldId },
-                golem.module.contact.data.labels[ctrl.name].map(function (label) {
-                  return m('option', { value: label });
+                ctrl.labels.map(function (label) {
+                  return m('option', { value: label.key[1] });
                 })
               )
             ]);

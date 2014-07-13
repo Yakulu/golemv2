@@ -62,7 +62,8 @@
           }, callback
         );
       }).bind(this);
-      module.data.getTags(getContacts);
+      var md = module.data;
+      md.getTags(md.getLabels.bind(null, 'tels', md.getLabels.bind(null, 'mails', getContacts)));
     },
     view: function (ctrl) {
       var l = golem.utils.locale;

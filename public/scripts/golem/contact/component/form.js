@@ -11,7 +11,7 @@
       // Model
       var key = m.route.param('contactId');
       m.startComputation();
-      contact.data.getTags((function () {
+      var main = (function () {
         golem.model.db.get(key, (function (err, res) {
           this.contact = res;
           if (!this.contact) {
@@ -31,6 +31,7 @@
             size: 15,
             radioField: true,
             labelField: true,
+            labels: contact.data.labels.tels,
             placeholder: l('TEL_PLACEHOLDER'),
             content: l('INFO_FORM_TELS'),
             current: this.contact.tels
@@ -42,6 +43,7 @@
             size: 25,
             radioField: true,
             labelField: true,
+            labels: contact.data.labels.mails,
             placeholder: l('MAIL_PLACEHOLDER'),
             content: l('INFO_FORM_MAILS'),
             current: this.contact.mails
@@ -77,7 +79,9 @@
           }
           m.endComputation();
         }).bind(this));
-      }).bind(this));
+      }).bind(this);
+      var cd = contact.data;
+      cd.getTags(cd.getLabels.bind(null, 'tels', cd.getLabels.bind(null, 'mails', main)));
       // Methods
       this.submit = (function (e) {
         e.preventDefault();

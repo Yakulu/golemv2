@@ -79,8 +79,8 @@
       'tags/count',
       {
         group: true,
-        startKey: ['contact'],
-        endKey: ['contact', {}]
+        startkey: ['contact'],
+        endkey: ['contact', {}]
       },
       function (err, res) {
         contact.data.tags = res.rows;
@@ -94,7 +94,24 @@
   };
   contact.data.tags = [];
 
-  // TODO: make it like tags : from database
+  contact.data.labels = {};
+  contact.data.getLabels = function (type, callback) {
+    type = type || 'tels';
+    golem.model.db.query(
+      'labels/all',
+      {
+        group: true,
+        startkey: [type],
+        endkey: [type, {}]
+      },
+      function (err, res) {
+        contact.data.labels[type] = res.rows;
+        callback(err, res);
+      }
+    );
+  };
+
+  /*
   contact.data.labels = (function () {
     var _labels = { tels: [], mails: [] };
     contact.data.items.forEach(function (c) {
@@ -111,4 +128,5 @@
     });
     return _labels;
   }).call();
+  */
 }).call(this);
