@@ -4,13 +4,12 @@
   contact.component.remove = {
     controller: function () {
       var l = golem.utils.locale;
-      golem.controller.call(this);
       var key = m.route.param('contactId');
       m.startComputation();
       golem.model.db.get(key, (function (err, res) {
         this.contact = res;
-        document.title = this.docTitle + l('CONTACTS_REMOVE') +
-          contact.model.fullname(this.contact);
+        document.title = golem.model.title(l('CONTACTS_REMOVE') +
+          contact.model.fullname(this.contact));
         this.removeModalCtrl = new widgets.modal.controller({
           active: true,
           title: l('SURE'),
@@ -29,8 +28,9 @@
       }).bind(this));
     },
     view: function (ctrl) {
-      this.mainContent = new widgets.modal.view(ctrl.removeModalCtrl);
-      return golem.view.call(this, ctrl);
+      return m('section', { class: 'twelve wide column' },
+        new widgets.modal.view(ctrl.removeModalCtrl)
+      );
     }
   };
 }).call(this);

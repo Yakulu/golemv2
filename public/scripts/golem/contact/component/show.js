@@ -3,20 +3,19 @@
   contact.component.show = {
     controller: function () {
       var l = golem.utils.locale;
-      golem.controller.call(this);
       var key = m.route.param('contactId');
       m.startComputation();
       golem.model.db.get(key, (function (err, res) {
         this.contact = res;
-        document.title = this.docTitle + l('CONTACTS_DETAIL') +
-          contact.model.fullname(this.contact);
+        document.title = golem.model.title(l('CONTACTS_DETAIL') +
+          contact.model.fullname(this.contact));
         var cmi = contact.data.menuItems;
         ['show', 'edit', 'remove'].forEach((function (v) {
           cmi[v].url = cmi[v].baseUrl + '/' + this.contact._id;
         }).bind(this));
-        this.secondaryMenu.replace([
+        golem.menus.secondary.items = [
           cmi.list, cmi.add, cmi.show, cmi.edit, cmi.remove
-        ]);
+        ];
         m.endComputation();
       }).bind(this));
     },
@@ -74,7 +73,7 @@
           ]);
         }
       };
-      this.mainContent = m('section', { class: 'ui piled segment' }, [
+      mainContent = m('section', { class: 'ui piled segment' }, [
         m('div', { class: 'ui floated right basic segment' },
           c.tags.map(function (tag) {
             return m('a', {
@@ -107,7 +106,11 @@
           ])
         ])
       ]);
-      return golem.view.call(this, ctrl);
+      return [
+        m('section', { class: 'sixteen wide column' }, [
+          new golem.menus.secondary.view(), mainContent
+        ])
+      ];
     }
   };
 }).call(this);

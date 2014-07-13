@@ -2,13 +2,10 @@
   var contact = golem.module.contact;
   contact.component.list = {
     controller: function () {
-      golem.controller.call(this);
       var l = golem.utils.locale;
       var cmi = contact.data.menuItems;
-      this.secondaryMenu.replace([
-        cmi.list, cmi.add, cmi.tags
-      ]);
-      document.title = this.docTitle + l('CONTACTS_LIST');
+      golem.menus.secondary.items = [cmi.list, cmi.add, cmi.tags];
+      document.title = golem.model.title(l('CONTACTS_LIST'));
       this.search = (function (e) {
         var val = e.target.value;
         if (val === '') {
@@ -106,7 +103,7 @@
           ])
         ]);
       };
-      this.mainContent = (function () {
+      var mainContent = (function () {
         var itemsDom;
         if (ctrl.filteredItems) {
           itemsDom = ctrl.filteredItems.map(contactItemDom);
@@ -153,7 +150,8 @@
           m('div', { class: 'ui pagination menu' }, pagesDom)
         ]);
       }).call(this);
-      this.contextMenuContent = (function () {
+
+      var contextMenuContent = (function () {
         var searchBox = {
           head: m('div', { class: 'header item' }, l('GLOBAL_SEARCH')),
           content: m('div', { class: 'item' }, [
@@ -220,7 +218,12 @@
           ])
         ]);
       }).call(this);
-      return golem.view.call(this, ctrl);
+      return [
+        m('section', { class: 'twelve wide column' }, [
+          new golem.menus.secondary.view(), mainContent
+        ]),
+        m('section', { class: 'four wide column' }, contextMenuContent)
+      ];
     }
   };
 }).call(this);

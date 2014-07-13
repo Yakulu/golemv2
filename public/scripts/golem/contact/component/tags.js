@@ -4,10 +4,9 @@
   contact.component.tags = {
     controller: function () {
       var l = golem.utils.locale;
-      golem.controller.call(this);
       var cmi = contact.data.menuItems;
-      this.secondaryMenu.replace([ cmi.list, cmi.add, cmi.tags ]);
-      document.title = this.docTitle + l('TAGS_MANAGEMENT');
+      golem.menus.secondary.items = [ cmi.list, cmi.add, cmi.tags ];
+      document.title = golem.model.title(l('TAGS_MANAGEMENT'));
       this.tags = [];
       m.startComputation();
       contact.data.getTags((function (err, res) {
@@ -79,48 +78,49 @@
     },
     view: function (ctrl) {
       var l = golem.utils.locale;
-      this.mainContent = m('section', [
+      var mainContent = m('section', [
         m('h2', l('TAGS_MANAGEMENT')),
-        m('div', { class: 'ui grid' }, [
-          m('div', { class: 'ten wide column'}, [
-            m('ul', { class: 'ui bulleted list' }, ctrl.tags.map(function (tag) {
-              return m('li', { class: 'item golem-tag' }, [
-                m('span', { class: 'ui small input' }, [
-                  m('input', {
-                    size: 10,
-                    value: tag,
-                    'data-value': tag
-                  })
-                ]),
-                m('span', { class: 'ui buttons' }, [
-                  m('button', {
-                    type:'button',
-                    class: 'ui tiny blue button',
-                    onclick: ctrl.updateTagFromClick
-                  }, l('RENAME')),
-                  m('span.or'),
-                  m('button', {
-                    type:'button',
-                    class: 'ui tiny red button',
-                    onclick: ctrl.removeTag
-                  }, l('DELETE'))
-                ])
-              ]);
-            }))
-          ]),
-          m('div', { class: 'six wide column' }, [
-            m('div', { class: 'ui purple inverted segment' }, [
-              m('h3', [
-                m('i', { class: 'info icon' }),
-                m('span', l('HELP'))
+          m('ul', { class: 'ui bulleted list' }, ctrl.tags.map(function (tag) {
+            return m('li', { class: 'item golem-tag' }, [
+              m('span', { class: 'ui small input' }, [
+                m('input', {
+                  size: 10,
+                  value: tag,
+                  'data-value': tag
+                })
               ]),
-              m('p', m.trust(l('TAGS_MANAGEMENT_HELP_MSG')))
-            ])
-          ])
+              m('span', { class: 'ui buttons' }, [
+                m('button', {
+                  type:'button',
+                  class: 'ui tiny blue button',
+                  onclick: ctrl.updateTagFromClick
+                }, l('RENAME')),
+                m('span.or'),
+                m('button', {
+                  type:'button',
+                  class: 'ui tiny red button',
+                  onclick: ctrl.removeTag
+                }, l('DELETE'))
+              ])
+            ]);
+          }))
+        ]);
+       var contextMenuContent = m('div', { class: 'six wide column' }, [
+          m('div', { class: 'ui purple inverted segment' }, [
+            m('h3', [
+              m('i', { class: 'info icon' }),
+              m('span', l('HELP'))
+            ]),
+            m('p', m.trust(l('TAGS_MANAGEMENT_HELP_MSG')))
+          ]),
+          new widgets.modal.view(ctrl.removeModalCtrl)
+        ]);
+      return [
+        m('section', { class: 'ten wide column' }, [
+          new golem.menus.secondary.view(), mainContent
         ]),
-        new widgets.modal.view(ctrl.removeModalCtrl)
-      ]);
-      return golem.view.call(this, ctrl);
+        m('section', { class: 'six wide column' }, contextMenuContent)
+      ];
     }
   };
 }).call(this);

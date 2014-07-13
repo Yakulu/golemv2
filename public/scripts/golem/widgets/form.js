@@ -218,7 +218,7 @@
                 onchange: ctrl.change.bind(ctrl, num, 'label')
               }),
               m('datalist', { id: fieldId },
-                contact.data.labels[ctrl.name].map(function (label) {
+                golem.module.contact.data.labels[ctrl.name].map(function (label) {
                   return m('option', { value: label });
                 })
               )

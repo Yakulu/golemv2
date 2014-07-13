@@ -3,7 +3,6 @@
   var menus = golem.menus;
   var contact = golem.module.contact;
   contact.data = {};
-  $script('contact/model', function () {
 
   // Local data (ATM)
   contact.data.items = [
@@ -111,5 +110,4 @@
     });
     return _labels;
   }).call();
-});
 }).call(this);

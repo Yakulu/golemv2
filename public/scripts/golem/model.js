@@ -1,5 +1,8 @@
 (function () {
   golem.model = {
+    title: function (suffix) {
+      return golem.utils.locale('TITLE') + ' - ' + suffix;
+    },
     db: new PouchDB('golem'),
     queries: {
       all: {

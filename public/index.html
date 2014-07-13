@@ -10,8 +10,21 @@
         font-family: 'Open Sans', sans-serif;
       }
     </style>
-    <!-- Script loader -->
-    <script src='vendor/script.js'></script>
+    <!-- App dependencies -->
+    <script src='vendor/mithril.js'></script>
+    <script src='vendor/notify.js'></script>
+    <script src='vendor/pouchdb-2.2.3.min.js'></script>
+  </head>
+  <body>
+    <!-- Application architecture -->
+    <header id='golem-header'></header>
+    <main class='ui grid'>
+      <section id='golem-mainmenu' class='two wide column'></section>
+      <div class='fourteen wide column'>
+        <div id='golem-main' class='ui grid'></div>
+      </div>
+    </main>
+    <footer id='golem-footer'></footer>
     <script>
       // Global namespace
       var golem = {
@@ -19,19 +32,26 @@
         module: {},
         widgets: {}
       };
-      // App dependencies
-      $script([
-      'vendor/mithril.js',
-      'vendor/notify.js',
-      'vendor/pouchdb-2.2.3.min.js',
-      'l10n/locale_fr-FR.js'
-      ], 'startpack');
-
       // Main Script
-      $script('scripts/golem.js');
     </script>
-  </head>
-  <body>
+    <script src='l10n/locale_fr-FR.js'></script>
+    <script src='scripts/golem/utils.js'></script>
+    <script src='scripts/golem/menus.js'></script>
+    <script src='scripts/golem/widgets/common.js'></script>
+    <script src='scripts/golem/widgets/form.js'></script>
+    <script src='scripts/golem/model.js'></script>
+    <script src='scripts/golem/home.js'></script>
+    <script src='scripts/golem/header.js'></script>
+    <script src='scripts/golem/footer.js'></script>
+    <script src='scripts/golem/contact/init.js'></script>
+    <script src='scripts/golem/contact/model.js'></script>
+    <script src='scripts/golem/contact/data.js'></script>
+    <script src='scripts/golem/contact/component/list.js'></script>
+    <script src='scripts/golem/contact/component/show.js'></script>
+    <script src='scripts/golem/contact/component/form.js'></script>
+    <script src='scripts/golem/contact/component/remove.js'></script>
+    <script src='scripts/golem/contact/component/tags.js'></script>
+    <script src='scripts/golem.js'></script>
   </body>
 </html>
 

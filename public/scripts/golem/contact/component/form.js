@@ -5,10 +5,9 @@
     controller: function () {
       // Init
       var l = golem.utils.locale;
-      golem.controller.call(this);
       // Menus
       var cmi = contact.data.menuItems;
-      this.secondaryMenu.replace([ cmi.list, cmi.add ]);
+      golem.menus.secondary.items = [ cmi.list, cmi.add ];
       // Model
       var key = m.route.param('contactId');
       m.startComputation();
@@ -66,14 +65,14 @@
           });
           // Add or edit
           if (this.add) {
-            document.title = this.docTitle + l('CONTACTS_NEW');
+            document.title = golem.model.title(l('CONTACTS_NEW'));
           } else {
-            document.title = this.docTitle + l('CONTACTS_EDIT') +
-              contact.model.fullname(this.contact);
+            document.title = golem.model.title(l('CONTACTS_EDIT') +
+              contact.model.fullname(this.contact));
             ['show', 'edit', 'remove'].forEach((function (v) {
               cmi[v].url = cmi[v].baseUrl + '/' + this.contact._id;
             }).bind(this));
-            this.secondaryMenu.items.splice(2, 0,
+            golem.menus.secondary.items.splice(2, 0,
               cmi.show, cmi.edit, cmi.remove);
           }
           m.endComputation();
@@ -99,7 +98,7 @@
       var l = golem.utils.locale;
       var c = ctrl.contact;
       var h2 = ctrl.add ? l('CONTACTS_NEW') : l('CONTACTS_EDIT') + ' ' + contact.model.fullname(c);
-      this.mainContent = m('section', { class: 'ui piled segment' }, [
+      var mainContent = m('section', { class: 'ui piled segment' }, [
         m('h2', h2),
         m('form', {
           id: 'contact-form',
@@ -183,7 +182,7 @@
             }, l('CANCEL'))
         ])
       ]);
-      this.contextMenuContent = m('nav', [
+      var contextMenuContent = m('nav', [
         m('menu', { class: 'ui buttons fixed-right' }, [
           m('input', {
             class: 'ui fluid teal submit button',
@@ -201,7 +200,12 @@
           }, l('CANCEL'))
         ])
       ]);
-      return golem.view.call(this, ctrl);
+      return [
+        m('section', { class: 'twelve wide column' }, [
+          new golem.menus.secondary.view(), mainContent
+        ]),
+        m('section', { class: 'four wide column' }, contextMenuContent)
+      ];
     }
   };
 }).call(this);
