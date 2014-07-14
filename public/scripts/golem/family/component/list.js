@@ -6,6 +6,9 @@
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add ];
       document.title = golem.model.title(l('FAMILIES_LIST'));
+      this.search = (function (e) {
+        this.filteredItems = golem.component.list.search(e, this.items);
+      }).bind(this);
       // Init
       this.items = [];
       var getFamilies = (function () {
@@ -54,6 +57,7 @@
           ])
         ]);
       };
+      var itemsDom = ctrl.filteredItems ? ctrl.filteredItems.map(itemDom) : ctrl.items.map(itemDom);
       var mainContent = m('section', { class: 'twelve wide column' }, [
         m('table', { class: 'ui basic table' }, [
           m('thead', [
@@ -71,10 +75,17 @@
               m('th', { width: '10%' }, l('ACTIONS'))
             ])
           ]),
-          m('tbody', ctrl.items.map(itemDom))
+          m('tbody', itemsDom)
         ])
       ]);
-      var contextMenuContent = m('section', { class: 'four wide column' }, 'context');
+      var searchBox = golem.component.list.searchBox(ctrl.search);
+      var contextMenuContent = m('section', { class: 'four wide column' }, 
+        m('nav', [
+          m('menu', { class: 'ui small vertical menu' }, [
+            searchBox.head, searchBox.content
+          ])
+        ])
+      );
       return [
         m('section', { class: 'twelve wide column' }, [
           new golem.menus.secondary.view(), mainContent

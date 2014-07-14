@@ -33,6 +33,7 @@
         return [
           new menus.Item(l('MENU_HOME'), '/home', 'home'),
           new menus.Item(l('MENU_CONTACTS'), '/contact', 'book'),
+          new menus.Item(l('MENU_FAMILIES'), '/family', 'sitemap'),
           new menus.Item(l('MENU_MEMBERS'), '/member', 'user'),
           new menus.Item(l('MENU_MESSAGES'), '/mail', 'mail', 'item disabled'),
           new menus.Item(l('MENU_ACTIVITIES'), '/activity', 'globe'),

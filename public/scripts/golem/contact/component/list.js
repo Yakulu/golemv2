@@ -7,16 +7,7 @@
       golem.menus.secondary.items = [cmi.list, cmi.add, cmi.tags];
       document.title = golem.model.title(l('CONTACTS_LIST'));
       this.search = (function (e) {
-        var val = e.target.value;
-        if (val === '') {
-          this.filteredItems = false;
-        }
-        if (val.length > 3) {
-          this.filteredItems = this.items.filter(function (item) {
-            var json = JSON.stringify(item).toLowerCase();
-            return (json.indexOf(val.toLowerCase()) !== -1);
-          });
-        }
+        this.filteredItems = golem.component.list.search(e, this.items);
       }).bind(this);
       this.items = [];
       this.itemsPerPage = 4;
@@ -155,21 +146,7 @@
       }).call(this);
 
       var contextMenuContent = (function () {
-        var searchBox = {
-          head: m('div', { class: 'header item' }, l('GLOBAL_SEARCH')),
-          content: m('div', { class: 'item' }, [
-            m('div', { class: 'ui small icon input' }, [
-              m('input', {
-                type: 'search',
-                placeholder: l('TYPE_HERE'),
-                title: l('SEARCH_ERROR_TOO_SHORT'),
-                oninput: ctrl.search
-              }),
-              m('i', { class: 'unhide icon' })
-            ])
-          ])
-        };
-
+        var searchBox = golem.component.list.searchBox(ctrl.search);
         var tagsIconAttrs = { class: 'tags icon' };
         var tagsClass = '';
         if (ctrl.tagFilter) {
