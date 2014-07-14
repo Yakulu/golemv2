@@ -14,7 +14,8 @@
       remove: new menus.Item(l('DELETE'), '/member/remove', 'remove')
     },
     tags: [],
-    getTags: golem.module.contact.data.getTags,
     skills: []
   };
+  member.data.getTags = golem.model.getTags.bind(null,'member', 'member', 'tags');
+  member.data.getSkills = golem.model.getTags.bind(null, 'memberskills', 'member', 'skills');
 }).call(this);

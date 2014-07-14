@@ -27,15 +27,7 @@
           this.telsWidget = golem.component.form.telsWidget(cmodule, this.contact);
           this.mailsWidget = golem.component.form.mailsWidget(cmodule, this.contact);
           this.wwwWidget = golem.component.form.wwwWidget(this.contact);
-          this.tagWidget = new form.tagWidget.controller({
-            name: 'tags',
-            label: l('MENU_TAGS'),
-            placeholder: l('TAGS_PLACEHOLDER'),
-            content: l('INFO_FORM_TAGS'),
-            size: 25,
-            tags: cmodule.data.tags.map(function (tag) { return tag.key[1]; }),
-            current: this.contact.tags
-          });
+          this.tagWidget = golem.component.form.tagWidget(cmodule, this.contact.tags);
           // Add or edit
           if (this.add) {
             document.title = golem.model.title(l('CONTACTS_NEW'));

@@ -74,42 +74,7 @@
     remove: new menus.Item(l('DELETE'), '/contact/remove', 'remove')
   };
 
-  contact.data.getTags = function (callback) {
-    golem.model.db.query(
-      'tags/count',
-      {
-        group: true,
-        startkey: ['contact'],
-        endkey: ['contact', {}]
-      },
-      function (err, res) {
-        contact.data.tags = res.rows;
-        contact.data.tags.sort(function (a, b) {
-          // Sort by value DESC
-          return b.value - a.value;
-        });
-        callback(err, res);
-      }
-    );
-  };
   contact.data.tags = [];
+  contact.data.getTags = golem.model.getTags.bind(null, 'contact', 'contact', 'tags');
 
-  /*
-  contact.data.labels = (function () {
-    var _labels = { tels: [], mails: [] };
-    contact.data.items.forEach(function (c) {
-      c.tels.forEach(function (tel) {
-        if (_labels.tels.indexOf(tel.label) === -1) {
-        _labels.tels.push(tel.label);
-        }
-      });
-      c.mails.forEach(function (mail) {
-        if (_labels.mails.indexOf(mail.label) === -1) {
-        _labels.mails.push(mail.label);
-        }
-      });
-    });
-    return _labels;
-  }).call();
-  */
 }).call(this);

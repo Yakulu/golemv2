@@ -1,6 +1,24 @@
 (function () {
   golem.model = {
     labels: { mails: [], tels: [] },
+    getTags: function (type, module, field, callback) {
+      golem.model.db.query(
+        'tags/count',
+        {
+          group: true,
+          startkey: [type],
+          endkey: [type, {}]
+        },
+        function (err, res) {
+          golem.module[module].data[field] = res.rows;
+          golem.module[module].data[field].sort(function (a, b) {
+            // Sort by value DESC
+            return b.value - a.value;
+          });
+          callback(err, res);
+        }
+      );
+    },
     getLabels: function (type, callback) {
       type = type || 'tels';
       golem.model.db.query(

@@ -60,7 +60,11 @@
       '/contact/show/:contactId': gm.contact.component.show,
       '/contact/add': gm.contact.component.form,
       '/contact/edit/:contactId': gm.contact.component.form,
-      '/contact/remove/:contactId': gm.contact.component.remove
+      '/contact/remove/:contactId': gm.contact.component.remove,
+      '/member': gm.member.component.list,
+      '/member/list': gm.member.component.list,
+      '/member/add': gm.member.component.form,
+      '/member/edit/:memberId': gm.member.component.form,
     });
   };
 }).call(this);

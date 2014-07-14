@@ -40,6 +40,17 @@
         current: item.www
       });
     },
+    tagWidget: function (module, current) {
+      return new golem.widgets.form.tagWidget.controller({
+        name: 'tags',
+        label: l('MENU_TAGS'),
+        placeholder: l('TAGS_PLACEHOLDER'),
+        content: l('INFO_FORM_TAGS'),
+        size: 25,
+        tags: module.data.tags.map(function (tag) { return tag.key[1]; }),
+        current: current
+      });
+    },
     submit: function (e, item, route) {
       e.preventDefault();
       var _submit = function (verb) {

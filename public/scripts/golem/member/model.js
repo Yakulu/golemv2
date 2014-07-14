@@ -2,7 +2,7 @@
   var gm = golem.module;
   gm.member.model = {
     create: function (props) {
-      var member = gm.contact.create(props);
+      var member = gm.contact.model.create(props);
       member.schema = 'member';
       member.skills = props.skills || [];
       member.family = false;
