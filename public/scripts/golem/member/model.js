@@ -11,6 +11,6 @@
       return member;
     },
     fullname: gm.contact.model.fullname,
-    fulladdress: gm.contact.model.fulladdress,
+    fulladdress: gm.family.model.fulladdress
   };
 }).call(this);

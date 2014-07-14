@@ -16,6 +16,13 @@
         www: props.www || [],
         movements: props.movements || []
       };
+    },
+    fulladdress: function (f) {
+      if (f.city) {
+        return f.address + ' ' + f.postalCode + ' ' + f.city;
+      } else {
+        return '';
+      }
     }
   };
 }).call(this);

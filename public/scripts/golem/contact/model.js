@@ -12,13 +12,7 @@
     fullname: function (c) {
       return c.firstname + ' ' + c.lastname;
     },
-    fulladdress: function (c) {
-      if (c.city) {
-        return c.address + ' ' + c.postalCode + ' ' + c.city;
-      } else {
-        return '';
-      }
-    },
+    fulladdress: gm.family.model.fulladdress
   };
 
   /*
