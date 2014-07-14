@@ -6,7 +6,7 @@
       if (val === '') {
         return false;
       }
-      if (val.length > 3) {
+      if (val.length > 2) {
         return items.filter(function (item) {
           var json = JSON.stringify(item).toLowerCase();
           return (json.indexOf(val.toLowerCase()) !== -1);

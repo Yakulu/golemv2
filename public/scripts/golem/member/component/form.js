@@ -8,14 +8,36 @@
       golem.menus.secondary.items = [ mi.list, mi.add ];
       var key = m.route.param('memberId');
       this.member = module.model.create({});
+      this.add = true;
+      this.familyFromMember = m.prop(false);
+      this.affectFamily = m.prop(false);
+      this.family = m.prop(null);
+      this.getFamilies = (function () {
+        this.affectFamily(true);
+        this.familyList = new golem.module.family.component.list.controller(true, this);
+        m.startComputation();
+        golem.model.db.query(
+          'all/bySchema',
+          {
+            startkey: ['family'],
+            endkey: ['family', {}],
+            include_docs: true
+          }, (function (err, res) {
+            this.families = res.rows;
+            m.endComputation(); 
+          }).bind(this)
+        );
+      }).bind(this);
       var main = (function () {
         golem.model.db.get(key, (function (err, res) {
           this.member = res;
           if (!this.member) {
             this.add = true;
+            this.familyFromMember(false);
             this.member = module.model.create({});
           } else {
             this.add = false;
+            this.familyFromMember(true);
           }
           this.telsWidget = golem.component.form.telsWidget(module, this.member);
           this.mailsWidget = golem.component.form.mailsWidget(module, this.member);
@@ -54,11 +76,39 @@
       }).bind(this);
     },
     view: function (ctrl) {
+      window.ctrl = ctrl;
       var l = golem.utils.locale;
       var f = ctrl.member;
       var form = golem.widgets.form;
       var h2 = ctrl.add ? l('MEMBERS_NEW') : l('CONTACTS_EDIT') + ' ' + module.model.fullname(f);
-      var mainContent = m('section', { class: 'ui piled segment' }, [
+      var initialContent = m('section', { class: 'ui piled segment' }, [
+        m('p', l('MEMBERS_NEW_FAMILY_MSG')),
+        m('button', {
+          class: 'fluid ui button',
+          onclick: ctrl.getFamilies
+        }, l('MEMBERS_NEW_FAMILY_AFFECT')),
+        m('button', {
+          class: 'fluid ui button',
+          onclick: function () { m.route('/family/add'); }
+        }, l('MEMBERS_NEW_FAMILY_NEW')),
+        m('button', {
+          class: 'fluid ui button',
+          onclick: ctrl.familyFromMember.bind(ctrl, true)
+        }, l('MEMBERS_NEW_FAMILY_FROM'))
+      ]);
+      var familyDom = function (f) {
+        return m('option', { value: f.doc._id },
+          f.doc.lastname + golem.module.family.model.fulladdress(f.doc));
+      };
+      var familyContent = function () {
+        return m('section', { class: 'ui piled segment' }, [
+          m('h2', l('MEMBERS_NEW_FAMILY_AFFECT')),
+          m('div', { class: 'ui grid' }, [
+            new golem.module.family.component.list.view(ctrl.familyList)
+          ])
+        ]);
+      };
+      var formContent = m('section', { class: 'ui piled segment' }, [
         m('h2', h2),
         m('form', {
           id: 'member-form',
@@ -161,11 +211,26 @@
           }, l('CANCEL'))
         ])
       ]);
+      var mainContent;
+      // Form if editing, if family will be created form members details or
+      // if a family has already been affected
+      var isForm = (!ctrl.add || ctrl.familyFromMember() || !!ctrl.family());
+      if (isForm) {
+        mainContent = formContent;
+      } else {
+        if (ctrl.affectFamily()) {
+          // We have to select and affect a family
+          mainContent = familyContent();
+        } else {
+          // Home choice
+          mainContent = initialContent;
+        }
+      }
       return [
         m('section', { class: 'twelve wide column' }, [
           new golem.menus.secondary.view(), mainContent
         ]),
-        m('section', { class: 'four wide column' }, contextMenuContent)
+        m('section', { class: 'four wide column' }, isForm ? contextMenuContent : '')
       ];
     }
   };

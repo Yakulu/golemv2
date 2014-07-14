@@ -1,10 +1,12 @@
 (function () {
   var module = golem.module.family;
   module.component.list = {
-    controller: function () {
+    controller: function (fromMember, memberCtrl) {
+      this.fromMember = fromMember || false;
+      this.memberCtrl = memberCtrl || null;
       var l = golem.utils.locale;
       var mi = module.data.menuItems;
-      golem.menus.secondary.items = [ mi.list, mi.add ];
+      if (!this.fromMember) { golem.menus.secondary.items = [ mi.list, mi.add ]; }
       document.title = golem.model.title(l('FAMILIES_LIST'));
       this.search = (function (e) {
         this.filteredItems = golem.component.list.search(e, this.items);
@@ -29,6 +31,26 @@
     },
     view: function (ctrl) {
       var l = golem.utils.locale;
+      var actionsDom = function (f) {
+        if (ctrl.fromMember) {
+          return m('button', {
+            class: 'positive ui small button',
+            onclick: ctrl.memberCtrl.family.bind(ctrl.memberCtrl, f)
+          }, l('OK'));
+        } else {
+          return [
+            m('a', { href: '#/family/show/' + f._id }, [
+              m('i', { class: 'unhide icon' })
+            ]),
+            m('a', { href: '#/family/edit/' + f._id }, [
+              m('i', { class: 'edit icon' })
+            ]),
+            m('a', { href: '#/family/remove/' + f._id }, [
+              m('i', { class: 'remove icon' })
+            ])
+          ];
+        }
+      };
       var itemDom = function (f) {
         f = f.doc;
         return m('tr', [
@@ -44,17 +66,7 @@
               return m('a', { href: 'mailto:' + mail.value }, mail.value);
             }
           })),
-          m('td', { class: 'actions' }, [
-            m('a', { href: '#/family/show/' + f._id }, [
-              m('i', { class: 'unhide icon' })
-            ]),
-            m('a', { href: '#/family/edit/' + f._id }, [
-              m('i', { class: 'edit icon' })
-            ]),
-            m('a', { href: '#/family/remove/' + f._id }, [
-              m('i', { class: 'remove icon' })
-            ])
-          ])
+          m('td', { class: 'actions' }, actionsDom(f))
         ]);
       };
       var itemsDom = ctrl.filteredItems ? ctrl.filteredItems.map(itemDom) : ctrl.items.map(itemDom);
@@ -72,7 +84,7 @@
                 l('MAIL'),
                 m('i', { class: 'icon info', title: l('DEFAULT_ONLY') })
               ]),
-              m('th', { width: '10%' }, l('ACTIONS'))
+              m('th', { width: '10%' }, ctrl.fromMember ? l('SELECTION') : l('ACTIONS'))
             ])
           ]),
           m('tbody', itemsDom)
@@ -88,7 +100,8 @@
       );
       return [
         m('section', { class: 'twelve wide column' }, [
-          new golem.menus.secondary.view(), mainContent
+          ctrl.fromMember ? '' : new golem.menus.secondary.view(),
+          mainContent
         ]),
         m('section', { class: 'four wide column' }, contextMenuContent)
       ];
