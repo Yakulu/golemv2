@@ -16,7 +16,7 @@ ul#contacts > li {
   margin-bottom: 2%;
 }
 
-ul#contacts a {
+ul#contacts a, td.actions a {
   text-decoration: none;
   color: #157FCC;
 }

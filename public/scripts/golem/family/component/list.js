@@ -1,13 +1,85 @@
 (function () {
   var module = golem.module.family;
   module.component.list = {
-    controller: function () {},
+    controller: function () {
+      var l = golem.utils.locale;
+      var mi = module.data.menuItems;
+      golem.menus.secondary.items = [ mi.list, mi.add ];
+      document.title = golem.model.title(l('FAMILIES_LIST'));
+      // Init
+      this.items = [];
+      var getFamilies = (function () {
+        m.startComputation();
+        golem.model.db.query(
+          'all/bySchema',
+          {
+            startkey: ['family'],
+            endkey: ['family', {}],
+            include_docs: true
+          }, (function (err, res) {
+            this.items = res.rows;
+            m.endComputation(); 
+          }).bind(this)
+        );
+      }).bind(this);
+      getFamilies();
+    },
     view: function (ctrl) {
+      var l = golem.utils.locale;
+      var itemDom = function (f) {
+        f = f.doc;
+        return m('tr', [
+          m('td', f.lastname),
+          m('td', f.postalCode + ' ' + f.city),
+          m('td', f.tels.map(function (tel) {
+            if (tel.default) {
+              return tel.value.match(/\d{2}/g).join('.');
+            }
+          })),
+          m('td', f.mails.map(function (mail) {
+            if (mail.default) {
+              return m('a', { href: 'mailto:' + mail.value }, mail.value);
+            }
+          })),
+          m('td', { class: 'actions' }, [
+            m('a', { href: '#/family/show/' + f._id }, [
+              m('i', { class: 'unhide icon' })
+            ]),
+            m('a', { href: '#/family/edit/' + f._id }, [
+              m('i', { class: 'edit icon' })
+            ]),
+            m('a', { href: '#/family/remove/' + f._id }, [
+              m('i', { class: 'remove icon' })
+            ])
+          ])
+        ]);
+      };
+      var mainContent = m('section', { class: 'twelve wide column' }, [
+        m('table', { class: 'ui basic table' }, [
+          m('thead', [
+            m('tr', [
+              m('th', l('LASTNAME')),
+              m('th', l('CITY')),
+              m('th', [
+                l('TEL'),
+                m('i', { class: 'icon info', title: l('DEFAULT_ONLY') })
+              ]),
+              m('th', [
+                l('MAIL'),
+                m('i', { class: 'icon info', title: l('DEFAULT_ONLY') })
+              ]),
+              m('th', { width: '10%' }, l('ACTIONS'))
+            ])
+          ]),
+          m('tbody', ctrl.items.map(itemDom))
+        ])
+      ]);
+      var contextMenuContent = m('section', { class: 'four wide column' }, 'context');
       return [
         m('section', { class: 'twelve wide column' }, [
-          m('p', 'Families!!')
+          new golem.menus.secondary.view(), mainContent
         ]),
-        m('section', { class: 'four wide column' }, 'context')
+        m('section', { class: 'four wide column' }, contextMenuContent)
       ];
     }
   };

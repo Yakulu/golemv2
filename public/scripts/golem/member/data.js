@@ -4,7 +4,6 @@
   var member = golem.module.member;
   member.data = {
     items: [],
-    labels: { tels: [], mails: [] },
     menuItems: {
       list: new menus.Item(l('MENU_LIST'), '/member/list', 'list'),
       add: new menus.Item(l('MENU_NEW'), '/member/add', 'add sign'),

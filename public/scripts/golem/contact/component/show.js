@@ -53,18 +53,6 @@
           return m('li', [ m('a', { href: item }, item) ]);
         }
       };
-      var groupsBox = (function () {
-        if (c.groups.length === 0) {
-          return m('p', l('GROUPS_NONE'));
-        } else {
-          return m('p', [
-            m('div', { class: 'ui green label'}, l('MENU_GROUPS')),
-            m('ul', { class: 'ui horizontal bulleted list' }, c.groups.map(function (group) {
-              return m('li', { class: 'item' }, group);
-            }))
-          ]);
-        }
-      }).call();
       var multiBox = function (items, header, formatFn) {
         if (items.length > 0) {
           return m('div', [
@@ -94,8 +82,7 @@
             m('p', [
               m('div', { class: 'ui label' }, l('CONTACT_DETAILS')),
               m('div', contact.model.fulladdress(c))
-            ]),
-            m('div', groupsBox)
+            ])
           ]),
           m('div', { class: 'column' }, [
             m('p', [

@@ -2,6 +2,7 @@
   var gm = golem.module;
   gm.family.model = {
     create: function (props) {
+      props = props || {};
       return {
         schema: 'family',
         creationDate: Date.now(),

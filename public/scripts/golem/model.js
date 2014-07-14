@@ -1,5 +1,21 @@
 (function () {
   golem.model = {
+    labels: { mails: [], tels: [] },
+    getLabels: function (type, callback) {
+      type = type || 'tels';
+      golem.model.db.query(
+        'labels/all',
+        {
+          group: true,
+          startkey: [type],
+          endkey: [type, {}]
+        },
+        function (err, res) {
+          golem.model.labels[type] = res.rows;
+          callback(err, res);
+        }
+      );
+    },
     title: function (suffix) {
       return golem.utils.locale('TITLE') + ' - ' + suffix;
     },

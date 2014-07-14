@@ -1,13 +1,13 @@
 (function () {
-  var contact = golem.module.contact;
+  var cmodule = golem.module.contact;
   var form = golem.widgets.form;
-  contact.component.form = {
+  cmodule.component.form = {
     controller: function () {
       // Init
       var l = golem.utils.locale;
       // Menus
-      var cmi = contact.data.menuItems;
-      golem.menus.secondary.items = [ cmi.list, cmi.add ];
+      var mi = cmodule.data.menuItems;
+      golem.menus.secondary.items = [ mi.list, mi.add ];
       // Model
       var key = m.route.param('contactId');
       m.startComputation();
@@ -16,7 +16,7 @@
           this.contact = res;
           if (!this.contact) {
             this.add = true;
-            this.contact = contact.model.create({
+            this.contact = cmodule.model.create({
               firstname: '',
               lastname: ''
             });
@@ -24,45 +24,16 @@
             this.add = false;
           }
           // Widgets
-          this.telsWidget = new form.multiFieldWidget.controller({
-            label: l('TELS'),
-            name: 'tels',
-            maxlength: 10,
-            size: 15,
-            radioField: true,
-            labelField: true,
-            labels: contact.data.labels.tels,
-            placeholder: l('TEL_PLACEHOLDER'),
-            content: l('INFO_FORM_TELS'),
-            current: this.contact.tels
-          });
-          this.mailsWidget = new form.multiFieldWidget.controller({
-            type: 'email',
-            label: l('MAILS'),
-            name: 'mails',
-            size: 25,
-            radioField: true,
-            labelField: true,
-            labels: contact.data.labels.mails,
-            placeholder: l('MAIL_PLACEHOLDER'),
-            content: l('INFO_FORM_MAILS'),
-            current: this.contact.mails
-          });
-          this.wwwWidget = new form.multiFieldWidget.controller({
-            type: 'url',
-            label: l('WWW'),
-            name: 'www',
-            placeholder: l('WWW_PLACEHOLDER'),
-            content: l('INFO_FORM_WWW'),
-            current: this.contact.www
-          });
+          this.telsWidget = golem.component.form.telsWidget(cmodule, this.contact);
+          this.mailsWidget = golem.component.form.mailsWidget(cmodule, this.contact);
+          this.wwwWidget = golem.component.form.wwwWidget(this.contact);
           this.tagWidget = new form.tagWidget.controller({
             name: 'tags',
             label: l('MENU_TAGS'),
             placeholder: l('TAGS_PLACEHOLDER'),
             content: l('INFO_FORM_TAGS'),
             size: 25,
-            tags: contact.data.tags.map(function (tag) { return tag.key[1]; }),
+            tags: cmodule.data.tags.map(function (tag) { return tag.key[1]; }),
             current: this.contact.tags
           });
           // Add or edit
@@ -70,38 +41,27 @@
             document.title = golem.model.title(l('CONTACTS_NEW'));
           } else {
             document.title = golem.model.title(l('CONTACTS_EDIT') +
-              contact.model.fullname(this.contact));
+              cmodule.model.fullname(this.contact));
             ['show', 'edit', 'remove'].forEach((function (v) {
-              cmi[v].url = cmi[v].baseUrl + '/' + this.contact._id;
+              mi[v].url = mi[v].baseUrl + '/' + this.contact._id;
             }).bind(this));
             golem.menus.secondary.items.splice(2, 0,
-              cmi.show, cmi.edit, cmi.remove);
+              mi.show, mi.edit, mi.remove);
           }
           m.endComputation();
         }).bind(this));
       }).bind(this);
-      var cd = contact.data;
-      cd.getTags(cd.getLabels.bind(null, 'tels', cd.getLabels.bind(null, 'mails', main)));
+      var cd = cmodule.data;
+      cd.getTags(golem.model.getLabels.bind(null, 'tels', golem.model.getLabels.bind(null, 'mails', main)));
       // Methods
       this.submit = (function (e) {
-        e.preventDefault();
-        var _submit = (function (verb) {
-          golem.model.db[verb](this.contact, function (err, res) {
-            golem.utils.sendNotification(
-              l('SUCCESS'),
-              { body: l('SUCCESS_UPDATE') },
-              m.route.bind(null, '/contact/list')
-            );
-          });
-        }).bind(this);
-        var verb = this.contact_id ? 'put' : 'post';
-        _submit(verb);
+        golem.component.form.submit(e, this.contact, '/contact/list');
       }).bind(this);
     },
     view: function (ctrl) {
       var l = golem.utils.locale;
       var c = ctrl.contact;
-      var h2 = ctrl.add ? l('CONTACTS_NEW') : l('CONTACTS_EDIT') + ' ' + contact.model.fullname(c);
+      var h2 = ctrl.add ? l('CONTACTS_NEW') : l('CONTACTS_EDIT') + ' ' + cmodule.model.fullname(c);
       var mainContent = m('section', { class: 'ui piled segment' }, [
         m('h2', h2),
         m('form', {

@@ -49,6 +49,8 @@
       '/': golem.home.main,
       '/family': gm.family.component.list,
       '/family/list': gm.family.component.list,
+      '/family/add': gm.family.component.form,
+      '/family/edit/:familyId': gm.family.component.form,
       '/contact': gm.contact.component.list,
       '/contact/list': gm.contact.component.list,
       '/contact/list/page/:page': gm.contact.component.list,

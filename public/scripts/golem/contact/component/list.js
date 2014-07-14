@@ -18,6 +18,7 @@
           });
         }
       }).bind(this);
+      this.items = [];
       this.itemsPerPage = 4;
       // Cast to Integer or 1
       this.currentPage = m.prop(m.route.param('page') | 0 || 1);
@@ -54,8 +55,8 @@
         m.startComputation();
         golem.model.db.query(
           'all/bySchema', {
-            startKey: ['contact'],
-            endKey: ['contact', {}],
+            startkey: ['contact'],
+            endkey: ['contact', {}],
             limit: this.itemsPerPage,
             skip: this.skipItems(),
             include_docs: true 
@@ -63,7 +64,7 @@
         );
       }).bind(this);
       var md = module.data;
-      md.getTags(md.getLabels.bind(null, 'tels', md.getLabels.bind(null, 'mails', getContacts)));
+      md.getTags(getContacts);
     },
     view: function (ctrl) {
       var l = golem.utils.locale;

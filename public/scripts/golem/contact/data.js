@@ -94,23 +94,6 @@
   };
   contact.data.tags = [];
 
-  contact.data.labels = {};
-  contact.data.getLabels = function (type, callback) {
-    type = type || 'tels';
-    golem.model.db.query(
-      'labels/all',
-      {
-        group: true,
-        startkey: [type],
-        endkey: [type, {}]
-      },
-      function (err, res) {
-        contact.data.labels[type] = res.rows;
-        callback(err, res);
-      }
-    );
-  };
-
   /*
   contact.data.labels = (function () {
     var _labels = { tels: [], mails: [] };

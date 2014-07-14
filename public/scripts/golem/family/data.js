@@ -4,7 +4,6 @@
   var family = golem.module.family;
   family.data = {
     items: [],
-    labels: { tels: [], mails: [] },
     menuItems: {
       list: new menus.Item(l('MENU_LIST'), '/family/list', 'list'),
       add: new menus.Item(l('MENU_NEW'), '/family/add', 'add sign'),
