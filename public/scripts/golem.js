@@ -52,6 +52,7 @@
       '/family/add': gm.family.component.form,
       '/family/edit/:familyId': gm.family.component.form,
       '/family/show/:familyId': gm.family.component.show,
+      '/family/remove/:familyId': gm.family.component.remove,
       '/contact': gm.contact.component.list,
       '/contact/list': gm.contact.component.list,
       '/contact/list/page/:page': gm.contact.component.list,

@@ -1,10 +1,10 @@
 (function () {
-  var module = golem.module.contact;
+  var module = golem.module.family;
   module.component.remove = golem.component.remove({
     module: module,
-    key: 'contactId',
-    nameFn: module.model.fullname,
+    key: 'familyId',
+    nameFn: function (f) { return f.lastname; },
     confirm: 'CONTACTS_REMOVE_CONFIRM_MSG',
-    route: '/contact/list'
+    route: '/family/list'
   });
 }).call(this);
