@@ -5,9 +5,9 @@
       var member = gm.contact.model.create(props);
       member.schema = 'member';
       member.skills = props.skills || [];
-      member.family = false;
-      member.cafNumber = props.cafNumber || null;
-      member.familyQuotient = props.familyQuotient || null;
+      //member.family = false;
+      //member.cafNumber = props.cafNumber || null;
+      //member.familyQuotient = props.familyQuotient || null;
       return member;
     },
     fullname: gm.contact.model.fullname,

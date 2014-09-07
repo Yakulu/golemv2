@@ -37,7 +37,7 @@
     title: function (suffix) {
       return golem.utils.locale('TITLE') + ' - ' + suffix;
     },
-    db: new PouchDB('golem'),
+    db: new PouchDB('http://localhost:8043/db/golemdata'),
     queries: {
       all: {
         _id: '_design/all',
