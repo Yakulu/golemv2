@@ -18,7 +18,7 @@
   "license": "MPL",
   "dependencies": {
     "express": "^4.6.0",
-    "validate.js": "^0.2.0"
+    "validate.js": "^0.3.0"
   },
   "devDependencies": {
     "docco": "^0.6.3",
