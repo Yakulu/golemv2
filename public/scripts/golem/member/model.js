@@ -4,6 +4,11 @@
     create: function (props) {
       var member = gm.contact.model.create(props);
       member.schema = 'member';
+			member.birthday = props.birthday || null;
+			member.gender = props.gender || null;
+			member.nationality = props.nationality || null;
+			member.profession = props.profession || null;
+			member.communicationModes = props.communicationModes || { mail: false, tel: false };
       member.skills = props.skills || [];
       //member.family = false;
       //member.cafNumber = props.cafNumber || null;

@@ -77,11 +77,13 @@
       if (config.minlength) { inputAttr.minlength = config.minlength; }
       if (config.size) { inputAttr.size = config.size; }
       if (config.required) { inputAttr.required = 'required'; }
+      if (config.pattern) { inputAttr.pattern = config.pattern; }
       if (config.onchange) { inputAttr.onchange = config.onchange; }
       // Element
       return m('input', inputAttr);
     },
     textHelper: function (config) {
+			var cls = config.cls || 'field small input';
       var labelText;
       if (config.required) {
         labelText = '* ' + config.label;
@@ -89,7 +91,7 @@
         labelText = config.label;
       }
       var label = m('label', { for: config.name }, labelText);
-      return m('div', { class: 'field small input' }, [
+      return m('div', { class: cls }, [
         label,
         form.inputHelper(config)
       ]);
@@ -197,7 +199,7 @@
                 onchange: ctrl.change.bind(ctrl, num, 'default')
             });
 
-            fields.push(m('div', { class: 'field' }, [
+            fields.push(m('div', { class: 'two wide inline field' }, [
               radioField,
               m('label',
                 { class: 'small', for: ctrl.name },
@@ -208,7 +210,7 @@
           // Label field
           if (ctrl.labelField) {
             var fieldId = ctrl.name + '-label-' + num;
-            var labelField = m('div', { class: 'field' }, [
+            var labelField = m('div', { class: 'seven wide field' }, [
               m('input', {
                 type: 'text',
                 list: fieldId,
@@ -246,14 +248,14 @@
           } else { // Complex fields like mail and tel
             ctrl.onchange = ctrl.change.bind(ctrl, num, 'value');
           }
-          fields.push(m('div', { class: 'field' }, [
+          fields.push(m('div', { class: 'seven wide field' }, [
               m('div', { class: 'ui action input' }, [
                 form.inputHelper(ctrl),
                 removeField
               ])
             ])
           );
-          return m('div', { class: 'multitext fields inline' }, fields);
+          return m('div', { class: 'multitext fields' }, fields);
         };
 
         var fieldset = m('fieldset', { class: 'ui segment' }, [

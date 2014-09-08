@@ -11,10 +11,10 @@
         alert(title + ' : ' + options.body); 
         callback();
       };
-      if (!Notify.isSupported()) {
+      if (!Notify.isSupported) {
         _alert();
       } else {
-        if (Notify.needsPermission()) {
+        if (Notify.needsPermission) {
           Notify.requestPermission(_send, _alert);
         } else {
           _send();

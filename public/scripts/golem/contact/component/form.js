@@ -12,36 +12,43 @@
       var key = m.route.param('contactId');
       m.startComputation();
       var main = (function () {
-        golem.model.db.get(key, (function (err, res) {
-          this.contact = res;
-          if (!this.contact) {
-            this.add = true;
-            this.contact = cmodule.model.create({
-              firstname: '',
-              lastname: ''
-            });
-          } else {
-            this.add = false;
-          }
-          // Widgets
-          this.telsWidget = golem.component.form.telsWidget(cmodule, this.contact);
-          this.mailsWidget = golem.component.form.mailsWidget(cmodule, this.contact);
-          this.wwwWidget = golem.component.form.wwwWidget(this.contact);
-          this.tagWidget = golem.component.form.tagWidget(cmodule, this.contact.tags);
-          // Add or edit
-          if (this.add) {
-            document.title = golem.model.title(l('CONTACTS_NEW'));
-          } else {
-            document.title = golem.model.title(l('CONTACTS_EDIT') +
-              cmodule.model.fullname(this.contact));
-            ['show', 'edit', 'remove'].forEach((function (v) {
-              mi[v].url = mi[v].baseUrl + '/' + this.contact._id;
-            }).bind(this));
-            golem.menus.secondary.items.splice(2, 0,
-              mi.show, mi.edit, mi.remove);
-          }
-          m.endComputation();
-        }).bind(this));
+				var newContact = (function () {
+					this.add = true; 
+					this.contact = cmodule.model.create({
+						firstname: '',
+						lastname: ''
+					});
+				}).bind(this);
+				var initController = (function () {
+					// Widgets
+					this.telsWidget = golem.component.form.telsWidget(cmodule, this.contact);
+					this.mailsWidget = golem.component.form.mailsWidget(cmodule, this.contact);
+					this.wwwWidget = golem.component.form.wwwWidget(this.contact);
+					this.tagWidget = golem.component.form.tagWidget(cmodule, this.contact.tags);
+					// Add or edit
+					if (this.add) {
+						document.title = golem.model.title(l('CONTACTS_NEW'));
+					} else {
+						document.title = golem.model.title(l('CONTACTS_EDIT') +
+							cmodule.model.fullname(this.contact));
+						['show', 'edit', 'remove'].forEach((function (v) {
+							mi[v].url = mi[v].baseUrl + '/' + this.contact._id;
+						}).bind(this));
+						golem.menus.secondary.items.splice(2, 0,
+							mi.show, mi.edit, mi.remove);
+					}
+					m.endComputation();
+				}).bind(this);
+				if (!key) { 
+					newContact();
+					initController();
+				} else {
+					golem.model.db.get(key, (function (err, res) {
+						this.contact = res;
+						if (!this.contact) { newContact(); }
+						initController();
+					}).bind(this));
+				}
       }).bind(this);
       var cd = cmodule.data;
       cd.getTags(golem.model.getLabels.bind(null, 'tels', golem.model.getLabels.bind(null, 'mails', main)));
@@ -93,6 +100,8 @@
             form.textHelper({
               name: 'postalCode',
               label: l('POSTAL_CODE'),
+							maxlength: 5,
+							pattern: '^\\d{5}$',
               value: c.postalCode,
               onchange: m.withAttr('value',
                 function (v) { c.postalCode = v; })

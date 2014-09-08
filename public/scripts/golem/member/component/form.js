@@ -6,9 +6,41 @@
       var l = golem.utils.locale;
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add ];
+      m.startComputation();
+			var newMember = (function () {
+			  this.add = true;
+				this.member = module.model.create({});
+			}).bind(this);
+			var initController = (function () {
+				this.telsWidget = golem.component.form.telsWidget(module, this.member);
+				this.mailsWidget = golem.component.form.mailsWidget(module, this.member);
+				this.wwwWidget = golem.component.form.wwwWidget(this.member);
+				this.tagWidget = golem.component.form.tagWidget(module, this.member.tags);
+				this.skillWidget = new golem.widgets.form.tagWidget.controller({
+					name: 'skills',
+					label: l('SKILLS'),
+					placeholder: l('SKILLS_NEW'),
+					content: l('INFO_FORM_SKILLS'),
+					size: 25,
+					tags: module.data.skills.map(function (skill) { return skill.key[1]; }),
+					current: this.member.skills
+				});
+				if (this.add) {
+					document.title = golem.model.title(l('MEMBERS_NEW'));
+				} else {
+					document.title = golem.model.title(l('CONTACTS_EDIT') +
+						module.model.fullname(this.member));
+					['show', 'edit', 'remove'].forEach((function (v) {
+						mi[v].url = mi[v].baseUrl + '/' + this.member._id;
+					}).bind(this));
+					golem.menus.secondary.items.splice(2, 0,
+						mi.show, mi.edit, mi.remove);
+				}
+				this.familyFromMember = m.prop(true); // TMP : avoiding family form
+				m.endComputation();
+			}).bind(this);
       var key = m.route.param('memberId');
-      this.member = module.model.create({});
-      this.add = true;
+			/* TMP: Family OFF
       this.familyFromMember = m.prop(false);
       this.affectFamily = m.prop(false);
       this.family = m.prop(null);
@@ -27,46 +59,21 @@
             m.endComputation(); 
           }).bind(this)
         );
-      }).bind(this);
-      var main = (function () {
-        golem.model.db.get(key, (function (err, res) {
-          this.member = res;
-          if (!this.member) {
-            this.add = true;
-            this.familyFromMember(false);
-            this.member = module.model.create({});
-          } else {
-            this.add = false;
-            this.familyFromMember(true);
-          }
-          this.telsWidget = golem.component.form.telsWidget(module, this.member);
-          this.mailsWidget = golem.component.form.mailsWidget(module, this.member);
-          this.wwwWidget = golem.component.form.wwwWidget(this.member);
-          this.tagWidget = golem.component.form.tagWidget(module, this.member.tags);
-          this.skillWidget = new golem.widgets.form.tagWidget.controller({
-            name: 'skills',
-            label: l('SKILLS'),
-            placeholder: l('SKILLS_NEW'),
-            content: l('INFO_FORM_SKILLS'),
-            size: 25,
-            tags: module.data.skills.map(function (skill) { return skill.key[1]; }),
-            current: this.member.skills
-          });
-          if (this.add) {
-            document.title = golem.model.title(l('MEMBERS_NEW'));
-          } else {
-            document.title = golem.model.title(l('CONTACTS_EDIT') +
-              module.model.fullname(this.member));
-            ['show', 'edit', 'remove'].forEach((function (v) {
-              mi[v].url = mi[v].baseUrl + '/' + this.member._id;
-            }).bind(this));
-            golem.menus.secondary.items.splice(2, 0,
-              mi.show, mi.edit, mi.remove);
-          }
-          m.endComputation();
-        }).bind(this));
-      }).bind(this);
-      m.startComputation();
+      }).bind(this);*/
+			var main = (function () {
+				if (!key) {
+					newMember();
+					initController(); 
+				} else {
+					golem.model.db.get(key, (function (err, res) {
+						this.member = res;
+						if (!this.member) { newMember(); }
+						initController();
+							//this.familyFromMember(false);
+					}).bind(this));
+				}
+				window.member = this.member;
+			}).bind(this);
       golem.model.getLabels('tels',
         golem.model.getLabels.bind(null, 'mails',
           module.data.getTags.bind(this,
@@ -114,6 +121,7 @@
           id: 'member-form',
           class: 'ui small form',
           onsubmit: ctrl.submit.bind(ctrl) }, [
+					  m('h3', { class: 'ui inverted center aligned purple header' }, l('CIVILITY')),
             m('div', { class: 'two fields' }, [
               form.textHelper({
                 name: 'lastname',
@@ -136,6 +144,98 @@
                 function (v) { f.firstname = v; })
               }),
             ]),
+            m('div', { class: 'fields' }, [
+							m('div', { class: 'one wide field' }, l('GENDER')),
+							m('div', { class: 'two wide field' }, [
+								m('div', { class: 'ui radio checkbox' }, [
+									m('input', {
+										type: 'radio',
+										name: 'gender',
+										value: 'm',
+										checked: (f.gender === 'm'),
+										onchange: function (v) { f.gender = 'm'; }
+									}),
+									m('label', {
+										onclick: function (v) { f.gender = 'm'; }
+									},
+										l('GENDER_MALE')),
+								]),
+							]),
+							m('div', { class: 'two wide field' }, [
+								m('div', { class: 'ui radio checkbox' }, [
+									m('input', {
+										type: 'radio',
+										name: 'gender',
+										value: 'f',
+										checked: (f.gender === 'f'),
+										onchange: function (v) { f.gender = 'f'; }
+									}),
+									m('label', {
+										onclick: function (v) { f.gender = 'f'; }
+									},
+										l('GENDER_FEMALE')),
+								]),
+							]),
+              form.textHelper({
+								cls: 'three wide field',
+							  name: 'birthday',
+								label: l('BIRTHDAY'),
+								placeholder: 'jj, mm, jjmm, jjmmaa, jj/mm/aaaa',
+								pattern: '\\d{2}/\\d{2}/\\d{4}',
+								value: f.birthday ? f.birthday.format('L') : '',
+								onchange: m.withAttr(
+									'value',
+									function (v) {
+										if (!v) {
+											f.birthday = null;
+										} else {
+											v = v.replace('/', '', 'g');
+											var birthday;
+											if (v && /^\d+$/.test(v)) {
+												switch (v.length) {
+													case 1:
+														v = '0' + v;
+													case 2:
+														birthday = moment(v, 'DD');
+														break;
+													case 4:
+														birthday = moment(v, 'DDMM');
+														break;
+													case 6:
+														birthday = moment(v, 'DDMMYY');
+														break;
+													case 8:
+														birthday = moment(v, 'DDMMYYYY');
+														break;
+												}
+											}
+											f.birthday = (birthday && birthday.isValid()) ? birthday : null;
+										}
+									}
+								)
+							}),
+              form.textHelper({
+								cls: 'four wide field',
+							  name: 'nationality',
+								label: l('NATIONALITY'),
+								value: f.nationality,
+								onchange: m.withAttr(
+									'value',
+									function (v) { f.nationality = v; }
+								)
+							}),
+              form.textHelper({
+								cls: 'four wide field',
+							  name: 'profession',
+								label: l('PROFESSION'),
+								value: f.nationality,
+								onchange: m.withAttr(
+									'value',
+									function (v) { f.nationality = v; }
+								)
+							})
+            ]),
+					  m('h3', { class: 'ui inverted center aligned teal header' }, l('CONTACT_DETAILS')),
             m('div', { class: 'three fields' }, [
               form.textHelper({
                 name: 'address',
@@ -148,6 +248,8 @@
                 name: 'postalCode',
                 label: l('POSTAL_CODE'),
                 value: f.postalCode,
+								maxlength: 5,
+								pattern: '^\\d{5}$',
                 onchange: m.withAttr('value',
                   function (v) { f.postalCode = v; })
               }),
@@ -159,12 +261,49 @@
                   function (v) { f.city = v; })
               })
             ]),
-            m('div', [
-              new form.multiFieldWidget.view(ctrl.telsWidget),
+            m('div', { class: 'ui two fields'}, [
+              m('div', { class: 'field' }, [
+								new form.multiFieldWidget.view(ctrl.telsWidget)
+								]),
+              m('div', { class: 'field' }, [
               new form.multiFieldWidget.view(ctrl.mailsWidget)
+							])
             ]),
-            m('div', { class: 'three fields' }, [
-              new form.multiFieldWidget.view(ctrl.wwwWidget),
+					  m('div', { class: 'inline field'}, [
+								m('div', l('COMMUNICATION_MODES')),
+								m('div', { 
+									class: 'ui checkbox',
+					        onclick: function () { 
+										f.communicationModes['mail'] = !f.communicationModes['mail'];
+									}
+								}, [
+								  m('input', {
+										type: 'checkbox',
+										name: 'cmodes-mail',
+										checked: f.communicationModes['mail'],
+										onchange: m.withAttr('checked', function (c) { f.communicationModes['mail'] = c; })
+									}),
+									m('label', l('MAIL'))
+								]),
+								m('div', { 
+									class: 'ui checkbox',
+					        onclick: function () { 
+										f.communicationModes['tel'] = !f.communicationModes['tel'];
+									}
+								}, [
+								  m('input', {
+										type: 'checkbox',
+										name: 'cmodes-tel',
+										checked: f.communicationModes['tel'],
+										onchange: m.withAttr('checked', function (c) { f.communicationModes['tel'] = c; })
+									}),
+									m('label', l('TEL'))
+								])
+						]),
+					  m('h3', { class: 'ui inverted center aligned green header' }, l('MINOR')),
+					  m('h3', { class: 'ui inverted center aligned blue header' }, l('COMPLEMENTARY')),
+            m('div', { class: 'two fields' }, [
+              //new form.multiFieldWidget.view(ctrl.wwwWidget),
               new form.tagWidget.view(ctrl.tagWidget),
               new form.tagWidget.view(ctrl.skillWidget)
             ]),
