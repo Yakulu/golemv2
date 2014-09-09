@@ -9,6 +9,9 @@
 			member.nationality = props.nationality || null;
 			member.profession = props.profession || null;
 			member.communicationModes = props.communicationModes || { mail: false, tel: false };
+			member.guardianLastname = props.guardianLastname || '';
+			member.guardianFirstname = props.guardianFirstname || '';
+			member.authorizations = props.authorizations || { activities: false, photos: false };
       member.skills = props.skills || [];
       //member.family = false;
       //member.cafNumber = props.cafNumber || null;

@@ -33,7 +33,7 @@
         f = f.doc;
         return m('tr', [
           m('td', module.model.fullname(f)),
-          m('td', f.family),
+          //m('td', f.family),
           m('td', module.model.fulladdress(f)),
           m('td', f.tels.map(function (tel) {
             if (tel.default) {
@@ -64,7 +64,7 @@
           m('thead', [
             m('tr', [
               m('th', l('LASTNAME')),
-              m('th', l('FAMILY')),
+              //m('th', l('FAMILY')),
               m('th', l('CITY')),
               m('th', [
                 l('TEL'),

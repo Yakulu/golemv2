@@ -12,6 +12,7 @@
 				this.member = module.model.create({});
 			}).bind(this);
 			var initController = (function () {
+				this.minorExpanded = false;
 				this.telsWidget = golem.component.form.telsWidget(module, this.member);
 				this.mailsWidget = golem.component.form.mailsWidget(module, this.member);
 				this.wwwWidget = golem.component.form.wwwWidget(this.member);
@@ -72,7 +73,6 @@
 							//this.familyFromMember(false);
 					}).bind(this));
 				}
-				window.member = this.member;
 			}).bind(this);
       golem.model.getLabels('tels',
         golem.model.getLabels.bind(null, 'mails',
@@ -83,7 +83,6 @@
       }).bind(this);
     },
     view: function (ctrl) {
-      window.ctrl = ctrl;
       var l = golem.utils.locale;
       var f = ctrl.member;
       var form = golem.widgets.form;
@@ -182,7 +181,7 @@
 								label: l('BIRTHDAY'),
 								placeholder: 'jj, mm, jjmm, jjmmaa, jj/mm/aaaa',
 								pattern: '\\d{2}/\\d{2}/\\d{4}',
-								value: f.birthday ? f.birthday.format('L') : '',
+								value: f.birthday ? moment(f.birthday).format('L') : '',
 								onchange: m.withAttr(
 									'value',
 									function (v) {
@@ -209,7 +208,20 @@
 														break;
 												}
 											}
-											f.birthday = (birthday && birthday.isValid()) ? birthday : null;
+											if (birthday && birthday.isValid()) {
+												f.birthday = birthday.toString();
+												// If the person is minor, expand the fields
+												var isMinor = birthday.isAfter(moment().subtract(18, 'years'));
+												if (isMinor) {
+													ctrl.minorExpanded = true; 
+													if (ctrl.add) {
+														member.authorizations.activities = true;
+														member.authorizations.photos = true;
+													}
+												}
+											} else {
+												f.birthday = null;
+											}
 										}
 									}
 								)
@@ -228,10 +240,10 @@
 								cls: 'four wide field',
 							  name: 'profession',
 								label: l('PROFESSION'),
-								value: f.nationality,
+								value: f.profession,
 								onchange: m.withAttr(
 									'value',
-									function (v) { f.nationality = v; }
+									function (v) { f.profession = v; }
 								)
 							})
             ]),
@@ -269,38 +281,88 @@
               new form.multiFieldWidget.view(ctrl.mailsWidget)
 							])
             ]),
-					  m('div', { class: 'inline field'}, [
-								m('div', l('COMMUNICATION_MODES')),
-								m('div', { 
-									class: 'ui checkbox',
-					        onclick: function () { 
-										f.communicationModes['mail'] = !f.communicationModes['mail'];
-									}
-								}, [
+					  m('div', { class: 'three fields'}, [
+								m('div', { class: 'field' }, l('COMMUNICATION_MODES')),
+								m('div', { class: 'inline field', }, [
 								  m('input', {
 										type: 'checkbox',
 										name: 'cmodes-mail',
 										checked: f.communicationModes['mail'],
 										onchange: m.withAttr('checked', function (c) { f.communicationModes['mail'] = c; })
 									}),
-									m('label', l('MAIL'))
+									m('label', { for: 'cmodes-mail' }, l('MAIL'))
 								]),
-								m('div', { 
-									class: 'ui checkbox',
-					        onclick: function () { 
-										f.communicationModes['tel'] = !f.communicationModes['tel'];
-									}
-								}, [
+								m('div', { class: 'inline field', }, [
 								  m('input', {
 										type: 'checkbox',
 										name: 'cmodes-tel',
 										checked: f.communicationModes['tel'],
 										onchange: m.withAttr('checked', function (c) { f.communicationModes['tel'] = c; })
 									}),
-									m('label', l('TEL'))
+									m('label', { for: 'cmodes-tel' }, l('TEL'))
 								])
 						]),
-					  m('h3', { class: 'ui inverted center aligned green header' }, l('MINOR')),
+					  m('h3', { class: 'ui inverted center aligned green header' }, [
+							m('span', [
+								l('MINOR') + ' ',
+								(function () {
+									var iconCls = ctrl.minorExpanded ? 'icon circle up' : 'icon circle down';
+									var icon =  m('i', {
+										class: iconCls,
+									  style: { cursor: 'pointer' },
+										onclick: function () { ctrl.minorExpanded = !ctrl.minorExpanded; }
+									});
+									return icon;
+								}).call(this)
+							])
+						]),
+					  m('div', {
+							class: 'fields',
+							style: { display: ctrl.minorExpanded ? 'block' : 'none' }
+						}, [
+					    m('div', { class: 'two wide field' }, l('CHILD_GUARDIAN')),
+              form.textHelper({
+								cls: 'three wide field',
+                name: 'guardian-lastname',
+                label: l('LASTNAME'),
+                minlength: 2,
+                maxlength: 100,
+                required: true,
+                value: f.guardianLastname,
+                onchange: m.withAttr('value',
+                  function (v) { f.guardianLastname = v; })
+              }),
+              form.textHelper({
+								cls: 'three wide field',
+                name: 'guardian-firstname',
+                label: l('FIRSTNAME'),
+                minlength: 2,
+                maxlength: 100,
+                required: true,
+                value: f.guardianFirstname,
+                onchange: m.withAttr('value',
+                function (v) { f.guardianFirstname = v; })
+              }),
+					    m('div', { class: 'two wide field' }, l('AUTHORIZATIONS')),
+					    m('div', { class: 'three wide inline field' }, [
+								m('input', {
+									type: 'checkbox',
+									name: 'authorizations-activities',
+									checked: f.authorizations['activities'],
+									onchange: m.withAttr('checked', function (c) { f.authorizations['activities'] = c; })
+								}),
+								m('label', { for: 'authorizations-activities' }, l('ACTIVITIES_PARTICIPATION'))
+							]),
+					    m('div', { class: 'three wide inline field' }, [
+								m('input', {
+									type: 'checkbox',
+									name: 'authorizations-photos',
+									checked: f.authorizations['photos'],
+									onchange: m.withAttr('checked', function (c) { f.authorizations['photos'] = c; })
+								}),
+								m('label', { for: 'authorizations-photos' }, l('AUTHORIZATIONS_PHOTOS'))
+							])
+						]),
 					  m('h3', { class: 'ui inverted center aligned blue header' }, l('COMPLEMENTARY')),
             m('div', { class: 'two fields' }, [
               //new form.multiFieldWidget.view(ctrl.wwwWidget),
@@ -311,6 +373,7 @@
               m('label', { for: 'note' }, l('NOTE')),
               m('textarea', {
                   name: 'note',
+									value: f.note,
                   onchange: m.withAttr('value',
                     function (v) { f.note = v; })
                 }, f.note)
