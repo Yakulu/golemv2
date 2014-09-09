@@ -46,13 +46,13 @@
             }
           })),
           m('td', { class: 'actions' }, [
-            m('a', { href: '#/member/show/' + f._id }, [
+            m('a', { href: '#/member/show/' + f._id, title: l('VIEW') }, [
               m('i', { class: 'unhide icon' })
             ]),
-            m('a', { href: '#/member/edit/' + f._id }, [
+            m('a', { href: '#/member/edit/' + f._id, title: l('EDIT') }, [
               m('i', { class: 'edit icon' })
             ]),
-            m('a', { href: '#/member/remove/' + f._id }, [
+            m('a', { href: '#/member/remove/' + f._id, title: l('DELETE') }, [
               m('i', { class: 'remove icon' })
             ])
           ])

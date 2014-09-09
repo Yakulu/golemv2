@@ -327,7 +327,6 @@
                 label: l('LASTNAME'),
                 minlength: 2,
                 maxlength: 100,
-                required: true,
                 value: f.guardianLastname,
                 onchange: m.withAttr('value',
                   function (v) { f.guardianLastname = v; })
@@ -338,7 +337,6 @@
                 label: l('FIRSTNAME'),
                 minlength: 2,
                 maxlength: 100,
-                required: true,
                 value: f.guardianFirstname,
                 onchange: m.withAttr('value',
                 function (v) { f.guardianFirstname = v; })

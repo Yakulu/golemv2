@@ -64,6 +64,7 @@
 			}
 			var communication = (function () {
 				var fcm = f.communicationModes;
+				if (f.tels.length === 0 && f.mails.length === 0) { return ''; }
 			  var content = l('COMMUNICATION_MODES_ACCEPTANCE') + ':'; 
 				if (!fcm.mail && !fcm.tel) {
 					content += ' ' + l('NONE');
@@ -88,7 +89,9 @@
 									tag
 								]);
 							});
-							tagsItems.unshift(m('span', l('MENU_TAGS') + ' '));
+							if (tagsItems.length > 0) {
+								tagsItems.unshift(m('span', l('MENU_TAGS') + ' '));
+							}
 							return tagsItems;
 						}).call(this)
 					),
@@ -104,13 +107,15 @@
 									skill
 								]);
 							});
-							skillsItems.unshift(m('span', l('SKILLS') + ' '));
+							if (skillsItems.length > 0) {
+								skillsItems.unshift(m('span', l('SKILLS') + ' '));
+							}
 							return skillsItems;
 						}).call(this)
 					)
 				]),
         m('h2', module.model.fullname(f)),
-        m('p', m.trust(f.note)),
+        m('p', { class: 'ui basic segment' },  f.note), //m.trust(f.note)),
         m('div', { class: 'ui two column grid' }, [
           m('div', { class: 'column' }, columnLeftContent),
           m('div', { class: 'column' }, [
