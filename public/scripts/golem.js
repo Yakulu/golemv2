@@ -65,6 +65,8 @@
       '/member/list': gm.member.component.list,
       '/member/add': gm.member.component.form,
       '/member/edit/:memberId': gm.member.component.form,
+      '/member/show/:memberId': gm.member.component.show,
+      '/member/remove/:memberId': gm.member.component.remove,
     });
   };
 }).call(this);
