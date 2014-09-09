@@ -215,8 +215,8 @@
 												if (isMinor) {
 													ctrl.minorExpanded = true; 
 													if (ctrl.add) {
-														member.authorizations.activities = true;
-														member.authorizations.photos = true;
+														f.authorizations.activities = true;
+														f.authorizations.photos = true;
 													}
 												}
 											} else {
