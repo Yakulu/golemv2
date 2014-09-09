@@ -79,9 +79,8 @@
           m('p',
 						(function () {
 							var tagsItems = f.tags.map(function (tag) {
-								return m('a', {
+								return m('span', {
 										class: 'ui small teal label golem-tag',
-										href: '#/member/list/filter/tag/' + tag,
 										title: l('MEMBERS_BY_TAGS'),
 										//config: m.route
 									}, [
@@ -98,9 +97,8 @@
 					m('p',
 						(function () { 
 							var skillsItems = f.skills.map(function (skill) {
-								return m('a', {
+								return m('span', {
 										class: 'ui small blue label golem-tag',
-										href: '#/member/list/filter/skill/' + skill,
 										title: l('MEMBERS_BY_SKILLS'),
 										//config: m.route
 									}, [

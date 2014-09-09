@@ -19,6 +19,7 @@
 				this.credentials = { login: m.prop(''), password: m.prop('') };
 				this.send = (function (e) {
 					e.preventDefault();
+					console.log(JSON.stringify(this.credentials));
 					if (!isAuthorized()) {
 						golem.utils.sendNotification(
 							'Erreur',
@@ -43,7 +44,7 @@
 										type: 'text',
 										placeholder: l('LOGIN'),
 										value: ctrl.credentials.login(),
-					          onchange: m.withAttr('value', ctrl.credentials.login)
+					          oninput: m.withAttr('value', ctrl.credentials.login)
 									}),
 									m('i', { class: 'icon asterisk' })
 								])
@@ -56,7 +57,7 @@
 										placeholder: l('PASSWORD'),
 										type: 'password',
 										value: ctrl.credentials.password(),
-					          onchange: m.withAttr('value', ctrl.credentials.password)
+					          oninput: m.withAttr('value', ctrl.credentials.password)
 									}),
 									m('i', { class: 'icon lock' })
 								])
