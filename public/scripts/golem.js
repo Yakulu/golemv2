@@ -30,30 +30,37 @@
   //});
   var init = function () {
     // Layout modules initialization
-    var roots = {
+    golem.roots = {
       header: document.getElementById('golem-header'),
       mainMenu: document.getElementById('golem-mainmenu'),
       //contextMenu: document.getElementById('golem-contextmenu'),
       main: document.getElementById('golem-main'),
       footer: document.getElementById('golem-footer'),
     };
+		var roots = golem.roots;
     m.module(roots.header, golem.header);
     m.module(roots.footer, golem.footer);
     m.module(roots.mainMenu, golem.menus.main);
     //m.module(roots.contextMenu, golem.home.context);
-
+		// TMP : AUTH
+		m.module(roots.main, golem.auth.main);
+  };
+	
+	golem.initRouting = function () {
     var gm = golem.module;
+		var roots = golem.roots;
     // Routing
     m.route.mode = 'hash';
     m.route(roots.main, '/', {
       '/': golem.home.main,
+      '/auth': golem.auth.main,
       '/family': gm.family.component.list,
       '/family/list': gm.family.component.list,
       '/family/add': gm.family.component.form,
       '/family/edit/:familyId': gm.family.component.form,
       '/family/show/:familyId': gm.family.component.show,
       '/family/remove/:familyId': gm.family.component.remove,
-      '/contact': gm.contact.component.list,
+      //'/contact': gm.contact.component.list,
       '/contact/list': gm.contact.component.list,
       '/contact/list/page/:page': gm.contact.component.list,
       '/contact/tags': gm.contact.component.tags,
@@ -70,5 +77,6 @@
       '/member/show/:memberId': gm.member.component.show,
       '/member/remove/:memberId': gm.member.component.remove,
     });
-  };
+	};
+	
 }).call(this);

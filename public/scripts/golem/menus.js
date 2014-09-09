@@ -32,7 +32,7 @@
         var l = golem.utils.locale;
         return [
           new menus.Item(l('MENU_HOME'), '/home', 'home'),
-          new menus.Item(l('MENU_CONTACTS'), '/contact', 'book'),
+          new menus.Item(l('MENU_CONTACTS'), '/contact', 'book', 'item disabled'),
           //new menus.Item(l('MENU_FAMILIES'), '/family', 'sitemap'),
           new menus.Item(l('MENU_MEMBERS'), '/member', 'user'),
           new menus.Item(l('MENU_MESSAGES'), '/mail', 'mail', 'item disabled'),
