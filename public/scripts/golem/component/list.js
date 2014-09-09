@@ -28,6 +28,44 @@
           ])
         ])
       };
-    }
+    },
+    tagsBox: function (tags, ctrl) {
+			var tagsIconAttrs = { class: 'tags icon' };
+			var tagsClass = '';
+			if (ctrl.tagFilter) {
+				tagsIconAttrs = { class: 'eraser icon', title: l('FILTERS_REMOVE') };
+				tagsClass = ' active';
+			}
+			return {
+				head: m('div', { class: 'header item' }, l('FILTERS')),
+				groups: m('a', { class: 'item' }, [
+					m('i', { class: 'users icon' }),
+					l('BY_GROUPS')
+				]),
+				tags: m('div', [
+					m('a', {
+						class: 'item' + tagsClass,
+						onclick: ctrl.unsetTagFilter
+						//config: m.route
+					}, [
+						m('i', tagsIconAttrs),
+						l('BY_TAGS')
+					]),
+					m('a', tags.map(function (tag) {
+						var items = [
+							tag.key[1],
+							m('div', { class: 'ui small teal label' }, tag.value)
+						];
+						var classTag = 'item';
+						if (ctrl.tagFilter === tag.key[1]) { classTag += ' active'; }
+						return m('a', {
+								class: classTag,
+								onclick: ctrl.setTagFilter.bind(ctrl, tag.key[1])
+							}, items);
+					})
+					)
+				])
+			};
+		}
   };
 }).call(this);

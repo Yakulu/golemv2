@@ -9,6 +9,29 @@
       this.search = (function (e) {
         this.filteredItems = golem.component.list.search(e, this.items);
       }).bind(this);
+			
+      var callback = (function (err, results) {
+        this.items = results.rows;
+        m.endComputation();
+      }).bind(this);
+      this.tagFilter = this.tagFilter || false;
+      this.setTagFilter = (function (tag) {
+        this.tagFilter = tag;
+        m.startComputation();
+        golem.model.db.query(
+          'tags/count',
+          {
+            reduce: false,
+            key: ['member', this.tagFilter],
+            include_docs: true
+          }, callback
+        );
+      }).bind(this);
+      this.unsetTagFilter = (function () {
+        this.tagFilter = false;
+        getMembers();
+      }).bind(this);
+			
       // Init
       this.items = [];
       var getMembers = (function () {
@@ -18,14 +41,11 @@
           {
             startkey: ['member'],
             endkey: ['member', {}],
-            include_docs: true
-          }, (function (err, res) {
-            this.items = res.rows;
-            m.endComputation(); 
-          }).bind(this)
-        );
-      }).bind(this);
-      getMembers();
+            include_docs: true,
+          }, callback
+				);
+			}).bind(this)
+      module.data.getTags(getMembers);
     },
     view: function (ctrl) {
       var l = golem.utils.locale;
@@ -81,10 +101,12 @@
         ])
       ]);
       var searchBox = golem.component.list.searchBox(ctrl.search);
+			var tagsBox = golem.component.list.tagsBox(module.data.tags, ctrl);
       var contextMenuContent = m('section', { class: 'four wide column' }, 
         m('nav', [
           m('menu', { class: 'ui small vertical menu' }, [
-            searchBox.head, searchBox.content
+            searchBox.head, searchBox.content,
+						tagsBox.head, tagsBox.tags
           ])
         ])
       );

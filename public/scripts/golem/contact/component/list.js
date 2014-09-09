@@ -147,48 +147,13 @@
 
       var contextMenuContent = (function () {
         var searchBox = golem.component.list.searchBox(ctrl.search);
-        var tagsIconAttrs = { class: 'tags icon' };
-        var tagsClass = '';
-        if (ctrl.tagFilter) {
-          tagsIconAttrs = { class: 'eraser icon', title: l('FILTERS_REMOVE') };
-          tagsClass = ' active';
-        }
-        var filtersBox = {
-          head: m('div', { class: 'header item' }, l('FILTERS')),
-          groups: m('a', { class: 'item' }, [
-            m('i', { class: 'users icon' }),
-            l('BY_GROUPS')
-          ]),
-          tags: m('div', [
-            m('a', {
-              class: 'item' + tagsClass,
-              onclick: ctrl.unsetTagFilter
-              //config: m.route
-            }, [
-              m('i', tagsIconAttrs),
-              l('BY_TAGS')
-            ]),
-            m('a', module.data.tags.map(function (tag) {
-              var items = [
-                tag.key[1],
-                m('div', { class: 'ui small teal label' }, tag.value)
-              ];
-              var classTag = 'item';
-              if (ctrl.tagFilter === tag.key[1]) { classTag += ' active'; }
-              return m('a', {
-                  class: classTag,
-                  onclick: ctrl.setTagFilter.bind(ctrl, tag.key[1])
-                }, items);
-            })
-            )
-          ])
-        };
+				var tagsBox = golem.component.list.tagsBox(module.data.tags, ctrl);
         return m('nav', [
           m('menu', { class: 'ui small vertical menu' }, [
             searchBox.head,
             searchBox.content,
-            filtersBox.head,
-            filtersBox.tags
+            tagsBox.head,
+            tagsBox.tags
           ])
         ]);
       }).call(this);
