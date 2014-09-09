@@ -4,7 +4,7 @@
     controller: function () {
       var l = golem.utils.locale;
       var mi = module.data.menuItems;
-      golem.menus.secondary.items = [ mi.list, mi.add ];
+      golem.menus.secondary.items = [ mi.list, mi.add, mi.tags, mi.skills ];
       document.title = golem.model.title(l('MEMBERS_LIST'));
       this.search = (function (e) {
         this.filteredItems = golem.component.list.search(e, this.items);
