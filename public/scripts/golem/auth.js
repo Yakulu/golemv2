@@ -12,15 +12,16 @@
 					var sha = new jsSHA(val, 'TEXT');
 					return sha.getHash('SHA-1', 'HEX');
 				};
-				var isAuthorized = (function () {
-					return (getHash(this.credentials.login()) === credentials.login &&
-					  getHash(this.credentials.password()) === credentials.password); 
-				}).bind(this);
-				this.credentials = { login: m.prop(''), password: m.prop('') };
+				var isAuthorized = function (login, password) {
+					return (getHash(login) === credentials.login && getHash(password) === credentials.password); 
+				};
 				this.send = (function (e) {
 					e.preventDefault();
-					console.log(JSON.stringify(this.credentials));
-					if (!isAuthorized()) {
+					var login = document.getElementsByName('login')[0].value;
+					var password = document.getElementsByName('password')[0].value;
+					console.log(login);
+					console.log(password);
+					if (!isAuthorized(login, password)) {
 						golem.utils.sendNotification(
 							'Erreur',
 							{ body: 'Mot de passe ou identifiant invalides' },
@@ -42,9 +43,7 @@
 									m('input', {
 										name: 'login',
 										type: 'text',
-										placeholder: l('LOGIN'),
-										value: ctrl.credentials.login(),
-					          oninput: m.withAttr('value', ctrl.credentials.login)
+										placeholder: l('LOGIN')
 									}),
 									m('i', { class: 'icon asterisk' })
 								])
@@ -55,9 +54,7 @@
 									m('input', {
 										name: 'password',
 										placeholder: l('PASSWORD'),
-										type: 'password',
-										value: ctrl.credentials.password(),
-					          oninput: m.withAttr('value', ctrl.credentials.password)
+										type: 'password'
 									}),
 									m('i', { class: 'icon lock' })
 								])
