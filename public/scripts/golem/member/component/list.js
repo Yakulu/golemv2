@@ -36,14 +36,7 @@
       this.items = [];
       var getMembers = (function () {
         m.startComputation();
-        golem.model.db.query(
-          'all/bySchema',
-          {
-            startkey: ['member'],
-            endkey: ['member', {}],
-            include_docs: true,
-          }, callback
-				);
+        golem.model.getBySchema('member', callback);
 			}).bind(this)
       module.data.getTags(getMembers);
     },

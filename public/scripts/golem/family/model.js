@@ -18,11 +18,7 @@
       };
     },
     fulladdress: function (f) {
-      if (f.city) {
-        return f.address + ' ' + f.postalCode + ' ' + f.city;
-      } else {
-        return '';
-      }
+      return [f.address, f.postalCode, f.city].join(' ');
     }
   };
 }).call(this);

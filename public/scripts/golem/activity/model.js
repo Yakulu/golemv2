@@ -13,6 +13,10 @@
         places: props.places || null,
         note: props.note || ''
       };
+    },
+    fullLabel: function (a) {
+      if (a.code) { return a.code + ' ' + a.label; }
+      return a.label;
     }
     // TODO : full, remainingPlaces, number of subscribers etc
   };

@@ -12,10 +12,19 @@
 				this.member = module.model.create({});
 			}).bind(this);
 			var initController = (function () {
+        if (this.member.activities.length === 0) {
+          this.selectedActivities = [];
+        } else {
+          this.selectedActivities = this.activities.filter((function (a) { 
+            return (this.member.activities.indexOf(a.id) !== -1);
+          }).bind(this));
+          this.selectedActivities = this.selectedActivities.map((function (a) { 
+              return golem.module.activity.model.fullLabel(a.doc);
+          }).bind(this));
+        }
 				this.minorExpanded = false;
 				this.telsWidget = golem.component.form.telsWidget(module, this.member);
 				this.mailsWidget = golem.component.form.mailsWidget(module, this.member);
-				this.wwwWidget = golem.component.form.wwwWidget(this.member);
 				this.tagWidget = golem.component.form.tagWidget(module, this.member.tags);
 				this.skillWidget = new golem.widgets.form.tagWidget.controller({
 					name: 'skills',
@@ -26,6 +35,13 @@
 					tags: module.data.skills.map(function (skill) { return skill.key[1]; }),
 					current: this.member.skills
 				});
+        /*this.activitiesWidget = new golem.widgets.form.multiFieldWidget.controller({
+          tagName: 'select',
+          label: l('ACTIVITIES_CHOICE'),
+          name: 'activities',
+          content: l('INFO_FORM_ACTIVITIES'),
+          current: this.member.activities
+        });*/
 				if (this.add) {
 					document.title = golem.model.title(l('MEMBERS_NEW'));
 				} else {
@@ -73,11 +89,15 @@
 							//this.familyFromMember(false);
 					}).bind(this));
 				}
+        window.ctrl = this;
 			}).bind(this);
-      golem.model.getLabels('tels',
-        golem.model.getLabels.bind(null, 'mails',
-          module.data.getTags.bind(this,
-            module.data.getSkills.bind(this, main))));
+      golem.model.getBySchema('activity', (function (err, res) {
+        this.activities = res.rows;
+        golem.model.getLabels('tels',
+          golem.model.getLabels.bind(null, 'mails',
+            module.data.getTags.bind(this,
+              module.data.getSkills.bind(this, main))))
+      }).bind(this));
       this.submit = golem.component.form.submit.bind(this, 'member', '/member/list');
     },
     view: function (ctrl) {
@@ -85,6 +105,15 @@
       var f = ctrl.member;
       var form = golem.widgets.form;
       var h2 = ctrl.add ? l('MEMBERS_NEW') : l('CONTACTS_EDIT') + ' ' + module.model.fullname(f);
+      var activitiesList = (function () {
+        var content;
+        if (f.activities.length === 0) {
+          content = l('NONE_F');
+        } else {
+          content = ctrl.selectedActivities.join(', ');
+        }
+        return m('span', content);
+      }).call(this);
       var initialContent = m('section', { class: 'ui piled segment' }, [
         m('p', l('MEMBERS_NEW_FAMILY_MSG')),
         m('button', {
@@ -374,21 +403,69 @@
                     function (v) { f.note = v; })
                 }, f.note)
             ]),
-            m('input', {
-                id: 'member-submit',
-                class:'ui teal submit button',
-                type: 'submit',
-                form: 'member-form',
-                value: ctrl.add ? l('SAVE') : l('UPDATE')
-            }),
-            m('button', {
-                name: 'cancel',
-                class: 'ui button',
-                type: 'button',
-                onclick: function () { 
-                  window.location.hash = '#/member/list';
-                }
-              }, l('CANCEL'))
+					  m('h3', { class: 'ui inverted center aligned red header' }, l('MENU_ACTIVITIES')),
+            m('div', { class: 'ui grid' }, [
+              m('div', { class: 'eight wide column' }, [
+                m('div.field', [
+                  // TODO : multiFieldWidget refactoring to allow select and others...
+                  m('select', {
+                    name: 'activities',
+                    multiple: true,
+                    size: ctrl.activities.length + 1,
+                    onchange: function (e) {
+                      var selectedActivities = [];
+                      ctrl.selectedActivities = [];
+                      for (var i = 0, l = e.target.options.length; i < l; i++) {
+                        var option = e.target.options[i];
+                        if (option.selected) {
+                          selectedActivities.push(option.value); 
+                          ctrl.selectedActivities.push(option.text); 
+                        }
+                      }
+                      f.activities = selectedActivities;
+                    }
+                  }, [
+                    m('optgroup', { label: l('MENU_ACTIVITIES') }, [
+                      ctrl.activities.map(function (a) {
+                        return m('option', {
+                          value: a.id,
+                          label: golem.module.activity.model.fullLabel(a.doc),
+                          selected: (f.activities.indexOf(a.id) !== -1)
+                        }, golem.module.activity.model.fullLabel(a.doc));
+                      })
+                    ])
+                  ]),
+                m('p', [
+                  m('span', l('ACTIVITIES_SELECTED')),
+                  activitiesList
+                ])
+              ])
+            ]),
+            m('div', { class: 'eight wide column' }, [
+              m('div', { class: 'ui purple inverted segment' }, [
+                m('h3', [
+                  m('i', { class: 'info icon' }),
+                  m('span', l('HELP'))
+                ]),
+                m('p', m.trust(l('ACTIVITIES_HELP')))
+              ])
+            ])
+          ]),
+          m('input', {
+              id: 'member-submit',
+              class:'ui teal submit button',
+              type: 'submit',
+              form: 'member-form',
+              value: ctrl.add ? l('SAVE') : l('UPDATE')
+          }),
+          m('button', {
+              name: 'cancel',
+              class: 'ui button',
+              type: 'button',
+              onclick: function () { 
+                window.location.hash = '#/member/list';
+              }
+            }, l('CANCEL'))
         ])
       ]);
       var contextMenuContent = m('nav', [

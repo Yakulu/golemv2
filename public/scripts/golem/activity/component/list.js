@@ -16,14 +16,7 @@
       }).bind(this);
       var getActivities = (function () {
         m.startComputation();
-        golem.model.db.query(
-          'all/bySchema',
-          {
-            startkey: ['activity'],
-            endkey: ['activity', {}],
-            include_docs: true,
-          }, callback
-				);
+        golem.model.getBySchema('activity', callback);
 			}).bind(this)
       getActivities();
     },

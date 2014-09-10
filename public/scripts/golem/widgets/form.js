@@ -60,6 +60,14 @@
         return m('div', box);
       }
     },
+    selectHelper: function (config) {
+      // TODO
+      // Defaults
+      // Attributes
+      var selectAttr = {};
+      // Element
+      return m('select', selectAttr);
+    },
     inputHelper: function (config) {
       // Defaults
       var placeholder = config.placeholder || config.label;
@@ -101,6 +109,7 @@
       controller: function (config) {
         var l = golem.utils.locale;
         // Internal state
+        this.tagName = config.tagName;
         this.type = config.type;
         this.label = config.label;
         this.name = config.name;
@@ -248,9 +257,10 @@
           } else { // Complex fields like mail and tel
             ctrl.onchange = ctrl.change.bind(ctrl, num, 'value');
           }
+          var valueField = (ctrl.tagName && ctrl.tagName === 'select') ? form.selectHelper(ctrl) : form.inputHelper(ctrl);
           fields.push(m('div', { class: 'seven wide field' }, [
               m('div', { class: 'ui action input' }, [
-                form.inputHelper(ctrl),
+                valueField,
                 removeField
               ])
             ])

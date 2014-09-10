@@ -1,5 +1,14 @@
 (function () {
   golem.model = {
+    getBySchema: function (schema, callback) {
+      golem.model.db.query(
+        'all/bySchema',
+        {
+          startkey: [schema],
+          endkey: [schema, {}],
+          include_docs: true,
+        }, callback);
+    },
     labels: { mails: [], tels: [] },
     getTags: function (type, module, field, callback) {
       golem.model.db.query(
@@ -46,6 +55,24 @@
             map: function (doc) {
               if (doc.schema) {
                 emit([doc.schema, doc.creationDate], null);
+              }
+            }.toString()
+          }
+        }
+      },
+      members: {
+        _id: '_design/members',
+        views: {
+          byActivity: {
+            map: function (doc) {
+              if (doc.schema) {
+                if (doc.schema === 'member') {
+                  for (var i = 0, l = doc.activities; i < l; i++) {
+                    emit([doc.activities[i], doc.schema], null);
+                  }
+                } else if (doc.schema === 'activity') {
+                  emit([doc._id, doc.schema], null);
+                }
               }
             }.toString()
           }
