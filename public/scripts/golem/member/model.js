@@ -4,6 +4,7 @@
     create: function (props) {
       var member = gm.contact.model.create(props);
       member.schema = 'member';
+      member.number = props.number || null;
 			member.birthday = props.birthday || null;
 			member.gender = props.gender || null;
 			member.nationality = props.nationality || null;

@@ -45,6 +45,7 @@
       var itemDom = function (f) {
         f = f.doc;
         return m('tr', [
+          m('td', f.number),
           m('td', module.model.fullname(f)),
           //m('td', f.family),
           m('td', module.model.fulladdress(f)),
@@ -76,9 +77,10 @@
         m('table', { class: 'ui basic table' }, [
           m('thead', [
             m('tr', [
+              m('th', l('MEMBER_NUMBER')),
               m('th', l('LASTNAME')),
               //m('th', l('FAMILY')),
-              m('th', l('CITY')),
+              m('th', l('ADDRESS')),
               m('th', [
                 l('TEL'),
                 m('i', { class: 'icon info', title: l('DEFAULT_ONLY') })

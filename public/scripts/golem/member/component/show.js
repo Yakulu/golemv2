@@ -129,7 +129,10 @@
 						}).call(this)
 					)
 				]),
-        m('h2', module.model.fullname(f)),
+        m('h2', [
+          m('span', module.model.fullname(f)),
+          m('span', f.number ? ' (' + f.number + ')' : '')
+        ]),
         m('p', { class: 'ui basic segment' },  f.note), //m.trust(f.note)),
         m('div', { class: 'ui two column grid' }, [
           m('div', { class: 'column' }, columnLeftContent),

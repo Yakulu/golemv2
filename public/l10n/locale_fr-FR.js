@@ -79,6 +79,7 @@
     ELEMENTS: 'Éléments',
     PERSON: 'Personne',
     MEMBER: 'Adhérent',
+    MEMBER_NUMBER: 'Numéro d\'adhérent',
     MEMBERS_LIST: 'Liste des adhérents',
     MEMBERS_BY_TAGS: 'Liste des adhérents filtrée par label',
     MEMBERS_BY_SKILLS: 'Liste des adhérents filtrée par compétence',

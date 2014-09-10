@@ -148,8 +148,19 @@
           class: 'ui small form',
           onsubmit: ctrl.submit.bind(ctrl) }, [
 					  m('h3', { class: 'ui inverted center aligned purple header' }, l('CIVILITY')),
-            m('div', { class: 'two fields' }, [
+            m('div', { class: 'fields' }, [
               form.textHelper({
+                cls: 'four wide field',
+                name: 'number',
+                label: l('MEMBER_NUMBER'),
+                minlength: 1,
+                maxlength: 20,
+                value: f.number,
+                onchange: m.withAttr('value',
+                  function (v) { f.number = v; })
+              }),
+              form.textHelper({
+                cls: 'six wide field',
                 name: 'lastname',
                 label: l('LASTNAME'),
                 minlength: 2,
@@ -160,6 +171,7 @@
                   function (v) { f.lastname = v; })
               }),
               form.textHelper({
+                cls: 'six wide field',
                 name: 'firstname',
                 label: l('FIRSTNAME'),
                 minlength: 2,
