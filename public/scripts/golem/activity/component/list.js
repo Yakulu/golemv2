@@ -12,7 +12,18 @@
       }).bind(this);
       var callback = (function (err, results) {
         this.items = results.rows;
-        m.endComputation();
+        golem.model.getMembersFromActivity(null, (function (err, res) {
+          this.takenPlacesByActivity = {};
+          for (var i = 0, l = res.rows.length; i < l; i++) {
+            var aId = res.rows[i].key[0];
+            if (!this.takenPlacesByActivity[aId]) {
+              this.takenPlacesByActivity[aId] = 1;
+            } else {
+              this.takenPlacesByActivity[aId] += 1;
+            }
+          }
+          m.endComputation();
+        }).bind(this));
       }).bind(this);
       var getActivities = (function () {
         m.startComputation();
@@ -22,6 +33,24 @@
     },
     view: function (ctrl) {
       var l = golem.utils.locale;
+      var placesDom = function (i) {
+        var color = 'inherit';
+        if (i.places) {
+          var distance = i.places - ctrl.takenPlacesByActivity[i._id];
+          if (distance <= 0) { // Red
+            color = 'red';
+          } else {
+            if (distance < 5) { // Orange
+              color = 'orange';
+            } else { // Green
+              color = 'green';
+            }
+          }
+        }
+        return m('span',
+          { style: { color: color } },
+          ctrl.takenPlacesByActivity[i._id]);
+      };
       var itemDom = function (i) {
         i = i.doc;
         return m('tr', [
@@ -30,6 +59,7 @@
           m('td', i.timeSlot),
           m('td', i.monitor),
           m('td', i.places),
+          m('td', placesDom(i)),
           m('td', { class: 'actions' }, [
             m('a', { href: '#/activity/show/' + i._id, title: l('VIEW') }, [
               m('i', { class: 'unhide icon' })
@@ -51,6 +81,7 @@
             m('th', l('TIMESLOT')),
             m('th', l('MONITOR')),
             m('th', l('PLACES')),
+            m('th', l('PLACES_TAKEN')),
             m('th', { width: '10%' }, l('ACTIONS'))
           ])
         ]),

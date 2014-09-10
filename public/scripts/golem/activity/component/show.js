@@ -16,7 +16,10 @@
         golem.menus.secondary.items = [
           mi.list, mi.add, mi.show, mi.edit, mi.remove
         ];
-        m.endComputation();
+        golem.model.getMembersFromActivity(this.activity._id, (function (err, res) {
+          this.members = res.rows;
+          m.endComputation();
+        }).bind(this));
       }).bind(this));
     },
     view: function (ctrl) {
@@ -24,7 +27,6 @@
       var a = ctrl.activity;
       var mainContent = m('section', { class: 'ui piled segment' }, [
         m('h2', a.label),
-        m('p', a.note),
         m('div', { class: 'ui horizontal list' }, [
           m('div.item', [
             m('div.content', [
@@ -49,8 +51,27 @@
               m('div.header', l('PLACES')),
               m('div.description', a.places)
             ])
+          ]),
+          m('div.item', [
+            m('div.content', [
+              m('div.header', l('PLACES_TAKEN')),
+              m('div.description', ctrl.members.length)
+            ])
+          ]),
+          m('div.item', [
+            m('div.content', [
+              m('div.header', l('PLACES_REMAIN')),
+              m('div.description', (a.places - ctrl.members.length))
+            ])
           ])
-        ])
+        ]),
+        m('h3', l('ACTIVITIES_MEMBERS')),
+        m('ul', { class: 'ui list' }, ctrl.members.map(function (i) {
+          var fullname = golem.module.member.model.fullname(i.doc);
+          return m('li', [
+            m('a', { href: '#/member/show/' + i.doc._id }, fullname)
+          ]);
+        }))
       ]);
       return [
         m('section', { class: 'sixteen wide column' }, [

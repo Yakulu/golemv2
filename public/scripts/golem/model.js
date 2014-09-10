@@ -43,6 +43,20 @@
         }
       );
     },
+    getMembersFromActivity: function (activityId, callback) {
+      if (!activityId) {
+        golem.model.db.query('members/byActivity', callback);
+      } else {
+        golem.model.db.query(
+        'members/byActivity',
+        {
+          key: [activityId, 'member'],
+          include_docs: true
+        },
+          callback
+        );
+      }
+    },
     title: function (suffix) {
       return golem.utils.locale('TITLE') + ' - ' + suffix;
     },
@@ -65,13 +79,9 @@
         views: {
           byActivity: {
             map: function (doc) {
-              if (doc.schema) {
-                if (doc.schema === 'member') {
-                  for (var i = 0, l = doc.activities; i < l; i++) {
-                    emit([doc.activities[i], doc.schema], null);
-                  }
-                } else if (doc.schema === 'activity') {
-                  emit([doc._id, doc.schema], null);
+              if (doc.schema && doc.schema === 'member') {
+                for (var i = 0, l = doc.activities.length; i < l; i++) {
+                  emit([doc.activities[i], doc.schema], null);
                 }
               }
             }.toString()

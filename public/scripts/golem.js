@@ -18,7 +18,7 @@
       if (err || response.rows.length === 0) {
         db.bulkDocs(golem.module.contact.data.items, function (err, response) {
           var gmq = golem.model.queries;
-          var queries = [gmq.all, gmq.tags, gmq.labels];
+          var queries = [gmq.all, gmq.tags, gmq.labels, gmq.members];
           db.bulkDocs(queries, function (err, response) {
             init();
           });

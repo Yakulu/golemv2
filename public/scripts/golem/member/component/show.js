@@ -89,7 +89,13 @@
 			};
       var selectedActivities = function () {
         if (!ctrl.selectedActivities) { return l('NONE_F'); }
-        return ctrl.selectedActivities.map(function (a) { return a.label; }).join(', ');
+        return m('ul', { class: 'ui list' },
+          ctrl.selectedActivities.map(function (a) {
+            return m('li', [
+              m('a', { href: '#/activity/show/' + a._id }, a.label) 
+            ]);
+          })
+        );
       };
       var mainContent = m('section', { class: 'ui piled segment' }, [
         m('div', { class: 'ui floated right basic segment' }, [
