@@ -8,7 +8,7 @@
       m.startComputation();
       golem.model.db.get(key, (function (err, res) {
         this.family = res;
-        document.title = golem.model.title(l('CONTACTS_DETAIL') +
+        document.title = golem.model.title(l('DETAILS') +
          this.family.lastname);
         var mi = module.data.menuItems;
         ['show', 'edit', 'remove'].forEach((function (v) {

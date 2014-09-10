@@ -13,6 +13,7 @@
 			member.guardianFirstname = props.guardianFirstname || '';
 			member.authorizations = props.authorizations || { activities: false, photos: false };
       member.skills = props.skills || [];
+      member.activities = props.skills || [];
       //member.family = false;
       //member.cafNumber = props.cafNumber || null;
       //member.familyQuotient = props.familyQuotient || null;

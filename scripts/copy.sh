@@ -12,4 +12,3 @@ cp $SRC/moment/locale/fr.js $DEST/moment-fr.js &&
 cp $SRC/semantic-ui/build/packaged/css/semantic.css $DEST/ &&
 cp $SRC/pouchdb/dist/pouchdb.min.js $DEST/ &&
 cp $SRC/mithril/mithril.js $DEST/
-# TODO : PouchDb

@@ -51,7 +51,8 @@
         current: current
       });
     },
-    submit: function (e, item, route) {
+    submit: function (itemField, route, e) {
+      var item = this[itemField];
       e.preventDefault();
       var _submit = function (verb) {
         golem.model.db[verb](item, function (err, res) {

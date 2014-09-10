@@ -7,7 +7,7 @@
       m.startComputation();
       golem.model.db.get(key, (function (err, res) {
         this.contact = res;
-        document.title = golem.model.title(l('CONTACTS_DETAIL') +
+        document.title = golem.model.title(l('DETAILS') +
           module.model.fullname(this.contact));
         var cmi = module.data.menuItems;
         ['show', 'edit', 'remove'].forEach((function (v) {

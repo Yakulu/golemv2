@@ -78,9 +78,7 @@
         golem.model.getLabels.bind(null, 'mails',
           module.data.getTags.bind(this,
             module.data.getSkills.bind(this, main))));
-      this.submit = (function (e) {
-        golem.component.form.submit(e, this.member, '/member/list');
-      }).bind(this);
+      this.submit = golem.component.form.submit.bind(this, 'member', '/member/list');
     },
     view: function (ctrl) {
       var l = golem.utils.locale;

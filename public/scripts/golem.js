@@ -76,6 +76,12 @@
       '/member/edit/:memberId': gm.member.component.form,
       '/member/show/:memberId': gm.member.component.show,
       '/member/remove/:memberId': gm.member.component.remove,
+      '/activity': gm.activity.component.list,
+      '/activity/list': gm.activity.component.list,
+      '/activity/add': gm.activity.component.form,
+      '/activity/show/:activityId': gm.activity.component.show,
+      '/activity/edit/:activityId': gm.activity.component.form,
+      '/activity/remove/:activityId': gm.activity.component.remove,
     });
 	};
 	

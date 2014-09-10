@@ -2,12 +2,13 @@
   var module = golem.module.member;
   module.component.show = {
     controller: function () {
+      console.log('ok');
       var l = golem.utils.locale;
       var key = m.route.param('memberId');
       m.startComputation();
       golem.model.db.get(key, (function (err, res) {
         this.member = res;
-        document.title = golem.model.title(l('CONTACTS_DETAIL') +
+        document.title = golem.model.title(l('DETAILS') +
           module.model.fullname(this.member));
         var mi = module.data.menuItems;
         ['show', 'edit', 'remove'].forEach((function (v) {

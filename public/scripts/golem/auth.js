@@ -19,8 +19,6 @@
 					e.preventDefault();
 					var login = document.getElementsByName('login')[0].value;
 					var password = document.getElementsByName('password')[0].value;
-					console.log(login);
-					console.log(password);
 					if (!isAuthorized(login, password)) {
 						golem.utils.sendNotification(
 							'Erreur',

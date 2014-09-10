@@ -36,7 +36,7 @@
           //new menus.Item(l('MENU_FAMILIES'), '/family', 'sitemap'),
           new menus.Item(l('MENU_MEMBERS'), '/member', 'user'),
           new menus.Item(l('MENU_MESSAGES'), '/mail', 'mail', 'item disabled'),
-          new menus.Item(l('MENU_ACTIVITIES'), '/activity', 'globe', 'item disabled'),
+          new menus.Item(l('MENU_ACTIVITIES'), '/activity', 'globe'),
           new menus.Item(l('MENU_STATISTICS'), '/stats', 'pie chart basic', 'item disabled'),
           new menus.Item(l('MENU_ADMINISTRATION'), '/admin', 'wrench', 'item disabled')
         ];

@@ -126,6 +126,7 @@
     FIRSTNAME: 'Prénom',
     LASTNAME: 'Nom',
     LABEL: 'Libellé',
+    DETAILS: 'Détails de ',
     CONTACT_DETAILS: 'Coordonnées',
     ADDRESS: 'Adresse',
     POSTAL_CODE: 'Code postal',
