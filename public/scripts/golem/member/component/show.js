@@ -2,12 +2,9 @@
   var module = golem.module.member;
   module.component.show = {
     controller: function () {
-      console.log('ok');
       var l = golem.utils.locale;
       var key = m.route.param('memberId');
-      m.startComputation();
-      golem.model.db.get(key, (function (err, res) {
-        this.member = res;
+      var initController = (function () {
         document.title = golem.model.title(l('DETAILS') +
           module.model.fullname(this.member));
         var mi = module.data.menuItems;
@@ -18,6 +15,21 @@
           mi.list, mi.add, mi.show, mi.edit, mi.remove
         ];
         m.endComputation();
+      }).bind(this);
+      m.startComputation();
+      golem.model.db.get(key, (function (err, res) {
+        this.member = res;
+        if (this.member.activities.length > 0) {
+          golem.model.db.allDocs({ keys: this.member.activities, include_docs: true }, (function (err, res) {
+            this.selectedActivities = res.rows.map(function (r) {
+              return r.doc;
+            });
+            initController();
+          }).bind(this));
+        } else {
+          this.selectedActivities = null;
+          initController();
+        }
       }).bind(this));
     },
     view: function (ctrl) {
@@ -63,7 +75,7 @@
 				]);
 				columnLeftContent.push(minorContent);
 			}
-			var communication = (function () {
+			var communication = function () {
 				var fcm = f.communicationModes;
 				if (f.tels.length === 0 && f.mails.length === 0) { return ''; }
 			  var content = l('COMMUNICATION_MODES_ACCEPTANCE') + ':'; 
@@ -74,7 +86,11 @@
 					if (fcm.tel) { content += ' ' + l('TEL'); }
 				}
 				return content;
-			}).call(this);
+			};
+      var selectedActivities = function () {
+        if (!ctrl.selectedActivities) { return l('NONE_F'); }
+        return ctrl.selectedActivities.map(function (a) { return a.label; }).join(', ');
+      };
       var mainContent = m('section', { class: 'ui piled segment' }, [
         m('div', { class: 'ui floated right basic segment' }, [
           m('p',
@@ -119,7 +135,10 @@
           m('div', { class: 'column' }, columnLeftContent),
           m('div', { class: 'column' }, [
             m('p', [
-              m('p', communication),
+              m('div', { class: 'ui label red' }, l('MENU_ACTIVITIES')),
+              m('p', selectedActivities()),
+              m('div', { class: 'ui label purple' }, l('COMMUNICATION_MODES')),
+              m('p', communication()),
               gcs.multiBox(f.tels, l('TELS'), gcs.format.tels),
               gcs.multiBox(f.mails, l('MAILS'), gcs.format.mails)
             ])
