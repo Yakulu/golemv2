@@ -1,6 +1,16 @@
 (function () {
   var l = golem.utils.locale;
   golem.component.list = {
+    sort: function (e, items) {
+      var field = e.target.getAttribute('data-sort-by');
+      if (field) {
+        var first = items[0];
+        items.sort(function (a, b) {
+          return a.doc[field] > b.doc[field] ? 1 : b.doc[field] < a.doc[field] ? -1 : 0;
+        });
+        if (first === items[0]) { items.reverse(); }
+      }
+    },
     search: function (e, items) {
       var val = e.target.value;
       if (val === '') {

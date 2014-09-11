@@ -104,6 +104,25 @@
         form.inputHelper(config)
       ]);
     },
+    sortTableHeaderHelper: function (config) {
+      var varName = config.field + 'IconDisplay';
+      if (!config.ctrl[varName]) { config.ctrl[varName] = 'hidden'; }
+      var attributes = {
+        'data-sort-by': config.field,
+        onmouseover: function () { config.ctrl[varName] = 'visible'; },
+        onmouseout: function () { config.ctrl[varName] = 'hidden'; },
+        onclick: config.ctrl.sort,
+        style: { cursor: 'pointer' }
+      };
+      var content = [
+        m('span', attributes, golem.utils.locale(config.title)),
+        m('i', {
+          class: 'icon sort',
+          style: { visibility: config.ctrl[varName], marginLeft: '3px' }
+        })
+      ];
+      return m('th', { 'data-sort-by': config.field }, content);
+    },
     multiFieldWidget: {
       // TODO : non trivial, make fidel representation of fields in reactive elements for m.withAttr...
       controller: function (config) {

@@ -6,6 +6,9 @@
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add, mi.tags, mi.skills ];
       document.title = golem.model.title(l('MEMBERS_LIST'));
+      this.sort = (function (e) {
+        golem.component.list.sort(e, this.items);
+      }).bind(this);
       this.search = (function (e) {
         this.filteredItems = golem.component.list.search(e, this.items);
       }).bind(this);
@@ -73,14 +76,15 @@
         ]);
       };
       var itemsDom = ctrl.filteredItems ? ctrl.filteredItems.map(itemDom) : ctrl.items.map(itemDom);
+      var gwf = golem.widgets.form;
       var mainContent = m('section', { class: 'twelve wide column' }, [
         m('table', { class: 'ui basic table' }, [
           m('thead', [
             m('tr', [
-              m('th', l('MEMBER_NUMBER')),
-              m('th', l('LASTNAME')),
+              gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'number', title: 'MEMBER_NUMBER'}),
+              gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'lastname', title: 'LASTNAME'}),
+              gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'city', title: 'ADDRESS'}),
               //m('th', l('FAMILY')),
-              m('th', l('ADDRESS')),
               m('th', [
                 l('TEL'),
                 m('i', { class: 'icon info', title: l('DEFAULT_ONLY') })
