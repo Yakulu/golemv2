@@ -114,8 +114,9 @@
         onclick: config.ctrl.sort,
         style: { cursor: 'pointer' }
       };
+      var title = config.title || config.field.toUpperCase();
       var content = [
-        m('span', attributes, golem.utils.locale(config.title)),
+        m('span', attributes, golem.utils.locale(title)),
         m('i', {
           class: 'icon sort',
           style: { visibility: config.ctrl[varName], marginLeft: '3px' }

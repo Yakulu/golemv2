@@ -82,7 +82,7 @@
           m('thead', [
             m('tr', [
               gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'number', title: 'MEMBER_NUMBER'}),
-              gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'lastname', title: 'LASTNAME'}),
+              gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'lastname'}),
               gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'city', title: 'ADDRESS'}),
               //m('th', l('FAMILY')),
               m('th', [

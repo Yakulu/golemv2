@@ -7,6 +7,9 @@
       golem.menus.secondary.items = [ mi.list, mi.add ];
       document.title = golem.model.title(l('ACTIVITIES_LIST'));
       this.items = [];
+      this.sort = (function (e) {
+        golem.component.list.sort(e, this.items);
+      }).bind(this);
       this.search = (function (e) {
         this.filteredItems = golem.component.list.search(e, this.items);
       }).bind(this);
@@ -73,14 +76,15 @@
           ])
         ]);
       };
+      var gwf = golem.widgets.form;
       var mainContent = m('table', { class: 'ui basic table' }, [
         m('thead', [
           m('tr', [
-            m('th', l('LABEL')),
-            m('th', l('CODE')),
+            gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'label' }),
+            gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'code' }),
             m('th', l('TIMESLOT')),
             m('th', l('MONITOR')),
-            m('th', l('PLACES')),
+            gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'places' }),
             m('th', l('PLACES_TAKEN')),
             m('th', { width: '10%' }, l('ACTIONS'))
           ])
