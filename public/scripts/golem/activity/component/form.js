@@ -54,7 +54,8 @@
               maxlength: 100,
               required: true,
               value: a.label,
-              onchange: m.withAttr('value', function (v) { a.label = v; })
+              validationMsg: l('LASTNAME_VALIDATION_MSG'),
+              validationCallback: function (e) { a.label = e.target.value; }
             }),
             form.textHelper({
               cls: 'four wide field small input',

@@ -87,6 +87,22 @@
       if (config.required) { inputAttr.required = 'required'; }
       if (config.pattern) { inputAttr.pattern = config.pattern; }
       if (config.onchange) { inputAttr.onchange = config.onchange; }
+      if (config.oninput) { inputAttr.oninput = config.oninput; }
+      if (config.validationMsg) {
+        inputAttr.oninput = function (e) {
+          var name = e.target.getAttribute('name');
+          var isValid = e.target.checkValidity();
+          var parent = e.target.parentNode;
+          if (isValid) {
+            parent.classList.remove('error');
+            parent.lastChild.style.display = 'none';
+          } else {
+            parent.classList.add('error');
+            parent.lastChild.style.display = 'block';
+          }
+          if (config.validationCallback) { config.validationCallback(e); }
+        };
+      }
       // Element
       return m('input', inputAttr);
     },
@@ -99,9 +115,19 @@
         labelText = config.label;
       }
       var label = m('label', { for: config.name }, labelText);
+      if (config.validationMsg) {
+        var validationElement = m(
+          'div',
+          { class: 'ui red pointing above label', style: { display: 'none' } },
+          config.validationMsg
+        );
+      } else {
+        var validationElement = '';
+      }
       return m('div', { class: cls }, [
         label,
-        form.inputHelper(config)
+        form.inputHelper(config),
+        validationElement
       ]);
     },
     sortTableHeaderHelper: function (config) {

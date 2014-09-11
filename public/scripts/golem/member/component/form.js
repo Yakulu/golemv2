@@ -89,7 +89,6 @@
 							//this.familyFromMember(false);
 					}).bind(this));
 				}
-        window.ctrl = this;
 			}).bind(this);
       golem.model.getBySchema('activity', (function (err, res) {
         this.activities = res.rows;
@@ -167,8 +166,8 @@
                 maxlength: 100,
                 required: true,
                 value: f.lastname,
-                onchange: m.withAttr('value',
-                  function (v) { f.lastname = v; })
+                validationMsg: l('LASTNAME_VALIDATION_MSG'),
+                validationCallback: function (e) { f.lastname = e.target.value; }
               }),
               form.textHelper({
                 cls: 'six wide field',
@@ -178,8 +177,8 @@
                 maxlength: 100,
                 required: true,
                 value: f.firstname,
-                onchange: m.withAttr('value',
-                function (v) { f.firstname = v; })
+                validationMsg: l('LASTNAME_VALIDATION_MSG'),
+                validationCallback: function (e) { f.firstname = e.target.value; }
               }),
             ]),
             m('div', { class: 'fields' }, [
@@ -301,8 +300,8 @@
                 value: f.postalCode,
 								maxlength: 5,
 								pattern: '^\\d{5}$',
-                onchange: m.withAttr('value',
-                  function (v) { f.postalCode = v; })
+                validationMsg: l('POSTAL_CODE_VALIDATION_MSG'),
+                validationCallback: function (e) { f.postalCode = e.target.value; }
               }),
               form.textHelper({
                 name: 'city',
