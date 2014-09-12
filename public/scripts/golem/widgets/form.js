@@ -12,13 +12,14 @@
     },
     helpButton: {
       controller: function (title, content, extra) {
-        this.title = title;
-        this.content = content;
-        this.extra = extra;
-        this.isPopupVisible = false;
-        this.togglePopup = (function () {
-          this.isPopupVisible = !this.isPopupVisible;
-        }).bind(this);
+        var me = this;
+        me.title = title;
+        me.content = content;
+        me.extra = extra;
+        me.isPopupVisible = false;
+        me.togglePopup = function () {
+          me.isPopupVisible = !me.isPopupVisible;
+        };
       },
       view: function (ctrl) {
         var l = golem.utils.locale;
@@ -153,74 +154,75 @@
     multiFieldWidget: {
       // TODO : non trivial, make fidel representation of fields in reactive elements for m.withAttr...
       controller: function (config) {
+        var me = this;
         var l = golem.utils.locale;
         // Internal state
-        this.tagName = config.tagName;
-        this.type = config.type;
-        this.label = config.label;
-        this.name = config.name;
-        this.size = config.size;
-        this.maxlength = config.maxlength;
-        this.minlength = config.minlength;
-        this.content = config.content;
+        me.tagName = config.tagName;
+        me.type = config.type;
+        me.label = config.label;
+        me.name = config.name;
+        me.size = config.size;
+        me.maxlength = config.maxlength;
+        me.minlength = config.minlength;
+        me.content = config.content;
         // Defaults
-        this.required = config.required || 'required';
-        this.placeholder = config.placeholder || '';
-        this.radioField = config.radioField || false;
-        this.labelField = config.labelField || false;
-        this.labels = config.labels || [];
-        this.removeNum = m.prop();
-        this.suffix = m.prop();
-        this.value = '';
+        me.required = config.required || 'required';
+        me.placeholder = config.placeholder || '';
+        me.radioField = config.radioField || false;
+        me.labelField = config.labelField || false;
+        me.labels = config.labels || [];
+        me.removeNum = m.prop();
+        me.suffix = m.prop();
+        me.value = '';
         // Reactive element
-        this.current = config.current;
+        me.current = config.current;
         // Methods
-        this.setSuffix = (function (num) {
-          this.suffix = '-' + num;
-        }).bind(this);
-        this.setValue = (function (obj) {
+        me.setSuffix = function (num) {
+          me.suffix = '-' + num;
+        };
+        me.setValue = function (obj) {
           if (obj.value !== undefined) {
-            this.value = obj.value;
+            me.value = obj.value;
           } else {
-            this.value = obj;
+            me.value = obj;
           }
-        }).bind(this);
-        this.addField = (function () {
+        };
+        me.addField = function () {
           var field;
-          if (!this.labelField) {
+          if (!me.labelField) {
             field = '';
           } else {
             field = { label: '', value: '' };
-            if (this.radioField) { field.default = false; }
+            if (me.radioField) { field.default = false; }
           }
-          this.current.push(field);
-        }).bind(this);
-        this.change = function (num, field, e) {
+          me.current.push(field);
+        };
+        me.change = function (num, field, e) {
           switch (field) {
             case 'default':
-              for (var i = 0, l = this.current.length; i < l; i++) {
-                this.current[i].default = (i === num);
+              for (var i = 0, l = me.current.length; i < l; i++) {
+                me.current[i].default = (i === num);
               }
               break;
             case 'www':
-              this.current[num] = e.target.value;
+              me.current[num] = e.target.value;
               break;
             default: // Label and classic value
-              this.current[num][field] = e.target.value;
+              me.current[num][field] = e.target.value;
           }
         };
         // Children Modules
-        this.helpButton = new form.helpButton.controller(
-          this.label,
-          this.content,
-          form.addButton(this.addField, l('MENU_NEW'))
+        me.helpButton = new form.helpButton.controller(
+          me.label,
+          me.content,
+          form.addButton(me.addField, l('MENU_NEW'))
         );
         // Remove Modal
-        var removeField = (function () {
-          this.current.splice(this.removeNum(), 1);
-          this.removeModalCtrl.toggle();
-        }).bind(this);
-        this.removeModalCtrl = new widgets.modal.controller({
+        var removeField = function () {
+          me.current.splice(me.removeNum(), 1);
+          me.removeModalCtrl.toggle();
+        };
+        me.removeModalCtrl = new widgets.modal.controller({
           title: l('SURE'),
           content: l('REMOVE_FIELD_CONFIRM_MSG'),
           acceptFn: removeField
@@ -328,35 +330,36 @@
     },
     tagWidget: {
       controller: function (config) {
+        var me = this;
         // Initialization
-        this.label = config.label;
-        this.placeholder = config.placeholder;
-        this.content = config.content;
+        me.label = config.label;
+        me.placeholder = config.placeholder;
+        me.content = config.content;
         // Defaults
-        this.size = config.size || 10;
-        this.name = config.name || 'tags';
+        me.size = config.size || 10;
+        me.name = config.name || 'tags';
         // All tags except those already selected
         var tags = config.tags.filter(function (tag) {
           return (config.current.indexOf(tag) === -1);
         });
         // Reactive elements
-        this.tags = tags;
-        this.current = config.current;
+        me.tags = tags;
+        me.current = config.current;
         // Children modules
-        this.helpButton = new form.helpButton.controller(this.label, this.content);
+        me.helpButton = new form.helpButton.controller(me.label, me.content);
         // Methods
-        this.add = (function (input) {
+        me.add = function (input) {
           var v = input.value;
-          if (v && this.current.indexOf(v) === -1) {
-            this.current.push(v);
+          if (v && me.current.indexOf(v) === -1) {
+            me.current.push(v);
             //config.model[this.name].push(v); 
           }
-          var vIdx = this.tags.indexOf(v);
+          var vIdx = me.tags.indexOf(v);
           if (vIdx !== -1) {
-            this.tags.splice(vIdx, 1);
+            me.tags.splice(vIdx, 1);
           }
           input.value = '';
-        }).bind(this);
+        };
       },
       view: function (ctrl) {
         var l = golem.utils.locale;

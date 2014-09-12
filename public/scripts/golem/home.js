@@ -5,7 +5,6 @@
         document.title =  golem.model.title(golem.utils.locale('MENU_HOME'));
       },
       view: function (ctrl) {
-        var notif = golem.utils.sendNotificationNG;
         return [
           m('section', { class: 'fourteen wide column' }, [
             m('p', m.trust([
@@ -41,13 +40,6 @@
     '<li>Le support de l\'ensemble des navigateurs récents du marché, ainsi que des périphériques mobiles (tablettes, téléphones).</li>'
 							].join('')
 						)),
-            m('ul', [
-              m('li', { onclick: notif.bind(null, { title: 'basic', body: 'basic' }) }, 'basic'),
-              m('li', { onclick: notif.bind(null, { title: 'icon', body: 'icon', icon: true }) }, 'icon'),
-              m('li', { onclick: notif.bind(null, { title: 'warning', body: 'and icon', icon: true, cls: 'warning' }) }, 'warning-icon'),
-              m('li', { onclick: notif.bind(null, { title: 'error', body: 'unlimited', cls: 'error', timeout: false }) }, 'error-unlimited'),
-              m('li', { onclick: notif.bind(null, { title: 'timeoutdiff', body: 'diff',  timeout: 6 }) }, 'timeout-diff'),
-            ]), 
           ]),
           /*m('section', { class: 'four wide column' }, [
             m('p', 'Menu contextuel')

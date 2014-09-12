@@ -2,36 +2,37 @@
   var module = golem.module.activity;
   module.component.list = {
     controller: function () {
+      var me = this;
       var l = golem.utils.locale;
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add ];
       document.title = golem.model.title(l('ACTIVITIES_LIST'));
-      this.items = [];
-      this.sort = (function (e) {
-        golem.component.list.sort(e, this.items);
-      }).bind(this);
-      this.search = (function (e) {
-        this.filteredItems = golem.component.list.search(e, this.items);
-      }).bind(this);
-      var callback = (function (err, results) {
-        this.items = results.rows;
-        golem.model.getMembersFromActivity(null, (function (err, res) {
-          this.takenPlacesByActivity = {};
+      me.items = [];
+      me.sort = function (e) {
+        golem.component.list.sort(e, me.items);
+      };
+      me.search = function (e) {
+        me.filteredItems = golem.component.list.search(e, me.items);
+      };
+      var callback = function (err, results) {
+        me.items = results.rows;
+        golem.model.getMembersFromActivity(null, function (err, res) {
+          me.takenPlacesByActivity = {};
           for (var i = 0, l = res.rows.length; i < l; i++) {
             var aId = res.rows[i].key[0];
-            if (!this.takenPlacesByActivity[aId]) {
-              this.takenPlacesByActivity[aId] = 1;
+            if (!me.takenPlacesByActivity[aId]) {
+              me.takenPlacesByActivity[aId] = 1;
             } else {
-              this.takenPlacesByActivity[aId] += 1;
+              me.takenPlacesByActivity[aId] += 1;
             }
           }
           m.endComputation();
-        }).bind(this));
-      }).bind(this);
-      var getActivities = (function () {
+        });
+      };
+      var getActivities = function () {
         m.startComputation();
         golem.model.getBySchema('activity', callback);
-			}).bind(this)
+			};
       getActivities();
     },
     view: function (ctrl) {

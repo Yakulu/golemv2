@@ -3,34 +3,35 @@
   var wform = golem.widgets.form;
   module.component.form = {
     controller: function () {
+      var me = this;
       var l = golem.utils.locale;
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add ];
-      var newActivity = (function () {
-        this.activity = module.model.create({});
-        this.add = true;
+      var newActivity = function () {
+        me.activity = module.model.create({});
+        me.add = true;
         document.title = golem.model.title(l('ACTIVITIES_NEW'));
-      }).bind(this);
+      };
       var key = m.route.param('activityId');
       if (!key) {
         newActivity(); 
       } else {
         m.startComputation();
-        golem.model.db.get(key, (function (err, res) {
-          this.activity = res;
-          if (!this.activity) {
+        golem.model.db.get(key, function (err, res) {
+          me.activity = res;
+          if (!me.activity) {
             newMember(); 
           } else {
-            document.title = golem.model.title(l('CONTACTS_EDIT') + this.activity.label);
-            ['show', 'edit', 'remove'].forEach((function (v) {
-              mi[v].url = mi[v].baseUrl + '/' + this.activity._id;
-            }).bind(this));
+            document.title = golem.model.title(l('CONTACTS_EDIT') + me.activity.label);
+            ['show', 'edit', 'remove'].forEach(function (v) {
+              mi[v].url = mi[v].baseUrl + '/' + me.activity._id;
+            });
             golem.menus.secondary.items.splice(2, 0, mi.show, mi.edit, mi.remove);
           }
           m.endComputation();
-        }).bind(this));
+        });
       }
-      this.submit = golem.component.form.submit.bind(this, 'activity', '/activity/list');
+      me.submit = golem.component.form.submit.bind(me, 'activity', '/activity/list');
     },
     view: function (ctrl) {
       var l = golem.utils.locale;

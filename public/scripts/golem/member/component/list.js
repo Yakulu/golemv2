@@ -2,45 +2,46 @@
   var module = golem.module.member;
   module.component.list = {
     controller: function () {
+      var me = this;
       var l = golem.utils.locale;
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add, mi.tags, mi.skills ];
       document.title = golem.model.title(l('MEMBERS_LIST'));
-      this.sort = (function (e) {
-        golem.component.list.sort(e, this.items);
-      }).bind(this);
-      this.search = (function (e) {
-        this.filteredItems = golem.component.list.search(e, this.items);
-      }).bind(this);
+      me.sort = function (e) {
+        golem.component.list.sort(e, me.items);
+      };
+      me.search = function (e) {
+        me.filteredItems = golem.component.list.search(e, me.items);
+      };
 			
-      var callback = (function (err, results) {
-        this.items = results.rows;
+      var callback = function (err, results) {
+        me.items = results.rows;
         m.endComputation();
-      }).bind(this);
-      this.tagFilter = this.tagFilter || false;
-      this.setTagFilter = (function (tag) {
-        this.tagFilter = tag;
+      };
+      me.tagFilter = me.tagFilter || false;
+      me.setTagFilter = function (tag) {
+        me.tagFilter = tag;
         m.startComputation();
         golem.model.db.query(
           'tags/count',
           {
             reduce: false,
-            key: ['member', this.tagFilter],
+            key: ['member', me.tagFilter],
             include_docs: true
           }, callback
         );
-      }).bind(this);
-      this.unsetTagFilter = (function () {
-        this.tagFilter = false;
+      };
+      me.unsetTagFilter = function () {
+        me.tagFilter = false;
         getMembers();
-      }).bind(this);
+      };
 			
       // Init
-      this.items = [];
-      var getMembers = (function () {
+      me.items = [];
+      var getMembers = function () {
         m.startComputation();
         golem.model.getBySchema('member', callback);
-			}).bind(this)
+			};
       module.data.getTags(getMembers);
     },
     view: function (ctrl) {

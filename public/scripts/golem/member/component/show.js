@@ -2,35 +2,36 @@
   var module = golem.module.member;
   module.component.show = {
     controller: function () {
+      var me = this;
       var l = golem.utils.locale;
       var key = m.route.param('memberId');
-      var initController = (function () {
+      var initController = function () {
         document.title = golem.model.title(l('DETAILS') +
-          module.model.fullname(this.member));
+          module.model.fullname(me.member));
         var mi = module.data.menuItems;
-        ['show', 'edit', 'remove'].forEach((function (v) {
-          mi[v].url = mi[v].baseUrl + '/' + this.member._id;
-        }).bind(this));
+        ['show', 'edit', 'remove'].forEach(function (v) {
+          mi[v].url = mi[v].baseUrl + '/' + me.member._id;
+        });
         golem.menus.secondary.items = [
           mi.list, mi.add, mi.show, mi.edit, mi.remove
         ];
         m.endComputation();
-      }).bind(this);
+      };
       m.startComputation();
-      golem.model.db.get(key, (function (err, res) {
-        this.member = res;
-        if (this.member.activities.length > 0) {
-          golem.model.db.allDocs({ keys: this.member.activities, include_docs: true }, (function (err, res) {
-            this.selectedActivities = res.rows.map(function (r) {
+      golem.model.db.get(key, function (err, res) {
+        me.member = res;
+        if (me.member.activities.length > 0) {
+          golem.model.db.allDocs({ keys: me.member.activities, include_docs: true }, function (err, res) {
+            me.selectedActivities = res.rows.map(function (r) {
               return r.doc;
             });
             initController();
-          }).bind(this));
+          });
         } else {
-          this.selectedActivities = null;
+          me.selectedActivities = null;
           initController();
         }
-      }).bind(this));
+      });
     },
     view: function (ctrl) {
       var l = golem.utils.locale;

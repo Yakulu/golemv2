@@ -5,23 +5,22 @@
       counter: 0 // id autoincrement
     },
     controller: function () {
-      // Only 1 controller base on the model
-      // View with loop on items...
+      var me = this;
       var gnm = golem.notifications.model;
-      this.toClose = {};
-      this.close = (function (id, from) {
+      me.toClose = {};
+      me.close = function (id, from) {
         if (from && from !== 'timeout') { // with from false, no clear because notimeout
-          window.clearTimeout(this.toClose[id]);
+          window.clearTimeout(me.toClose[id]);
         }
-        delete this.toClose[id];
+        delete me.toClose[id];
         delete gnm.items[id];
-      }).bind(this);
-      this.delayClose = (function (id, timeout) {
-        if (timeout && !this.toClose[id]) {
-          this.toClose[id] = window.setTimeout((function () {
-            this.close(id, 'timeout');
+      };
+      me.delayClose = (function (id, timeout) {
+        if (timeout && !me.toClose[id]) {
+          me.toClose[id] = window.setTimeout(function () {
+            me.close(id, 'timeout');
             m.redraw();
-          }).bind(this), timeout * 1000);
+          }, timeout * 1000);
         }
       });
     },

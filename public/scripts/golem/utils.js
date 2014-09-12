@@ -1,7 +1,7 @@
 (function () {
   golem.utils = {
     locale: function (str) { return golem.config.locale[str]; },
-    sendNotification: function (title, options, callback) {
+    sendNotificationHTML5: function (title, options, callback) {
       options.timeout = options.timeout || 5;
       var _send = function () {
         var notif = new Notify(title, options);
@@ -22,7 +22,7 @@
         }
       }
     },
-    sendNotificationNG: function (config) {
+    sendNotification: function (config) {
       var timeout = config.timeout;
       config.timeout = (timeout || (timeout === false)) ? timeout : 3;
       var gnm = golem.notifications.model;

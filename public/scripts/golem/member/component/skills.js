@@ -3,17 +3,18 @@
   var widgets = golem.widgets.common;
   member.component.skills = {
     controller: function () {
+      var me = this;
       var l = golem.utils.locale;
       var mi = member.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add, mi.tags, mi.skills ];
       document.title = golem.model.title(l('SKILLS_MANAGEMENT'));
-      this.skills = [];
+      me.skills = [];
       m.startComputation();
-      member.data.getSkills((function (err, res) {
-        this.skills = res.rows.map(function (skill) { return skill.key[1]; });
+      member.data.getSkills(function (err, res) {
+        me.skills = res.rows.map(function (skill) { return skill.key[1]; });
         m.endComputation();
-      }).bind(this));
-      this._updateTag = (function (input, removal) {
+      });
+      me._updateTag = function (input, removal) {
         m.startComputation();
         var oldVal = input.getAttribute('data-value');
         var newVal;
@@ -30,7 +31,7 @@
           reduce: false,
           key: ['memberskills', oldVal],
           include_docs: true
-        }, (function (err, res) {
+        }, function (err, res) {
           var docs = [];
           res.rows.forEach(function (row) {
             var idx = row.doc.skills.indexOf(oldVal);
@@ -41,38 +42,38 @@
             }
             docs.push(row.doc);
           });
-          golem.model.db.bulkDocs(docs, (function (err, res) {
+          golem.model.db.bulkDocs(docs, function (err, res) {
             golem.utils.sendNotification(
               l('SUCCESS'),
               { body: l('SUCCESS_UPDATE') },
-              (function () {
+              function () {
                 if (!newVal) {
-                  var tagsIdx = this.skills.indexOf(oldVal);
-                  this.skills.splice(tagsIdx, 1); 
-                  this.removeModalCtrl.toggle();
+                  var tagsIdx = me.skills.indexOf(oldVal);
+                  me.skills.splice(tagsIdx, 1); 
+                  me.removeModalCtrl.toggle();
                 }
                 m.endComputation();
-              }).bind(this)
+              }
             );
-          }).bind(this));
-        }).bind(this));
-      }).bind(this);
-      this.updateTagFromClick = (function (e) {
+          });
+        });
+      };
+      me.updateTagFromClick = function (e) {
         var input = e.target.parentElement.parentElement.children[0].children[0];
-        this._updateTag(input);
-      }).bind(this);
+        me._updateTag(input);
+      };
       var input = null;
-      this.removeModalCtrl = new widgets.modal.controller({
+      me.removeModalCtrl = new widgets.modal.controller({
         title: l('SURE'),
         content: l('SKILLS_DELETE_CONFIRM_MSG'),
-        acceptFn: (function () {
-          this._updateTag(input, true);
-        }).bind(this)
+        acceptFn: function () {
+          me._updateTag(input, true);
+        }
       });
-      this.removeTag = (function (e) {
+      me.removeTag = function (e) {
         input = e.target.parentElement.parentElement.children[0].children[0];
-        this.removeModalCtrl.toggle();
-      }).bind(this);
+        me.removeModalCtrl.toggle();
+      };
     },
     view: function (ctrl) {
       var l = golem.utils.locale;

@@ -3,67 +3,68 @@
   var wform = golem.widgets.form;
   module.component.form = {
     controller: function () {
+      var me = this;
       var l = golem.utils.locale;
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add ];
       m.startComputation();
-			var newMember = (function () {
-			  this.add = true;
-				this.member = module.model.create({});
-			}).bind(this);
-			var initController = (function () {
-        if (this.member.activities.length === 0) {
-          this.selectedActivities = [];
+			var newMember = function () {
+			  me.add = true;
+				me.member = module.model.create({});
+			};
+			var initController = function () {
+        if (me.member.activities.length === 0) {
+          me.selectedActivities = [];
         } else {
-          this.selectedActivities = this.activities.filter((function (a) { 
-            return (this.member.activities.indexOf(a.id) !== -1);
-          }).bind(this));
-          this.selectedActivities = this.selectedActivities.map((function (a) { 
+          me.selectedActivities = me.activities.filter(function (a) {
+            return (me.member.activities.indexOf(a.id) !== -1);
+          });
+          me.selectedActivities = me.selectedActivities.map(function (a) {
               return golem.module.activity.model.fullLabel(a.doc);
-          }).bind(this));
+          });
         }
-				this.minorExpanded = false;
-				this.telsWidget = golem.component.form.telsWidget(module, this.member);
-				this.mailsWidget = golem.component.form.mailsWidget(module, this.member);
-				this.tagWidget = golem.component.form.tagWidget(module, this.member.tags);
-				this.skillWidget = new golem.widgets.form.tagWidget.controller({
+				me.minorExpanded = false;
+				me.telsWidget = golem.component.form.telsWidget(module, me.member);
+				me.mailsWidget = golem.component.form.mailsWidget(module, me.member);
+				me.tagWidget = golem.component.form.tagWidget(module, me.member.tags);
+				me.skillWidget = new golem.widgets.form.tagWidget.controller({
 					name: 'skills',
 					label: l('SKILLS'),
 					placeholder: l('SKILLS_NEW'),
 					content: l('INFO_FORM_SKILLS'),
 					size: 25,
 					tags: module.data.skills.map(function (skill) { return skill.key[1]; }),
-					current: this.member.skills
+					current: me.member.skills
 				});
-        /*this.activitiesWidget = new golem.widgets.form.multiFieldWidget.controller({
+        /*me.activitiesWidget = new golem.widgets.form.multiFieldWidget.controller({
           tagName: 'select',
           label: l('ACTIVITIES_CHOICE'),
           name: 'activities',
           content: l('INFO_FORM_ACTIVITIES'),
-          current: this.member.activities
+          current: me.member.activities
         });*/
-				if (this.add) {
+				if (me.add) {
 					document.title = golem.model.title(l('MEMBERS_NEW'));
 				} else {
 					document.title = golem.model.title(l('CONTACTS_EDIT') +
-						module.model.fullname(this.member));
-					['show', 'edit', 'remove'].forEach((function (v) {
-						mi[v].url = mi[v].baseUrl + '/' + this.member._id;
-					}).bind(this));
+						module.model.fullname(me.member));
+					['show', 'edit', 'remove'].forEach(function (v) {
+						mi[v].url = mi[v].baseUrl + '/' + me.member._id;
+					});
 					golem.menus.secondary.items.splice(2, 0,
 						mi.show, mi.edit, mi.remove);
 				}
-				this.familyFromMember = m.prop(true); // TMP : avoiding family form
+				me.familyFromMember = m.prop(true); // TMP : avoiding family form
 				m.endComputation();
-			}).bind(this);
+			};
       var key = m.route.param('memberId');
 			/* TMP: Family OFF
-      this.familyFromMember = m.prop(false);
-      this.affectFamily = m.prop(false);
-      this.family = m.prop(null);
-      this.getFamilies = (function () {
-        this.affectFamily(true);
-        this.familyList = new golem.module.family.component.list.controller(true, this);
+      me.familyFromMember = m.prop(false);
+      me.affectFamily = m.prop(false);
+      me.family = m.prop(null);
+      me.getFamilies = function () {
+        me.affectFamily(true);
+        me.familyList = new golem.module.family.component.list.controller(true, me);
         m.startComputation();
         golem.model.db.query(
           'all/bySchema',
@@ -71,33 +72,33 @@
             startkey: ['family'],
             endkey: ['family', {}],
             include_docs: true
-          }, (function (err, res) {
-            this.families = res.rows;
+          }, function (err, res) {
+            me.families = res.rows;
             m.endComputation(); 
-          }).bind(this)
+          }
         );
-      }).bind(this);*/
-			var main = (function () {
+      };*/
+			var main = function () {
 				if (!key) {
 					newMember();
 					initController(); 
 				} else {
-					golem.model.db.get(key, (function (err, res) {
-						this.member = res;
-						if (!this.member) { newMember(); }
+					golem.model.db.get(key, function (err, res) {
+						me.member = res;
+						if (!me.member) { newMember(); }
 						initController();
-							//this.familyFromMember(false);
-					}).bind(this));
+							//me.familyFromMember(false);
+					});
 				}
-			}).bind(this);
-      golem.model.getBySchema('activity', (function (err, res) {
-        this.activities = res.rows;
+			};
+      golem.model.getBySchema('activity', function (err, res) {
+        me.activities = res.rows;
         golem.model.getLabels('tels',
           golem.model.getLabels.bind(null, 'mails',
-            module.data.getTags.bind(this,
-              module.data.getSkills.bind(this, main))))
-      }).bind(this));
-      this.submit = golem.component.form.submit.bind(this, 'member', '/member/list');
+            module.data.getTags.bind(me,
+              module.data.getSkills.bind(me, main))))
+      });
+      me.submit = golem.component.form.submit.bind(me, 'member', '/member/list');
     },
     view: function (ctrl) {
       var l = golem.utils.locale;

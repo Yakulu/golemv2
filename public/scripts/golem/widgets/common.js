@@ -2,16 +2,17 @@
   golem.widgets.common = {
     modal: {
       controller: function (config) {
+        var me = this;
         // Defaults
-        this.active = config.active || false;
-        this.toggle = (function () {
-          this.active = !this.active;
-        }).bind(this);
+        me.active = config.active || false;
+        me.toggle = function () {
+          me.active = !me.active;
+        };
         // Init
-        this.title = config.title;
-        this.content = config.content;
-        this.cancelFn = config.cancelFn || this.toggle;
-        this.acceptFn = config.acceptFn;
+        me.title = config.title;
+        me.content = config.content;
+        me.cancelFn = config.cancelFn || me.toggle;
+        me.acceptFn = config.acceptFn;
       },
       view: function (ctrl) {
         var l = golem.utils.locale;
@@ -45,14 +46,14 @@
         // Defaults
         config.timeout = timeout || 5;
         // Init
-        this.title = config.title;
-        this.body = config.body;
-        this.displayed = true;
+        me.title = config.title;
+        me.body = config.body;
+        me.displayed = true;
         // Methods
-        this.toggle = (function () {
-          this.displayed = !this.displayed;
-        }).bind(this);
-        this.click = function () { console.log('click'); };
+        me.toggle = function () {
+          me.displayed = !me.displayed;
+        };
+        me.click = function () { console.log('click'); };
       },
       view: function (ctrl) {
         return m('div',

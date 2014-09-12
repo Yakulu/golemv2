@@ -2,6 +2,7 @@
   golem.auth = {
     main: {
       controller: function () {
+        var me = this;
 				var l = golem.utils.locale;
         document.title =  golem.model.title(l('AUTHENTIFICATION'));
 				var credentials = {
@@ -15,7 +16,7 @@
 				var isAuthorized = function (login, password) {
 					return (getHash(login) === credentials.login && getHash(password) === credentials.password); 
 				};
-				this.send = (function (e) {
+				me.send = function (e) {
 					e.preventDefault();
 					var login = document.getElementsByName('login')[0].value;
 					var password = document.getElementsByName('password')[0].value;
@@ -28,7 +29,7 @@
 					} else {
 						golem.initRouting();
 					}
-				}).bind(this);
+				};
       },
       view: function (ctrl) {
 				var l = golem.utils.locale;

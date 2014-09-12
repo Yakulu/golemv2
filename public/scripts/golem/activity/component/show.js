@@ -2,25 +2,26 @@
   var module = golem.module.activity;
   module.component.show = {
     controller: function () {
+      var me = this;
       var l = golem.utils.locale;
       var key = m.route.param('activityId');
       m.startComputation();
-      golem.model.db.get(key, (function (err, res) {
-        this.activity = res;
+      golem.model.db.get(key, function (err, res) {
+        me.activity = res;
         document.title = golem.model.title(l('DETAILS')) +
-          this.activity.label;
+          me.activity.label;
         var mi = module.data.menuItems;
-        ['show', 'edit', 'remove'].forEach((function (v) {
-          mi[v].url = mi[v].baseUrl + '/' + this.activity._id;
-        }).bind(this));
+        ['show', 'edit', 'remove'].forEach(function (v) {
+          mi[v].url = mi[v].baseUrl + '/' + me.activity._id;
+        });
         golem.menus.secondary.items = [
           mi.list, mi.add, mi.show, mi.edit, mi.remove
         ];
-        golem.model.getMembersFromActivity(this.activity._id, (function (err, res) {
-          this.members = res.rows;
+        golem.model.getMembersFromActivity(me.activity._id, function (err, res) {
+          me.members = res.rows;
           m.endComputation();
-        }).bind(this));
-      }).bind(this));
+        });
+      });
     },
     view: function (ctrl) {
       var l = golem.utils.locale;
