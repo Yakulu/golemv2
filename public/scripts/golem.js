@@ -42,7 +42,7 @@
     m.module(roots.header, golem.header);
     m.module(roots.footer, golem.footer);
     m.module(roots.mainMenu, golem.menus.main);
-    window.notif = m.module(roots.notifications, golem.notifications);
+    m.module(roots.notifications, golem.notifications);
     //m.module(roots.contextMenu, golem.home.context);
 		// TMP : AUTH
 		m.module(roots.main, golem.auth.main);

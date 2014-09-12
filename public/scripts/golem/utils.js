@@ -23,9 +23,11 @@
       }
     },
     sendNotificationNG: function (config) {
-      config.timeout = config.timeout || 10;
-      golem.notifications.model.items.unshift(config);
-      m.redraw(); // FIXME with huge rearchitecturing hierarchical MVC or simply inversing items ? -> oui
+      var timeout = config.timeout;
+      config.timeout = (timeout || (timeout === false)) ? timeout : 3;
+      var gnm = golem.notifications.model;
+      gnm.counter += 1;
+      gnm.items[gnm.counter] = config;
     }
   };
 }).call(this);
