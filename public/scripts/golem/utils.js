@@ -21,12 +21,13 @@
         }
       }
     },
-    sendNotification: function (config) {
+    sendNotification: function (config, callback) {
       var timeout = config.timeout;
-      config.timeout = (timeout || (timeout === false)) ? timeout : 3;
+      config.timeout = (timeout || (timeout === false)) ? timeout : 10;
       var gnm = golem.notifications.model;
       gnm.counter += 1;
       gnm.items[gnm.counter] = config;
+      if (callback) { return callback(); }
     }
   };
 }).call(this);

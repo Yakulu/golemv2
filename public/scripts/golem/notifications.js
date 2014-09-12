@@ -33,14 +33,14 @@
         var closeFn = ctrl.close.bind(ctrl, id, n.timeout)
         var notifClass = ['ui', 'floating', 'message', 'notification'];
         if (n.cls) { notifClass.push(n.cls); };
-        if (n.icon) { notifClass.push('icon'); }
+        if (n.icon) { notifClass.push('icon'); };
         return m('div',
           {
             class: notifClass.join(' '),
             onclick: n.click ? n.click : closeFn
           },
           [
-            n.icon ? m('i', { class: 'inbox icon' }): '',
+            n.icon ? m('i', { class: n.icon + ' icon' }): '',
             m('i', { class: 'close icon', onclick: closeFn }),
             m('div.content', [
               m('div.header', n.title),

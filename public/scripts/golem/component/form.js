@@ -57,8 +57,12 @@
       var _submit = function (verb) {
         golem.model.db[verb](item, function (err, res) {
           golem.utils.sendNotification(
-            l.SUCCESS,
-            { body: l.SUCCESS_UPDATE },
+            {
+              cls: 'success',
+              icon: 'checkmark',
+              title: l.SUCCESS,
+              body: l.SUCCESS_UPDATE,
+            },
             m.route.bind(null, route)
           );
         });

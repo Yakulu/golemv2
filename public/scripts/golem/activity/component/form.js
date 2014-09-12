@@ -44,7 +44,7 @@
         m('form', {
           id: 'activity-form',
           class: 'ui small form',
-          onsubmit: ctrl.submit.bind(ctrl)
+          onsubmit: ctrl.submit
         }, [
           m('div', { class:'fields' }, [
             form.textHelper({
