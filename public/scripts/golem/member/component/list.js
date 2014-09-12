@@ -3,10 +3,10 @@
   module.component.list = {
     controller: function () {
       var me = this;
-      var l = golem.utils.locale;
+      var l = golem.config.locale;
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add, mi.tags, mi.skills ];
-      document.title = golem.model.title(l('MEMBERS_LIST'));
+      document.title = golem.model.title(l.MEMBERS_LIST);
       me.sort = function (e) {
         golem.component.list.sort(e, me.items);
       };
@@ -45,7 +45,7 @@
       module.data.getTags(getMembers);
     },
     view: function (ctrl) {
-      var l = golem.utils.locale;
+      var l = golem.config.locale;
       var itemDom = function (f) {
         f = f.doc;
         return m('tr', [
@@ -64,13 +64,13 @@
             }
           })),
           m('td', { class: 'actions' }, [
-            m('a', { href: '#/member/show/' + f._id, title: l('VIEW') }, [
+            m('a', { href: '#/member/show/' + f._id, title: l.VIEW }, [
               m('i', { class: 'unhide icon' })
             ]),
-            m('a', { href: '#/member/edit/' + f._id, title: l('EDIT') }, [
+            m('a', { href: '#/member/edit/' + f._id, title: l.EDIT }, [
               m('i', { class: 'edit icon' })
             ]),
-            m('a', { href: '#/member/remove/' + f._id, title: l('DELETE') }, [
+            m('a', { href: '#/member/remove/' + f._id, title: l.DELETE }, [
               m('i', { class: 'remove icon' })
             ])
           ])
@@ -85,16 +85,16 @@
               gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'number', title: 'MEMBER_NUMBER'}),
               gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'lastname'}),
               gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'city', title: 'ADDRESS'}),
-              //m('th', l('FAMILY')),
+              //m('th', l.FAMILY),
               m('th', [
-                l('TEL'),
-                m('i', { class: 'icon info', title: l('DEFAULT_ONLY') })
+                l.TEL,
+                m('i', { class: 'icon info', title: l.DEFAULT_ONLY })
               ]),
               m('th', [
-                l('MAIL'),
-                m('i', { class: 'icon info', title: l('DEFAULT_ONLY') })
+                l.MAIL,
+                m('i', { class: 'icon info', title: l.DEFAULT_ONLY })
               ]),
-              m('th', { width: '10%' }, l('ACTIONS'))
+              m('th', { width: '10%' }, l.ACTIONS)
             ])
           ]),
           m('tbody', itemsDom)

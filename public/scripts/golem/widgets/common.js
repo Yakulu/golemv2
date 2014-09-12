@@ -15,7 +15,7 @@
         me.acceptFn = config.acceptFn;
       },
       view: function (ctrl) {
-        var l = golem.utils.locale;
+        var l = golem.config.locale;
         var cls = '';
         if (ctrl.active) { cls += ' active visible'; }
         return m('div', { class: 'ui dimmer page' + cls }, [
@@ -29,13 +29,13 @@
                   class: 'ui negative button',
                   type: 'button',
                   onclick: ctrl.cancelFn
-                } , l('CANCEL')),
+                } , l.CANCEL),
                 m('button',
                   {
                     class: 'ui positive button',
                     type: 'button',
                     onclick: ctrl.acceptFn
-                  }, l('OK'))
+                  }, l.OK)
             ])
           ])
         ]);

@@ -22,7 +22,7 @@
         };
       },
       view: function (ctrl) {
-        var l = golem.utils.locale;
+        var l = golem.config.locale;
         var box = [];
         var cls = 'ui tiny button';
         if (ctrl.extra) {
@@ -38,7 +38,7 @@
               'data-content': ctrl.content,
               onclick: ctrl.togglePopup
             },
-            [ m('i', { class: 'help icon' }), l('HELP') ]
+            [ m('i', { class: 'help icon' }), l.HELP ]
           )
         );
         var popup = m('div', {
@@ -143,7 +143,7 @@
       };
       var title = config.title || config.field.toUpperCase();
       var content = [
-        m('span', attributes, golem.utils.locale(title)),
+        m('span', attributes, golem.config.locale[title]),
         m('i', {
           class: 'icon sort',
           style: { visibility: config.ctrl[varName], marginLeft: '3px' }
@@ -155,7 +155,7 @@
       // TODO : non trivial, make fidel representation of fields in reactive elements for m.withAttr...
       controller: function (config) {
         var me = this;
-        var l = golem.utils.locale;
+        var l = golem.config.locale;
         // Internal state
         me.tagName = config.tagName;
         me.type = config.type;
@@ -215,7 +215,7 @@
         me.helpButton = new form.helpButton.controller(
           me.label,
           me.content,
-          form.addButton(me.addField, l('MENU_NEW'))
+          form.addButton(me.addField, l.MENU_NEW)
         );
         // Remove Modal
         var removeField = function () {
@@ -223,13 +223,13 @@
           me.removeModalCtrl.toggle();
         };
         me.removeModalCtrl = new widgets.modal.controller({
-          title: l('SURE'),
-          content: l('REMOVE_FIELD_CONFIRM_MSG'),
+          title: l.SURE,
+          content: l.REMOVE_FIELD_CONFIRM_MSG,
           acceptFn: removeField
         });
       },
       view: function (ctrl) {
-        var l = golem.utils.locale;
+        var l = golem.config.locale;
         // Buttons
         // Input and remove fields
         var inputRemoveFields = function (num) {
@@ -247,7 +247,7 @@
             var radioField = m('input',
               {
                 class: 'ui radio checkbox',
-                title: l('DEFAULT'),
+                title: l.DEFAULT,
                 type: 'radio',
                 name: ctrl.name + '-default',
                 required: 'required',
@@ -260,7 +260,7 @@
               radioField,
               m('label',
                 { class: 'small', for: ctrl.name },
-                l('DEFAULT'))
+                l.DEFAULT)
             ]));
           }
 
@@ -272,7 +272,7 @@
                 type: 'text',
                 list: fieldId,
                 name: fieldId,
-                placeholder: l('TYPE'),
+                placeholder: l.TYPE,
                 size: 15,
                 value: sel ? sel.label : '',
                 onchange: ctrl.change.bind(ctrl, num, 'label')
@@ -290,7 +290,7 @@
           var removeField = m('div', {
             role: 'button',
             class: 'ui tiny red icon button',
-            title: l('DELETE'),
+            title: l.DELETE,
             onclick: function () {
               ctrl.removeNum(num);
               ctrl.removeModalCtrl.toggle();
@@ -362,7 +362,7 @@
         };
       },
       view: function (ctrl) {
-        var l = golem.utils.locale;
+        var l = golem.config.locale;
         return m('div', { class: 'field tagfield' }, [
           m('fieldset', { class: 'ui segment' }, [
             m('legend', ctrl.label),
@@ -390,7 +390,7 @@
                   var ipt = document.getElementById(ctrl.name + '-input');
                   ctrl.add(ipt);
                 }
-              }, l('OK'))
+              }, l.OK)
             ]),
             m('datalist', { id: ctrl.name }, ctrl.tags.map(function (tag) {
               return m('option', { value: tag });

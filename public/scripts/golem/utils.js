@@ -1,6 +1,5 @@
 (function () {
   golem.utils = {
-    locale: function (str) { return golem.config.locale[str]; },
     sendNotificationHTML5: function (title, options, callback) {
       options.timeout = options.timeout || 5;
       var _send = function () {

@@ -1,5 +1,5 @@
 (function () {
-  var l = golem.utils.locale;
+  var l = golem.config.locale;
   golem.component.show = {
     format: {
       default: function (def) {
@@ -7,7 +7,7 @@
           return m('span', [
             m('i', {
               class: 'checkmark icon green',
-              title: l('DEFAULT')
+              title: l.DEFAULT
               }
             )
           ]);

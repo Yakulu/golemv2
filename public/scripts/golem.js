@@ -56,13 +56,13 @@
     m.route(roots.main, '/', {
       '/': golem.home.main,
       '/auth': golem.auth.main,
-      '/family': gm.family.component.list,
+      /*'/family': gm.family.component.list,
       '/family/list': gm.family.component.list,
       '/family/add': gm.family.component.form,
       '/family/edit/:familyId': gm.family.component.form,
       '/family/show/:familyId': gm.family.component.show,
       '/family/remove/:familyId': gm.family.component.remove,
-      //'/contact': gm.contact.component.list,
+      '/contact': gm.contact.component.list,
       '/contact/list': gm.contact.component.list,
       '/contact/list/page/:page': gm.contact.component.list,
       '/contact/tags': gm.contact.component.tags,
@@ -70,6 +70,7 @@
       '/contact/add': gm.contact.component.form,
       '/contact/edit/:contactId': gm.contact.component.form,
       '/contact/remove/:contactId': gm.contact.component.remove,
+      */
       '/member': gm.member.component.list,
       '/member/list': gm.member.component.list,
       '/member/tags': gm.member.component.tags,

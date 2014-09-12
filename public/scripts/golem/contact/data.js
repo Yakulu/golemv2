@@ -1,5 +1,5 @@
 (function () {
-  var l = golem.utils.locale;
+  var l = golem.config.locale;
   var menus = golem.menus;
   var contact = golem.module.contact;
   contact.data = {};
@@ -65,13 +65,13 @@
 
   // Menu Items
   contact.data.menuItems = {
-    list: new menus.Item(l('MENU_LIST'), '/contact/list', 'list'),
-    add: new menus.Item(l('MENU_NEW'), '/contact/add', 'add sign'),
-    //groups: new menus.Item(l('MENU_GROUPS'), '/contact/groups', 'users'),
-    tags: new menus.Item(l('MENU_TAGS'), '/contact/tags', 'tags'),
-    show: new menus.Item(l('VIEW'), '/contact/show', 'search'),
-    edit: new menus.Item(l('EDIT'), '/contact/edit', 'edit'),
-    remove: new menus.Item(l('DELETE'), '/contact/remove', 'remove')
+    list: new menus.Item(l.MENU_LIST, '/contact/list', 'list'),
+    add: new menus.Item(l.MENU_NEW, '/contact/add', 'add sign'),
+    //groups: new menus.Item(l.MENU_GROUPS, '/contact/groups', 'users'),
+    tags: new menus.Item(l.MENU_TAGS, '/contact/tags', 'tags'),
+    show: new menus.Item(l.VIEW, '/contact/show', 'search'),
+    edit: new menus.Item(l.EDIT, '/contact/edit', 'edit'),
+    remove: new menus.Item(l.DELETE, '/contact/remove', 'remove')
   };
 
   contact.data.tags = [];

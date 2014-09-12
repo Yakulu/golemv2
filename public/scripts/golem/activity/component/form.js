@@ -4,13 +4,13 @@
   module.component.form = {
     controller: function () {
       var me = this;
-      var l = golem.utils.locale;
+      var l = golem.config.locale;
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add ];
       var newActivity = function () {
         me.activity = module.model.create({});
         me.add = true;
-        document.title = golem.model.title(l('ACTIVITIES_NEW'));
+        document.title = golem.model.title(l.ACTIVITIES_NEW);
       };
       var key = m.route.param('activityId');
       if (!key) {
@@ -22,7 +22,7 @@
           if (!me.activity) {
             newMember(); 
           } else {
-            document.title = golem.model.title(l('CONTACTS_EDIT') + me.activity.label);
+            document.title = golem.model.title(l.CONTACTS_EDIT + me.activity.label);
             ['show', 'edit', 'remove'].forEach(function (v) {
               mi[v].url = mi[v].baseUrl + '/' + me.activity._id;
             });
@@ -34,10 +34,10 @@
       me.submit = golem.component.form.submit.bind(me, 'activity', '/activity/list');
     },
     view: function (ctrl) {
-      var l = golem.utils.locale;
+      var l = golem.config.locale;
       var a = ctrl.activity;
       var form = golem.widgets.form;
-      var h2 = ctrl.add ? l('ACTIVITIES_NEW') : l('CONTACTS_EDIT') + ' ' + a.label;
+      var h2 = ctrl.add ? l.ACTIVITIES_NEW : l.CONTACTS_EDIT + ' ' + a.label;
 
       var mainContent = m('section', { class: 'ui piled segment'}, [
         m('h2', h2),
@@ -50,25 +50,25 @@
             form.textHelper({
               cls: 'eight wide field small input',
               name: 'label',
-              label: l('LABEL'),
+              label: l.LABEL,
               minlength: 2,
               maxlength: 100,
               required: true,
               value: a.label,
-              validationMsg: l('LASTNAME_VALIDATION_MSG'),
+              validationMsg: l.LASTNAME_VALIDATION_MSG,
               validationCallback: function (e) { a.label = e.target.value; }
             }),
             form.textHelper({
               cls: 'four wide field small input',
               name: 'code',
-              label: l('CODE'),
+              label: l.CODE,
               minlength: 2,
               maxlength: 30,
               value: a.code,
               onchange: m.withAttr('value', function (v) { a.code = v; })
             }),
             m('div', { class: 'four wide field small input' }, [
-              m('label', { for: 'places'}, l('PLACES')),
+              m('label', { for: 'places'}, l.PLACES),
               m('input', {
                 id: 'places',
                 name: 'places',
@@ -93,7 +93,7 @@
             form.textHelper({
               cls: 'ten wide field small input',
               name: 'timeSlot',
-              label: l('TIMESLOT'),
+              label: l.TIMESLOT,
               minlength: 2,
               maxlength: 100,
               value: a.timeSlot,
@@ -102,7 +102,7 @@
             form.textHelper({
               cls: 'six wide field small input',
               name: 'monitor',
-              label: l('MONITOR'),
+              label: l.MONITOR,
               minlength: 2,
               maxlength: 50,
               value: a.monitor,
@@ -110,7 +110,7 @@
             })
           ]),
           m('div.field', [
-            m('label', { for: 'note' }, l('NOTE')),
+            m('label', { for: 'note' }, l.NOTE),
             m('textarea', {
                 name: 'note',
                 value: a.note,
@@ -122,7 +122,7 @@
                 class:'ui teal submit button',
                 type: 'submit',
                 form: 'activity-form',
-                value: ctrl.add ? l('SAVE') : l('UPDATE')
+                value: ctrl.add ? l.SAVE : l.UPDATE
             }),
             m('button', {
                 name: 'cancel',
@@ -131,7 +131,7 @@
                 onclick: function () { 
                   window.location.hash = '#/activity/list';
                 }
-              }, l('CANCEL'))
+              }, l.CANCEL)
         ])
       ]);
       var contextMenuContent = m('nav', [
@@ -139,7 +139,7 @@
           m('input', {
             class: 'ui fluid teal submit button',
             type: 'submit',
-            value: ctrl.add ? l('SAVE') : l('UPDATE'),
+            value: ctrl.add ? l.SAVE : l.UPDATE,
             // FIXME : here's a hack, to fix properly
             onclick: function () {
               document.getElementById('activity-submit').click();
@@ -149,7 +149,7 @@
             role: 'button',
           class: 'ui fluid button',
           onclick: function (e) { window.location = '#/activity/list'; }
-          }, l('CANCEL'))
+          }, l.CANCEL)
         ])
       ]);
       return [

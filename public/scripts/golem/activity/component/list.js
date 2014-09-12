@@ -3,10 +3,10 @@
   module.component.list = {
     controller: function () {
       var me = this;
-      var l = golem.utils.locale;
+      var l = golem.config.locale;
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add ];
-      document.title = golem.model.title(l('ACTIVITIES_LIST'));
+      document.title = golem.model.title(l.ACTIVITIES_LIST);
       me.items = [];
       me.sort = function (e) {
         golem.component.list.sort(e, me.items);
@@ -36,7 +36,7 @@
       getActivities();
     },
     view: function (ctrl) {
-      var l = golem.utils.locale;
+      var l = golem.config.locale;
       var placesDom = function (i) {
         var color = 'inherit';
         if (i.places) {
@@ -65,13 +65,13 @@
           m('td', i.places),
           m('td', placesDom(i)),
           m('td', { class: 'actions' }, [
-            m('a', { href: '#/activity/show/' + i._id, title: l('VIEW') }, [
+            m('a', { href: '#/activity/show/' + i._id, title: l.VIEW }, [
               m('i', { class: 'unhide icon' })
             ]),
-            m('a', { href: '#/activity/edit/' + i._id, title: l('EDIT') }, [
+            m('a', { href: '#/activity/edit/' + i._id, title: l.EDIT }, [
               m('i', { class: 'edit icon' })
             ]),
-            m('a', { href: '#/activity/remove/' + i._id, title: l('DELETE') }, [
+            m('a', { href: '#/activity/remove/' + i._id, title: l.DELETE }, [
               m('i', { class: 'remove icon' })
             ])
           ])
@@ -83,11 +83,11 @@
           m('tr', [
             gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'label' }),
             gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'code' }),
-            m('th', l('TIMESLOT')),
-            m('th', l('MONITOR')),
+            m('th', l.TIMESLOT),
+            m('th', l.MONITOR),
             gwf.sortTableHeaderHelper({ ctrl: ctrl, field: 'places' }),
-            m('th', l('PLACES_TAKEN')),
-            m('th', { width: '10%' }, l('ACTIONS'))
+            m('th', l.PLACES_TAKEN),
+            m('th', { width: '10%' }, l.ACTIONS)
           ])
         ]),
         m('tbody', ctrl.filteredItems ? ctrl.filteredItems.map(itemDom) : ctrl.items.map(itemDom))

@@ -4,10 +4,10 @@
   member.component.skills = {
     controller: function () {
       var me = this;
-      var l = golem.utils.locale;
+      var l = golem.config.locale;
       var mi = member.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add, mi.tags, mi.skills ];
-      document.title = golem.model.title(l('SKILLS_MANAGEMENT'));
+      document.title = golem.model.title(l.SKILLS_MANAGEMENT);
       me.skills = [];
       m.startComputation();
       member.data.getSkills(function (err, res) {
@@ -44,8 +44,8 @@
           });
           golem.model.db.bulkDocs(docs, function (err, res) {
             golem.utils.sendNotification(
-              l('SUCCESS'),
-              { body: l('SUCCESS_UPDATE') },
+              l.SUCCESS,
+              { body: l.SUCCESS_UPDATE },
               function () {
                 if (!newVal) {
                   var tagsIdx = me.skills.indexOf(oldVal);
@@ -64,8 +64,8 @@
       };
       var input = null;
       me.removeModalCtrl = new widgets.modal.controller({
-        title: l('SURE'),
-        content: l('SKILLS_DELETE_CONFIRM_MSG'),
+        title: l.SURE,
+        content: l.SKILLS_DELETE_CONFIRM_MSG,
         acceptFn: function () {
           me._updateTag(input, true);
         }
@@ -76,9 +76,9 @@
       };
     },
     view: function (ctrl) {
-      var l = golem.utils.locale;
+      var l = golem.config.locale;
       var mainContent = m('section', [
-        m('h2', l('SKILLS_MANAGEMENT')),
+        m('h2', l.SKILLS_MANAGEMENT),
           m('ul', { class: 'ui bulleted list' }, ctrl.skills.map(function (tag) {
             return m('li', { class: 'item golem-tag' }, [
               m('span', { class: 'ui small input' }, [
@@ -93,13 +93,13 @@
                   type:'button',
                   class: 'ui tiny blue button',
                   onclick: ctrl.updateTagFromClick
-                }, l('RENAME')),
+                }, l.RENAME),
                 m('span.or'),
                 m('button', {
                   type:'button',
                   class: 'ui tiny red button',
                   onclick: ctrl.removeTag
-                }, l('DELETE'))
+                }, l.DELETE)
               ])
             ]);
           }))
@@ -108,9 +108,9 @@
           m('div', { class: 'ui purple inverted segment' }, [
             m('h3', [
               m('i', { class: 'info icon' }),
-              m('span', l('HELP'))
+              m('span', l.HELP)
             ]),
-            m('p', m.trust(l('TAGS_MANAGEMENT_HELP_MSG')))
+            m('p', m.trust(l.TAGS_MANAGEMENT_HELP_MSG))
           ]),
           new widgets.modal.view(ctrl.removeModalCtrl)
         ]);

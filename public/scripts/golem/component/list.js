@@ -1,5 +1,5 @@
 (function () {
-  var l = golem.utils.locale;
+  var l = golem.config.locale;
   golem.component.list = {
     sort: function (e, items) {
       var field = e.target.getAttribute('data-sort-by');
@@ -25,13 +25,13 @@
     },
     searchBox: function (searchFn) {
       return {
-        head: m('div', { class: 'header item' }, l('GLOBAL_SEARCH')),
+        head: m('div', { class: 'header item' }, l.GLOBAL_SEARCH),
         content: m('div', { class: 'item' }, [
           m('div', { class: 'ui small icon input' }, [
             m('input', {
               type: 'search',
-              placeholder: l('TYPE_HERE'),
-              title: l('SEARCH_ERROR_TOO_SHORT'),
+              placeholder: l.TYPE_HERE,
+              title: l.SEARCH_ERROR_TOO_SHORT,
               oninput: searchFn
             }),
             m('i', { class: 'unhide icon' })
@@ -43,14 +43,14 @@
 			var tagsIconAttrs = { class: 'tags icon' };
 			var tagsClass = '';
 			if (ctrl.tagFilter) {
-				tagsIconAttrs = { class: 'eraser icon', title: l('FILTERS_REMOVE') };
+				tagsIconAttrs = { class: 'eraser icon', title: l.FILTERS_REMOVE };
 				tagsClass = ' active';
 			}
 			return {
-				head: m('div', { class: 'header item' }, l('FILTERS')),
+				head: m('div', { class: 'header item' }, l.FILTERS),
 				groups: m('a', { class: 'item' }, [
 					m('i', { class: 'users icon' }),
-					l('BY_GROUPS')
+					l.BY_GROUPS
 				]),
 				tags: m('div', [
 					m('a', {
@@ -59,7 +59,7 @@
 						//config: m.route
 					}, [
 						m('i', tagsIconAttrs),
-						l('BY_TAGS')
+						l.BY_TAGS
 					]),
 					m('a', tags.map(function (tag) {
 						var items = [
