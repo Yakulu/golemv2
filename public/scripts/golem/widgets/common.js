@@ -1,5 +1,5 @@
 (function () {
-  var widgets = golem.widgets.common = {
+  golem.widgets.common = {
     modal: {
       controller: function (config) {
         // Defaults
@@ -38,6 +38,34 @@
             ])
           ])
         ]);
+      }
+    },
+    notification: {
+      controller: function (config) {
+        // Defaults
+        config.timeout = timeout || 5;
+        // Init
+        this.title = config.title;
+        this.body = config.body;
+        this.displayed = true;
+        // Methods
+        this.toggle = (function () {
+          this.displayed = !this.displayed;
+        }).bind(this);
+        this.click = function () { console.log('click'); };
+      },
+      view: function (ctrl) {
+        return m('div',
+          { class: 'ui message notification',
+            style: { display: ctrl.displayed ? 'block' : 'none' },
+            onclick: ctrl.click
+          },
+          [
+            m('i', { class: 'close icon', onclick: ctrl.toggle }),
+            m('div', { class: 'header' }, ctrl.title),
+            m('p', ctrl.body)
+          ]
+        );
       }
     }
   };

@@ -24,6 +24,12 @@
           item.title
         ]
       );
+    /*itemDom: (item) -> (CS Version)
+      cls = "#{@cls} active" if @url in window.location.hash
+      m 'a', { class: cls, href: "##{@url}" }, [
+        m 'i', { class: "#{@icon} icon" }
+        @title
+      ]*/
     }
   };
   menus.main = {

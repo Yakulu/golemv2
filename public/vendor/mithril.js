@@ -422,6 +422,7 @@ Mithril = m = new function app(window, undefined) {
 			modules[index] = module
 			controllers[index] = new module.controller
 			m.endComputation()
+      return controllers[index]; // TODO : propose...
 		}
 	}
 	m.redraw = function(force) {

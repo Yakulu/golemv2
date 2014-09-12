@@ -76,3 +76,17 @@ menu.fixed-right {
   position: fixed;
   margin-right: 1%;
 }
+
+.notification {
+  z-index: 99 !important;
+}
+
+section.notification {
+  width: 80%;
+  position: fixed !important;
+  left: 10%;
+  top: 2%;
+}
+
+div.notification {
+}
