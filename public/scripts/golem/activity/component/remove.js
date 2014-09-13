@@ -23,7 +23,6 @@
           });
           activity._deleted = true;
           docs.push(activity);
-          console.log(docs);
           golem.model.db.bulkDocs(docs, callback);
         } else {
           golem.model.db.remove(activity, callback);
@@ -35,7 +34,7 @@
     module: module,
     key: 'activityId',
     acceptFn: acceptFn,
-    nameFn: function (item ) { return item.label; },
+    nameFn: function (item) { return item.label; },
     confirm: 'ACTIVITIES_REMOVE_CONFIRM_MSG',
     route: '/activity/list'
   });
