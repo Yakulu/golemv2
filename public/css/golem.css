@@ -85,7 +85,7 @@ section.notification {
   width: 20%;
   position: fixed !important;
   right: 1%;
-  top: 2%;
+  bottom: 2%;
 }
 
 div.notification {
