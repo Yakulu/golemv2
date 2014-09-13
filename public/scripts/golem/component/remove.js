@@ -2,6 +2,18 @@
   var l = golem.config.locale;
   var widgets = golem.widgets.common;
   golem.component.remove = function (props) {
+    if (!props.acceptFn) {
+      props.acceptFn = function (item) {
+        golem.model.db.remove(item, function (err, res) {
+          if (err) {
+            golem.notifications.helpers.errorUnexpected({ body: err });
+          } else {
+            golem.notifications.helpers.success({ body: l.SUCCESS_DELETE });
+          }
+          m.route(props.route);
+        });
+      };
+    }
     return {
       controller: function () {
         var me = this;
@@ -18,16 +30,7 @@
               active: true,
               title: l.SURE,
               content: l[props.confirm],
-              acceptFn: function () {
-                golem.model.db.remove(me.item, function (err, res) {
-                  if (err) {
-                    golem.notifications.helpers.errorUnexpected({ body: err });
-                  } else {
-                    golem.notifications.helpers.success({ body: l.SUCCESS_DELETE });
-                  }
-                  m.route(props.route);
-                });
-              },
+              acceptFn: props.acceptFn.bind(me, me.item),
               cancelFn: function () {
                 me.removeModalCtrl.toggle();
                 m.route(props.route);
