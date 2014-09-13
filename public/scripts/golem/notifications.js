@@ -1,5 +1,42 @@
 (function () {
+  var l = golem.config.locale;
   golem.notifications = {
+    helpers: {
+      base: function (options, callback) {
+        golem.utils.sendNotification({
+          title: options.title,
+          body: options.body,
+          cls: options.cls,
+          icon: options.icon
+        }, callback);
+      },
+      success: function (options, callback) {
+        options.title = options.title || l.SUCCESS;
+        options.cls = 'success';
+        options.icon = 'checkmark';
+        golem.notifications.helpers.base(options, callback);
+      },
+      info: function (options, callback) {
+        options.title = options.title || l.INFO;
+        options.cls = options.icon = 'info';
+        golem.notifications.helpers.base(options, callback);
+      },
+      warning: function (options, callback) {
+        options.title = l.WARNING;
+        options.cls = options.icon = 'warning';
+        golem.notifications.helpers.base(options, callback);
+      },
+      error: function (options, callback) {
+        options.title = l.ERROR;
+        options.cls = 'error';
+        options.icon = 'attention';
+        golem.notifications.helpers.base(options, callback);
+      },
+      errorUnexpected: function (options, callback) {
+        options.body = '<em>' + options.body + '</em><br>' + l.ERROR_UNEXPECTED;
+        golem.notifications.helpers.error(options, callback);
+      }
+    },
     model: {
       items: {}, // list of items by id -> item
       counter: 0 // id autoincrement
@@ -44,7 +81,7 @@
             m('i', { class: 'close icon', onclick: closeFn }),
             m('div.content', [
               m('div.header', n.title),
-              m('p', n.body)
+              m('p', m.trust(n.body))
             ])
           ]
         );

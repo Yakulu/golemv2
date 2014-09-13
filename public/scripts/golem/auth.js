@@ -21,14 +21,7 @@
 					var login = document.getElementsByName('login')[0].value;
 					var password = document.getElementsByName('password')[0].value;
 					if (!isAuthorized(login, password)) {
-						golem.utils.sendNotification(
-              {
-                cls: 'error',
-                icon: 'attention',
-                title: l.ERROR,
-                body: 'Mot de passe ou identifiant invalides'
-              }
-						);
+            golem.notifications.helpers.error({ body: 'Mot de passe ou identifiant invalides' });
 					} else {
 						golem.initRouting();
 					}

@@ -19,11 +19,15 @@
           endkey: [type, {}]
         },
         function (err, res) {
-          golem.module[module].data[field] = res.rows;
-          golem.module[module].data[field].sort(function (a, b) {
-            // Sort by value DESC
-            return b.value - a.value;
-          });
+          if (err) {
+            golem.notifications.helpers.errorUnexpected({ body: err });
+          } else {
+            golem.module[module].data[field] = res.rows;
+            golem.module[module].data[field].sort(function (a, b) {
+              // Sort by value DESC
+              return b.value - a.value;
+            });
+          }
           callback(err, res);
         }
       );
@@ -38,7 +42,11 @@
           endkey: [type, {}]
         },
         function (err, res) {
-          golem.model.labels[type] = res.rows;
+          if (err) {
+            golem.notifications.helpers.errorUnexpected({ body: err });
+          } else {
+            golem.model.labels[type] = res.rows;
+          }
           callback(err, res);
         }
       );

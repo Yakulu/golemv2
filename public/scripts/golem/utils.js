@@ -31,6 +31,14 @@
       gnm.counter += 1;
       gnm.items[gnm.counter] = config;
       if (callback) { return callback(); }
+    },
+    handlePouchError: function (err, res, callbackSuccess, callbackAlways) {
+      if (err) {
+        golem.notifications.helpers.errorUnexpected({ body: err });
+      } else {
+        callbackSuccess(err, res);
+      }
+      if (callbackAlways) { callbackAlways(); }
     }
   };
 }).call(this);

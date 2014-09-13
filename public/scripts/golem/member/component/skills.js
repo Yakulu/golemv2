@@ -43,13 +43,8 @@
             docs.push(row.doc);
           });
           golem.model.db.bulkDocs(docs, function (err, res) {
-            golem.utils.sendNotification(
-              {
-                cls: 'success',
-                icon: 'checkmark',
-                title: l.SUCCESS,
-                body: l.SUCCESS_UPDATE,
-              },
+          golem.notifications.helpers.success(
+              { body: l.SUCCESS_UPDATE },
               function () {
                 if (!newVal) {
                   var tagsIdx = me.skills.indexOf(oldVal);

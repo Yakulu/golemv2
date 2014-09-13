@@ -92,7 +92,12 @@
 				}
 			};
       golem.model.getBySchema('activity', function (err, res) {
-        me.activities = res.rows;
+        if (err) {
+          me.activities = [];
+          golem.notifications.helpers.errorUnexpected({ body: err });
+        } else {
+          me.activities = res.rows;
+        }
         golem.model.getLabels('tels',
           golem.model.getLabels.bind(null, 'mails',
             module.data.getTags.bind(me,
@@ -218,7 +223,7 @@
 								cls: 'three wide field',
 							  name: 'birthday',
 								label: l.BIRTHDAY,
-								placeholder: 'jj, mm, jjmm, jjmmaa, jj/mm/aaaa',
+								placeholder: l.BIRTHDAY_PLACEHOLDER,
 								pattern: '\\d{2}/\\d{2}/\\d{4}',
 								value: f.birthday ? moment(f.birthday).format('L') : '',
 								onchange: m.withAttr(
@@ -240,7 +245,12 @@
 														birthday = moment(v, 'DDMM');
 														break;
 													case 6:
-														birthday = moment(v, 'DDMMYY');
+                            // FIX for DDMMYY problems
+                            var year = moment().format('YY');
+                            var ddmm = v.substr(0, 4);
+                            var yy = v.substr(4);
+                            v = (yy > year) ? ddmm + '19' + yy : ddmm + '20' + yy;
+														birthday = moment(v, 'DDMMYYYY');
 														break;
 													case 8:
 														birthday = moment(v, 'DDMMYYYY');

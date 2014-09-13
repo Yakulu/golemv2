@@ -10,12 +10,16 @@
       document.title = golem.utils.title(l.TAGS_MANAGEMENT);
       me.tags = [];
       m.startComputation();
-      member.data.getTags(function (err, res) {
-        me.tags = res.rows.map(function (tag) {
-          return tag.key[1];
-        });
-        m.endComputation();
-      });
+      member.data.getTags(
+        function (err, res) {
+          if (!err) {
+            me.tags = res.rows.map(function (tag) {
+              return tag.key[1];
+            });
+          }
+          m.endComputation();
+        }
+      );
       me._updateTag = function (input, removal) {
         m.startComputation();
         var oldVal = input.getAttribute('data-value');
@@ -45,13 +49,8 @@
             docs.push(row.doc);
           });
           golem.model.db.bulkDocs(docs, function (err, res) {
-            golem.utils.sendNotification(
-              {
-                cls: 'success',
-                icon: 'checkmark',
-                title: l.SUCCESS,
-                body: l.SUCCESS_UPDATE,
-              },
+          golem.notifications.helpers.success(
+              { body: l.SUCCESS_UPDATE },
               function () {
                 if (!newVal) {
                   var tagsIdx = me.tags.indexOf(oldVal);
