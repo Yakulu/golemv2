@@ -82,11 +82,18 @@ menu.fixed-right {
 }
 
 section.notification {
-  width: 80%;
+  width: 20%;
   position: fixed !important;
-  left: 10%;
+  right: 1%;
   top: 2%;
 }
 
 div.notification {
+  animation: 1s fadein;
+  -moz-animation: 1s fadein;
+  -webkit-animation: 1s fadein;
 }
+
+@keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
+@-moz-keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
+@-webkit-keyframes fadein { from { opacity: 0 } to { opacity: 1 } }

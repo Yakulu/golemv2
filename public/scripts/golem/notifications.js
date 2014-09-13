@@ -15,18 +15,18 @@
         delete me.toClose[id];
         delete gnm.items[id];
       };
-      me.delayClose = (function (id, timeout) {
+      me.delayClose = function (id, timeout) {
         if (timeout && !me.toClose[id]) {
           me.toClose[id] = window.setTimeout(function () {
             me.close(id, 'timeout');
             m.redraw();
           }, timeout * 1000);
         }
-      });
+      };
     },
     view: function (ctrl) {
       var gnm = golem.notifications.model;
-      var keys = Object.keys(gnm.items).sort().reverse();
+      var keys = Object.keys(gnm.items).sort();
       return m('div', keys.map(function (id) {
         var n = gnm.items[id];
         ctrl.delayClose(id, n.timeout);
