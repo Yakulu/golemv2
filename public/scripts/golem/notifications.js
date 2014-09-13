@@ -7,7 +7,8 @@
           title: options.title,
           body: options.body,
           cls: options.cls,
-          icon: options.icon
+          icon: options.icon,
+          timeout: options.timeout
         }, callback);
       },
       success: function (options, callback) {
@@ -24,12 +25,14 @@
       warning: function (options, callback) {
         options.title = l.WARNING;
         options.cls = options.icon = 'warning';
+        options.timeout = 15;
         golem.notifications.helpers.base(options, callback);
       },
       error: function (options, callback) {
         options.title = l.ERROR;
         options.cls = 'error';
         options.icon = 'attention';
+        options.timeout = false;
         golem.notifications.helpers.base(options, callback);
       },
       errorUnexpected: function (options, callback) {

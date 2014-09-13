@@ -18,15 +18,20 @@
       } else {
         m.startComputation();
         golem.model.db.get(key, function (err, res) {
-          me.activity = res;
-          if (!me.activity) {
-            newMember(); 
+          if (err) {
+            golem.notifications.helpers.warning({ body: l.ERROR_RECORD_NOT_FOUND });
+            m.route('/activity/list');
           } else {
-            document.title = golem.utils.title(l.CONTACTS_EDIT + me.activity.label);
-            ['show', 'edit', 'remove'].forEach(function (v) {
-              mi[v].url = mi[v].baseUrl + '/' + me.activity._id;
-            });
-            golem.menus.secondary.items.splice(2, 0, mi.show, mi.edit, mi.remove);
+            me.activity = res;
+            if (!me.activity) {
+              newMember(); 
+            } else {
+              document.title = golem.utils.title(l.CONTACTS_EDIT + me.activity.label);
+              ['show', 'edit', 'remove'].forEach(function (v) {
+                mi[v].url = mi[v].baseUrl + '/' + me.activity._id;
+              });
+              golem.menus.secondary.items.splice(2, 0, mi.show, mi.edit, mi.remove);
+            }
           }
           m.endComputation();
         });

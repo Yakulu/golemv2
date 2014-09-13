@@ -17,7 +17,7 @@
               return tag.key[1];
             });
           }
-          m.endComputation();
+        m.endComputation();
         }
       );
       me._updateTag = function (input, removal) {
@@ -38,29 +38,40 @@
           key: ['member', oldVal],
           include_docs: true
         }, function (err, res) {
-          var docs = [];
-          res.rows.forEach(function (row) {
-            var idx = row.doc.tags.indexOf(oldVal);
-            if (newVal) {
-              row.doc.tags[idx] = newVal;
-            } else {
-              row.doc.tags.splice(idx, 1);
-            }
-            docs.push(row.doc);
-          });
-          golem.model.db.bulkDocs(docs, function (err, res) {
-          golem.notifications.helpers.success(
-              { body: l.SUCCESS_UPDATE },
-              function () {
-                if (!newVal) {
-                  var tagsIdx = me.tags.indexOf(oldVal);
-                  me.tags.splice(tagsIdx, 1); 
-                  me.removeModalCtrl.toggle();
-                }
-                m.endComputation();
+          if (err) {
+            golem.notifications.helpers.errorUnexpected({ body: err });
+            m.endComputation();
+          } else {
+            var docs = [];
+            res.rows.forEach(function (row) {
+              var idx = row.doc.tags.indexOf(oldVal);
+              if (newVal) {
+                row.doc.tags[idx] = newVal;
+              } else {
+                row.doc.tags.splice(idx, 1);
               }
-            );
-          });
+              docs.push(row.doc);
+            });
+            golem.model.db.bulkDocs(docs, function (err, res) {
+              if (err) {
+                golem.notifications.helpers.errorUnexpected({ body: err });
+              } else {
+                golem.notifications.helpers.success(
+                  { body: l.SUCCESS_UPDATE },
+                  function () {
+                    if (!newVal) {
+                      var tagsIdx = me.tags.indexOf(oldVal);
+                      me.tags.splice(tagsIdx, 1); 
+                      me.removeModalCtrl.toggle();
+                    } else {
+                      me.tags[me.tags.indexOf(oldVal)] = newVal;
+                    }
+                  }
+                );
+              }
+              m.endComputation();
+            });
+          }
         });
       };
       me.updateTagFromClick = function (e) {

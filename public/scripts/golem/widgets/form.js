@@ -90,7 +90,7 @@
       if (config.onchange) { inputAttr.onchange = config.onchange; }
       if (config.oninput) { inputAttr.oninput = config.oninput; }
       if (config.validationMsg) {
-        inputAttr.oninput = function (e) {
+        var validateFn = function (e) {
           var name = e.target.getAttribute('name');
           var isValid = e.target.checkValidity();
           var parent = e.target.parentNode;
@@ -103,6 +103,8 @@
           }
           if (config.validationCallback) { config.validationCallback(e); }
         };
+        inputAttr.oninput = validateFn;
+        inputAttr.onblur = validateFn;
       }
       // Element
       return m('input', inputAttr);

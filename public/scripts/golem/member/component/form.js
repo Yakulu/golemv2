@@ -55,7 +55,7 @@
 						mi.show, mi.edit, mi.remove);
 				}
 				me.familyFromMember = m.prop(true); // TMP : avoiding family form
-				m.endComputation();
+        m.endComputation();
 			};
       var key = m.route.param('memberId');
 			/* TMP: Family OFF
@@ -84,9 +84,14 @@
 					initController(); 
 				} else {
 					golem.model.db.get(key, function (err, res) {
-						me.member = res;
-						if (!me.member) { newMember(); }
-						initController();
+            if (err) {
+              golem.notifications.helpers.warning({ body: l.ERROR_RECORD_NOT_FOUND });
+              m.route('/member/list');
+              m.endComputation();
+            } else {
+              me.member = res;
+              initController();
+            }
 							//me.familyFromMember(false);
 					});
 				}

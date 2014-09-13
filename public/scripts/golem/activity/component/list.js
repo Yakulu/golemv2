@@ -15,19 +15,29 @@
         me.filteredItems = golem.component.list.search(e, me.items);
       };
       var callback = function (err, results) {
-        me.items = results.rows;
-        golem.model.getMembersFromActivity(null, function (err, res) {
-          me.takenPlacesByActivity = {};
-          for (var i = 0, l = res.rows.length; i < l; i++) {
-            var aId = res.rows[i].key[0];
-            if (!me.takenPlacesByActivity[aId]) {
-              me.takenPlacesByActivity[aId] = 1;
-            } else {
-              me.takenPlacesByActivity[aId] += 1;
-            }
-          }
+        if (err) {
+          golem.notifications.helpers.errorUnexpected({ body: err });
+          me.items = [];
           m.endComputation();
-        });
+        } else {
+          me.items = results.rows;
+          golem.model.getMembersFromActivity(null, function (err, res) {
+            if (err) {
+              golem.notifications.helpers.errorUnexpected({ body: err });
+            } else {
+              me.takenPlacesByActivity = {};
+              for (var i = 0, l = res.rows.length; i < l; i++) {
+                var aId = res.rows[i].key[0];
+                if (!me.takenPlacesByActivity[aId]) {
+                  me.takenPlacesByActivity[aId] = 1;
+                } else {
+                  me.takenPlacesByActivity[aId] += 1;
+                }
+              }
+            }
+            m.endComputation();
+          });
+        }
       };
       var getActivities = function () {
         m.startComputation();

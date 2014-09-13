@@ -32,29 +32,40 @@
           key: ['memberskills', oldVal],
           include_docs: true
         }, function (err, res) {
-          var docs = [];
-          res.rows.forEach(function (row) {
-            var idx = row.doc.skills.indexOf(oldVal);
-            if (newVal) {
-              row.doc.skills[idx] = newVal;
-            } else {
-              row.doc.skills.splice(idx, 1);
-            }
-            docs.push(row.doc);
-          });
-          golem.model.db.bulkDocs(docs, function (err, res) {
-          golem.notifications.helpers.success(
-              { body: l.SUCCESS_UPDATE },
-              function () {
-                if (!newVal) {
-                  var tagsIdx = me.skills.indexOf(oldVal);
-                  me.skills.splice(tagsIdx, 1); 
-                  me.removeModalCtrl.toggle();
-                }
-                m.endComputation();
+          if (err) {
+            golem.notifications.helpers.errorUnexpected({ body: err });
+            m.endComputation();
+          } else {
+            var docs = [];
+            res.rows.forEach(function (row) {
+              var idx = row.doc.skills.indexOf(oldVal);
+              if (newVal) {
+                row.doc.skills[idx] = newVal;
+              } else {
+                row.doc.skills.splice(idx, 1);
               }
-            );
-          });
+              docs.push(row.doc);
+            });
+            golem.model.db.bulkDocs(docs, function (err, res) {
+              if (err) {
+                golem.notifications.helpers.errorUnexpected({ body: err });
+              } else {
+                golem.notifications.helpers.success(
+                  { body: l.SUCCESS_UPDATE },
+                  function () {
+                    if (!newVal) {
+                      var tagsIdx = me.skills.indexOf(oldVal);
+                      me.skills.splice(tagsIdx, 1); 
+                      me.removeModalCtrl.toggle();
+                    } else {
+                      me.skills[me.skills.indexOf(oldVal)] = newVal;
+                    }
+                  }
+                );
+              }
+              m.endComputation();
+            });
+          }
         });
       };
       me.updateTagFromClick = function (e) {

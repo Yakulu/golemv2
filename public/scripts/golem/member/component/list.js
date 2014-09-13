@@ -15,21 +15,19 @@
       };
 			
       var callback = function (err, results) {
-        me.items = results.rows;
-        m.endComputation();
+        if (err) {
+          golem.notifications.helpers.errorUnexpected({ body: err });
+          me.items = [];
+        } else {
+          me.items = results.rows;
+        }
+          m.endComputation();
       };
       me.tagFilter = me.tagFilter || false;
       me.setTagFilter = function (tag) {
         me.tagFilter = tag;
         m.startComputation();
-        golem.model.db.query(
-          'tags/count',
-          {
-            reduce: false,
-            key: ['member', me.tagFilter],
-            include_docs: true
-          }, callback
-        );
+        golem.model.getMembersByTag(tag, callback);
       };
       me.unsetTagFilter = function () {
         me.tagFilter = false;

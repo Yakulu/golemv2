@@ -7,25 +7,48 @@
       var key = m.route.param('activityId');
       m.startComputation();
       golem.model.db.get(key, function (err, res) {
-        me.activity = res;
-        document.title = golem.utils.title(l.DETAILS) +
-          me.activity.label;
-        var mi = module.data.menuItems;
-        ['show', 'edit', 'remove'].forEach(function (v) {
-          mi[v].url = mi[v].baseUrl + '/' + me.activity._id;
-        });
-        golem.menus.secondary.items = [
-          mi.list, mi.add, mi.show, mi.edit, mi.remove
-        ];
-        golem.model.getMembersFromActivity(me.activity._id, function (err, res) {
-          me.members = res.rows;
+        if (err) {
+          golem.notifications.helpers.error({ body: l.ERROR_RECORD_NOT_FOUND });
+          m.route('/member/list');
           m.endComputation();
-        });
+        } else {
+          me.activity = res;
+          document.title = golem.utils.title(l.DETAILS) +
+            me.activity.label;
+          var mi = module.data.menuItems;
+          ['show', 'edit', 'remove'].forEach(function (v) {
+            mi[v].url = mi[v].baseUrl + '/' + me.activity._id;
+          });
+          golem.menus.secondary.items = [
+            mi.list, mi.add, mi.show, mi.edit, mi.remove
+          ];
+          golem.model.getMembersFromActivity(me.activity._id, function (err, res) {
+            if (err) {
+              golem.notifications.helpers.errorUnexpected({ body: err });
+              me.members = [];
+            } else {
+              me.members = res.rows;
+            }
+            m.endComputation();
+          });
+        }
       });
     },
     view: function (ctrl) {
       var l = golem.config.locale;
       var a = ctrl.activity;
+      var activityMembersContent =  (function () {
+        if (ctrl.members.length > 0) {
+          return m('ul', { class: 'ui list' }, ctrl.members.map(function (i) {
+            var fullname = golem.module.member.model.fullname(i.doc);
+            return m('li', [
+              m('a', { href: '#/member/show/' + i.doc._id }, fullname)
+            ]);
+          }));
+        } else {
+          return m('p', l.NONE);
+        }
+      }).call(this);
       var mainContent = m('section', { class: 'ui piled segment' }, [
         m('h2', a.label),
         m('div', { class: 'ui horizontal list' }, [
@@ -65,14 +88,9 @@
               m('div.description', (a.places - ctrl.members.length))
             ])
           ])
-        ]),
+        ]), 
         m('h3', l.ACTIVITIES_MEMBERS),
-        m('ul', { class: 'ui list' }, ctrl.members.map(function (i) {
-          var fullname = golem.module.member.model.fullname(i.doc);
-          return m('li', [
-            m('a', { href: '#/member/show/' + i.doc._id }, fullname)
-          ]);
-        }))
+        activityMembersContent
       ]);
       return [
         m('section', { class: 'sixteen wide column' }, [

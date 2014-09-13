@@ -56,10 +56,17 @@
       e.preventDefault();
       var _submit = function (verb) {
         golem.model.db[verb](item, function (err, res) {
-          golem.notifications.helpers.success(
-            { body: l.SUCCESS_UPDATE },
-            m.route.bind(null, route)
-          );
+          if (err) {
+            golem.notifications.helpers.error(
+              { body: '<em>' + err + '</em><br>' + l.ERROR_UPDATE },
+              m.route.bind(null, route)
+            );
+          } else {
+            golem.notifications.helpers.success(
+              { body: l.SUCCESS_UPDATE },
+              m.route.bind(null, route)
+            );
+          }
         });
       };
       var verb = item._id ? 'put' : 'post';

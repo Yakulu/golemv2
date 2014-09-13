@@ -51,6 +51,16 @@
         }
       );
     },
+    getMembersByTag: function (tag, callback) {
+      golem.model.db.query(
+        'tags/count',
+        {
+          reduce: false,
+          key: ['member', tag],
+          include_docs: true
+        }, callback
+      );
+    },
     getMembersFromActivity: function (activityId, callback) {
       if (!activityId) {
         golem.model.db.query('members/byActivity', callback);

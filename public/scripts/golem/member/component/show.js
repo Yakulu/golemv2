@@ -19,17 +19,28 @@
       };
       m.startComputation();
       golem.model.db.get(key, function (err, res) {
-        me.member = res;
-        if (me.member.activities.length > 0) {
-          golem.model.db.allDocs({ keys: me.member.activities, include_docs: true }, function (err, res) {
-            me.selectedActivities = res.rows.map(function (r) {
-              return r.doc;
-            });
-            initController();
-          });
+        if (err) {
+          golem.notifications.helpers.error({ body: l.ERROR_RECORD_NOT_FOUND });
+          m.route('/member/list');
+          m.endComputation();
         } else {
-          me.selectedActivities = null;
-          initController();
+          me.member = res;
+          if (me.member.activities.length > 0) {
+            golem.model.db.allDocs({ keys: me.member.activities, include_docs: true }, function (err, res) {
+              if (err) {
+                me.selectedActivities = null;
+                golem.notifications.helpers.errorUnexpected({ body: err });
+              } else {
+                me.selectedActivities = res.rows.map(function (r) {
+                  return r.doc;
+                });
+              }
+              initController();
+            });
+          } else {
+            me.selectedActivities = null;
+            initController();
+          }
         }
       });
     },

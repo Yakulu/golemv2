@@ -8,23 +8,32 @@
         var key = m.route.param(props.key);
         m.startComputation();
         golem.model.db.get(key, function (err, res) {
-          me.item = res;
-          document.title = golem.utils.title(l.CONTACTS_REMOVE +
-            props.nameFn(me.item))
-          me.removeModalCtrl = new widgets.modal.controller({
-            active: true,
-            title: l.SURE,
-            content: l[props.confirm],
-            acceptFn: function () {
-              golem.model.db.remove(me.item, function (err, res) {
+          if (err) {
+            golem.notifications.helpers.error({ body: l.ERROR_RECORD_NOT_FOUND });
+          } else {
+            me.item = res;
+            document.title = golem.utils.title(l.CONTACTS_REMOVE +
+              props.nameFn(me.item))
+            me.removeModalCtrl = new widgets.modal.controller({
+              active: true,
+              title: l.SURE,
+              content: l[props.confirm],
+              acceptFn: function () {
+                golem.model.db.remove(me.item, function (err, res) {
+                  if (err) {
+                    golem.notifications.helpers.errorUnexpected({ body: err });
+                  } else {
+                    golem.notifications.helpers.success({ body: l.SUCCESS_DELETE });
+                  }
+                  m.route(props.route);
+                });
+              },
+              cancelFn: function () {
+                me.removeModalCtrl.toggle();
                 m.route(props.route);
-              });
-            },
-            cancelFn: function () {
-              me.removeModalCtrl.toggle();
-              m.route(props.route);
-            }
-          });
+              }
+            });
+          }
           m.endComputation();
         });
       },
