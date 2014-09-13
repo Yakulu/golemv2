@@ -6,7 +6,7 @@
       var l = golem.config.locale;
       var mi = module.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add ];
-      document.title = golem.model.title(l.ACTIVITIES_LIST);
+      document.title = golem.utils.title(l.ACTIVITIES_LIST);
       me.items = [];
       me.sort = function (e) {
         golem.component.list.sort(e, me.items);

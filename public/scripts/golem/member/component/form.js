@@ -44,9 +44,9 @@
           current: me.member.activities
         });*/
 				if (me.add) {
-					document.title = golem.model.title(l.MEMBERS_NEW);
+					document.title = golem.utils.title(l.MEMBERS_NEW);
 				} else {
-					document.title = golem.model.title(l.CONTACTS_EDIT +
+					document.title = golem.utils.title(l.CONTACTS_EDIT +
 						module.model.fullname(me.member));
 					['show', 'edit', 'remove'].forEach(function (v) {
 						mi[v].url = mi[v].baseUrl + '/' + me.member._id;

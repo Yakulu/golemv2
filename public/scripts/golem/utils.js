@@ -1,5 +1,8 @@
 (function () {
   golem.utils = {
+    title: function (suffix) {
+      return golem.config.locale.TITLE + ' - ' + suffix;
+    },
     sendNotificationHTML5: function (title, options, callback) {
       options.timeout = options.timeout || 5;
       var _send = function () {

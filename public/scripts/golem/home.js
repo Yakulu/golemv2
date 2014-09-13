@@ -2,7 +2,7 @@
   golem.home = {
     main: {
       controller: function () {
-        document.title =  golem.model.title(golem.config.locale.MENU_HOME);
+        document.title =  golem.utils.title(golem.config.locale.MENU_HOME);
       },
       view: function (ctrl) {
         return [

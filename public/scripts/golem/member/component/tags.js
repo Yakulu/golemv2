@@ -7,7 +7,7 @@
       var l = golem.config.locale;
       var mi = member.data.menuItems;
       golem.menus.secondary.items = [ mi.list, mi.add, mi.tags, mi.skills ];
-      document.title = golem.model.title(l.TAGS_MANAGEMENT);
+      document.title = golem.utils.title(l.TAGS_MANAGEMENT);
       me.tags = [];
       m.startComputation();
       member.data.getTags(function (err, res) {

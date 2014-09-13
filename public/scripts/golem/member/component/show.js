@@ -6,7 +6,7 @@
       var l = golem.config.locale;
       var key = m.route.param('memberId');
       var initController = function () {
-        document.title = golem.model.title(l.DETAILS +
+        document.title = golem.utils.title(l.DETAILS +
           module.model.fullname(me.member));
         var mi = module.data.menuItems;
         ['show', 'edit', 'remove'].forEach(function (v) {

@@ -10,7 +10,7 @@
       var newActivity = function () {
         me.activity = module.model.create({});
         me.add = true;
-        document.title = golem.model.title(l.ACTIVITIES_NEW);
+        document.title = golem.utils.title(l.ACTIVITIES_NEW);
       };
       var key = m.route.param('activityId');
       if (!key) {
@@ -22,7 +22,7 @@
           if (!me.activity) {
             newMember(); 
           } else {
-            document.title = golem.model.title(l.CONTACTS_EDIT + me.activity.label);
+            document.title = golem.utils.title(l.CONTACTS_EDIT + me.activity.label);
             ['show', 'edit', 'remove'].forEach(function (v) {
               mi[v].url = mi[v].baseUrl + '/' + me.activity._id;
             });

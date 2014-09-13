@@ -4,7 +4,7 @@
       controller: function () {
         var me = this;
 				var l = golem.config.locale;
-        document.title =  golem.model.title(l.AUTHENTIFICATION);
+        document.title =  golem.utils.title(l.AUTHENTIFICATION);
 				var credentials = {
 						login: '8d143618d8af1efbade9dba8b6c93434d98d3da1',
 						password: 'db55970eeb626c3e0a00163672ab96aa0ca94572'

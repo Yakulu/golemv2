@@ -57,9 +57,6 @@
         );
       }
     },
-    title: function (suffix) {
-      return golem.config.locale.TITLE + ' - ' + suffix;
-    },
     db: new PouchDB(window.location.protocol + '//' + window.location.host + '/db/golemdata'),
     queries: {
       all: {
