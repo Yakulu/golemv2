@@ -48,6 +48,7 @@ module.component.show =
 
     mainContent = m 'section', { class: 'ui piled segment' }, [
       m 'h2', a.label
+      m 'p', a.note
       m 'div', { class: 'ui horizontal list' }, [
         m 'div.item', [
           m 'div.content', [

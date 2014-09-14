@@ -12,7 +12,8 @@ golem.auth =
         sha.getHash 'SHA-1', 'HEX'
 
       isAuthorized = (login, password) ->
-        getHash(login) is credentials.login and getHash(password) is credentials.password
+        getHash(login) is credentials.login and
+          getHash(password) is credentials.password
 
       @send = (e) ->
         e.preventDefault()
@@ -21,7 +22,8 @@ golem.auth =
         if isAuthorized(login, password)
           golem.initRouting()
         else
-          golem.notifications.helpers.error(body: 'Mot de passe ou identifiant invalides')
+          golem.notifications.helpers.error(
+            body: 'Mot de passe ou identifiant invalides')
       return
 
     view: (ctrl) ->

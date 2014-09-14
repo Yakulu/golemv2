@@ -54,7 +54,7 @@ golem.model =
         include_docs: true
       , callback
 
-  db: new PouchDB "#{window.location.protocol}//#{window.location.host}/db/golemdata"
+  db: new PouchDB "#{location.protocol}//#{location.host}/db/golemdata"
   queries:
     all:
       _id: '_design/all'
@@ -84,7 +84,8 @@ golem.model =
               emit([schema, p]) for p in doc[prop]
 
             emitProp() if doc.tags
-            emitProp('memberskills', 'skills') if (doc.schema is 'member') and doc.skills
+            if (doc.schema is 'member') and doc.skills
+              emitProp('memberskills', 'skills')
           ).toString()
           reduce: '_count'
 

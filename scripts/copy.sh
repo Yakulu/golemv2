@@ -1,7 +1,7 @@
 #!/bin/sh
 
 DEST='public/vendor'
-SRC='bower_components'
+SRC='node_modules'
 
 cp -r $SRC/semantic-ui/build/packaged/fonts public/ &&
 cp -r $SRC/open-sans-fontface/fonts $DEST/ &&

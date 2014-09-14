@@ -64,7 +64,7 @@ module.component.form =
     #            include_docs: true
     #          }, function (err, res) {
     #            @families = res.rows;
-    #            m.endComputation(); 
+    #            m.endComputation();
     #          }
     #        );
     #      };

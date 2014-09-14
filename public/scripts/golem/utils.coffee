@@ -15,7 +15,10 @@ golem.utils =
     unless Notify.isSupported
       _alert()
     else
-      if Notify.needsPermission then Notify.requestPermission(_send, _alert) else _send()
+      if Notify.needsPermission
+        Notify.requestPermission(_send, _alert)
+      else
+        _send()
 
   sendNotification: (config, callback) ->
     timeout = config.timeout

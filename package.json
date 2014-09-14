@@ -6,10 +6,12 @@
   "main": "golem.js",
   "scripts": {
     "copy": "./scripts/copy.sh",
-    "lint": "jshint ./public/scripts/*.js",
-    "doc": "docco -o doc ./public/scripts/*.js",
+    "compile": "cd public && coffee -mc scripts/",
+    "coffeewatch": "cd public && coffee -mcw scripts/",
+    "lint": "find public/ -name *.coffee -exec coffeelint {} \\;",
+    "doc": "docco -o doc ./public/scripts/**/*.coffee",
     "test": "node ./tests/*.js",
-    "default": "npm run copy && npm run lint"
+    "default": "npm run compile && npm run lint"
   },
   "keywords": [
     "webapp"
@@ -24,9 +26,8 @@
     "validate.js": "^0.3.0"
   },
   "devDependencies": {
-    "docco": "^0.6.3",
-    "gulp": "^3.8.8",
-    "gulp-coffee": "^2.2.0",
-    "gulp-sourcemaps": "^1.1.5"
+    "coffee-script": "^1.8.0",
+    "coffeelint": "^1.6.0",
+    "docco": "^0.6.3"
   }
 }
