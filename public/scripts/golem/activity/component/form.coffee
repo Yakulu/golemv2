@@ -36,7 +36,7 @@ module.component.form =
             ]
         m.endComputation()
 
-    @submit = golem.component.form.submit.bind this, 'activity', '/activity/list'
+    @submit = golem.component.form.submit.bind this, 'activity'
     return
 
   view: (ctrl) ->

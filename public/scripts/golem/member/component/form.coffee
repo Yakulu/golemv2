@@ -94,7 +94,7 @@ module.component.form =
           module.data.getTags.bind(this,
             module.data.getSkills.bind(this, main))))
 
-    @submit = golem.component.form.submit.bind(this, 'member', '/member/list')
+    @submit = golem.component.form.submit.bind this, 'member'
     return
 
   view: (ctrl) ->

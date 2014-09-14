@@ -46,7 +46,7 @@ golem.component.form =
       tags: tag.key[1] for tag in module.data.tags
       current: current
 
-  submit: (itemField, route, e) ->
+  submit: (itemField, e) ->
     item = @[itemField]
     e.preventDefault()
     _submit = (verb) ->
@@ -54,10 +54,10 @@ golem.component.form =
         if err
           golem.notifications.helpers.error
             body: '<em>' + err + '</em><br>' + l.ERROR_UPDATE,
-            m.route.bind null, route
+            m.route.bind null, "/#{itemField}/list"
         else
           golem.notifications.helpers.success
             body: l.SUCCESS_UPDATE,
-            m.route.bind null, route
+            m.route.bind null, "/#{itemField}/show/#{res.id}"
     verb = (if item._id then 'put' else 'post')
     _submit verb
