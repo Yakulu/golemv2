@@ -17,7 +17,7 @@ module.component.form =
       m.startComputation()
       golem.model.db.get key, (err, res) =>
         if err
-          golem.notifications.helpers.warning body: l.ERROR_RECORD_NOT_FOUND
+          golem.widgets.common.notifications.warning body: l.ERROR_RECORD_NOT_FOUND
           m.route '/activity/list'
         else
           @activity = res

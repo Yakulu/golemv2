@@ -75,7 +75,7 @@ module.component.form =
       else
         golem.model.db.get key, (err, res) =>
           if err
-            golem.notifications.helpers.warning body: l.ERROR_RECORD_NOT_FOUND
+            golem.widgets.common.notifications.warning body: l.ERROR_RECORD_NOT_FOUND
             m.route '/member/list'
             m.endComputation()
           else
@@ -86,7 +86,7 @@ module.component.form =
     golem.model.getBySchema 'activity', (err, res) =>
       if err
         @activities = []
-        golem.notifications.helpers.errorUnexpected body: err
+        golem.widgets.common.notifications.errorUnexpected body: err
       else
         @activities = res.rows
       golem.model.getLabels('tels',

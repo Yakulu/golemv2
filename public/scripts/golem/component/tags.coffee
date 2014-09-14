@@ -33,7 +33,7 @@ golem.component.tags =
         include_docs: true,
         (err, res) =>
           if err
-            golem.notifications.helpers.errorUnexpected body: err
+            golem.widgets.common.notifications.errorUnexpected body: err
             m.endComputation()
           else
             docs = []
@@ -47,9 +47,9 @@ golem.component.tags =
 
             golem.model.db.bulkDocs docs, (err, res) =>
               if err
-                golem.notifications.helpers.errorUnexpected body: err
+                golem.widgets.common.notifications.errorUnexpected body: err
               else
-                golem.notifications.helpers.success body: l.SUCCESS_UPDATE,
+                golem.widgets.common.notifications.success body: l.SUCCESS_UPDATE,
                 =>
                   unless newVal
                     tagsIdx = @tags.indexOf oldVal

@@ -3,13 +3,13 @@ l = golem.config.locale
 acceptFn = (activity) ->
   golem.model.getMembersFromActivity activity._id, (err, res) ->
     if err
-      golem.notifications.helpers.errorUnexpected body: err
+      golem.widgets.common.notifications.errorUnexpected body: err
     else
       callback = (err, res) ->
         if err
-          golem.notifications.helpers.errorUnexpected body: err
+          golem.widgets.common.notifications.errorUnexpected body: err
         else
-          golem.notifications.helpers.success body: l.SUCCESS_UPDATE
+          golem.widgets.common.notifications.success body: l.SUCCESS_UPDATE
           m.route '/activity/list'
       if res.rows.length > 0
         docs = res.rows.map (r) ->

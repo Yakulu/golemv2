@@ -15,7 +15,7 @@ module.component.show =
     m.startComputation()
     golem.model.db.get key, (err, res) =>
       if err
-        golem.notifications.helpers.error body: l.ERROR_RECORD_NOT_FOUND
+        golem.widgets.common.notifications.warning body: l.ERROR_RECORD_NOT_FOUND
         m.route '/member/list'
         m.endComputation()
       else
@@ -27,7 +27,7 @@ module.component.show =
             (err, res) =>
             if err
               @selectedActivities = null
-              golem.notifications.helpers.errorUnexpected body: err
+              golem.widgets.common.notifications.errorUnexpected body: err
             else
               @selectedActivities = r.doc for r in res.activities
             initController()

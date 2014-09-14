@@ -12,14 +12,14 @@ module.component.list =
 
     callback = (err, results) =>
       if err
-        golem.notifications.helpers.errorUnexpected body: err
+        golem.widgets.common.notifications.errorUnexpected body: err
         @items = []
         m.endComputation()
       else
         @items = results.rows
         golem.model.getMembersFromActivity null, (err, res) =>
           if err
-            golem.notifications.helpers.errorUnexpected body: err
+            golem.widgets.common.notifications.errorUnexpected body: err
           else
             @takenPlacesByActivity = {}
             for r in res.rows

@@ -5,9 +5,9 @@ golem.component.remove = (props) ->
     props.acceptFn = (item) ->
       golem.model.db.remove item, (err, res) ->
         if err
-          golem.notifications.helpers.errorUnexpected body: err
+          golem.widgets.common.notifications.errorUnexpected body: err
         else
-          golem.notifications.helpers.success body: l.SUCCESS_DELETE
+          golem.widgets.common.notifications.success body: l.SUCCESS_DELETE
         m.route props.route
   return {
     controller: ->
@@ -15,7 +15,7 @@ golem.component.remove = (props) ->
       m.startComputation()
       golem.model.db.get key, (err, res) =>
         if err
-          golem.notifications.helpers.error body: l.ERROR_RECORD_NOT_FOUND
+          golem.widgets.common.notifications.error body: l.ERROR_RECORD_NOT_FOUND
         else
           @item = res
           document.title = golem.utils.title(l.CONTACTS_REMOVE + props.nameFn(@item))

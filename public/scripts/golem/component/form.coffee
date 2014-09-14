@@ -52,11 +52,11 @@ golem.component.form =
     _submit = (verb) ->
       golem.model.db[verb] item, (err, res) ->
         if err
-          golem.notifications.helpers.error
+          golem.widgets.common.notifications.error
             body: '<em>' + err + '</em><br>' + l.ERROR_UPDATE,
             m.route.bind null, "/#{itemField}/list"
         else
-          golem.notifications.helpers.success
+          golem.widgets.common.notifications.success
             body: l.SUCCESS_UPDATE,
             m.route.bind null, "/#{itemField}/show/#{res.id}"
     verb = (if item._id then 'put' else 'post')

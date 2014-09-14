@@ -18,7 +18,7 @@ golem.model =
       endkey: [type, {}]
     , (err, res) ->
       if err
-        golem.notifications.helpers.errorUnexpected body: err
+        golem.widgets.common.notifications.errorUnexpected body: err
       else
         golem.module[module].data[field] = res.rows
         # Sort by value DESC
@@ -33,7 +33,7 @@ golem.model =
       endkey: [type, {}]
     , (err, res) ->
       if err
-        golem.notifications.helpers.errorUnexpected body: err
+        golem.widgets.common.notifications.errorUnexpected body: err
       else
         golem.model.labels[type] = res.rows
       callback err, res

@@ -10,7 +10,7 @@ module.component.list =
 
     callback = (err, results) =>
       if err
-        golem.notifications.helpers.errorUnexpected body: err
+        golem.widgets.common.notifications.errorUnexpected body: err
         @items = []
       else
         @items = results.rows

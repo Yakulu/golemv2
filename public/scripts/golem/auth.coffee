@@ -22,8 +22,8 @@ golem.auth =
         if isAuthorized(login, password)
           golem.initRouting()
         else
-          golem.notifications.helpers.error(
-            body: 'Mot de passe ou identifiant invalides')
+          golem.widgets.common.notifications.error
+            body: 'Mot de passe ou identifiant invalides'
       return
 
     view: (ctrl) ->
