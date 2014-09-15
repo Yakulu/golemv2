@@ -39,7 +39,7 @@ golem.component.form =
   tagWidget: (module, current) ->
     new golem.widgets.form.tagWidget.controller
       name: 'tags'
-      label: l.MENU_TAGS
+      label: l.TAGS
       placeholder: l.TAGS_PLACEHOLDER
       content: l.INFO_FORM_TAGS
       size: 25

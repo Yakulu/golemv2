@@ -1,6 +1,6 @@
 golem.home = main:
   controller: ->
-    document.title = golem.utils.title golem.config.locale.MENU_HOME
+    document.title = golem.utils.title golem.config.locale.HOME
   view: (ctrl) ->
     [
       m 'section', { class: 'fourteen wide column' }, [

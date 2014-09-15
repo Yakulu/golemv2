@@ -100,7 +100,7 @@ module.component.show =
               class: 'ui small teal label golem-tag'
               title: l.MEMBERS_BY_TAGS,
               [ m 'i', { class: 'tag icon' }, tag ]
-          tagsItems.unshift m 'span', l.MENU_TAGS + ' ' if tagsItems.length > 0
+          tagsItems.unshift m 'span', l.TAGS + ' ' if tagsItems.length > 0
           tagsItems
         m 'p', do ->
           skillsItems = f.skills.map (skill) ->
@@ -120,7 +120,7 @@ module.component.show =
         m 'div.column', columnLeftContent
         m 'div.column', [
           m 'p', [
-            m 'div', { class: 'ui label red' }, l.MENU_ACTIVITIES
+            m 'div', { class: 'ui label red' }, l.ACTIVITIES
             m 'p', selectedActivities()
             m 'div', { class: 'ui label purple' }, l.COMMUNICATION_MODES
             m 'p', communication()

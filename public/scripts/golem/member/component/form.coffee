@@ -40,7 +40,7 @@ module.component.form =
       if @add
         document.title = golem.utils.title l.MEMBERS_NEW
       else
-        document.title = golem.utils.title l.CONTACTS_EDIT + @member.fullname()
+        document.title = golem.utils.title l.EDITION_OF + @member.fullname()
         ['show', 'edit', 'remove'].forEach (v) =>
           mi[v].url = mi[v].baseUrl + '/' + @member._id
         golem.menus.secondary.items.splice 2, 0, mi.show, mi.edit, mi.remove
@@ -101,7 +101,7 @@ module.component.form =
     l = golem.config.locale
     f = ctrl.member
     form = golem.widgets.form
-    h2 = (if ctrl.add then l.MEMBERS_NEW else "#{l.CONTACTS_EDIT} #{f.fullname()}")
+    h2 = (if ctrl.add then l.MEMBERS_NEW else "#{l.EDITION_OF} #{f.fullname()}")
     activitiesList = do ->
       content = if f.activities.length is 0 then l.NONE_F else ctrl.selectedActivities.join ', '
       m 'span', content
@@ -363,7 +363,7 @@ module.component.form =
               onchange: m.withAttr('value', (v) -> f.note = v),
               f.note
           ]
-          m 'h3', { class: 'ui inverted center aligned red header' }, l.MENU_ACTIVITIES
+          m 'h3', { class: 'ui inverted center aligned red header' }, l.ACTIVITIES
           m 'div', { class: 'ui grid' }, [
             m 'div', { class: 'eight wide column' }, [
               m 'div.field', [
@@ -381,7 +381,7 @@ module.component.form =
                         ctrl.selectedActivities.push option.text
                     f.activities = selectedActivities
                   , [
-                      m 'optgroup', { label: l.MENU_ACTIVITIES }, ctrl.activities.map (a) ->
+                      m 'optgroup', { label: l.ACTIVITIES }, ctrl.activities.map (a) ->
                         m 'option',
                           value: a._id
                           label: a.fullLabel()

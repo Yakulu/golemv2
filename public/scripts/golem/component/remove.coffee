@@ -18,7 +18,7 @@ golem.component.remove = (props) ->
           golem.widgets.common.notifications.error body: l.ERROR_RECORD_NOT_FOUND
         else
           @item = new props.class res
-          document.title = golem.utils.title(l.CONTACTS_REMOVE + props.nameFn(@item))
+          document.title = golem.utils.title(l.REMOVAL_OF + props.nameFn(@item))
           @removeModalCtrl = new widgets.modal.controller
             active: true
             title: l.SURE

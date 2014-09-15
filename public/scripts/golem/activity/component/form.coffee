@@ -24,7 +24,7 @@ module.component.form =
           unless @activity
             newMember()
           else
-            document.title = golem.utils.title l.CONTACTS_EDIT + @activity.label
+            document.title = golem.utils.title l.EDITION_OF + @activity.label
             for action in ['show', 'edit', 'remove']
               mi[action].url = "#{mi[action].baseUrl}/#{@activity._id}"
             golem.menus.secondary.items = [
@@ -43,7 +43,7 @@ module.component.form =
     l = golem.config.locale
     a = ctrl.activity
     form = golem.widgets.form
-    h2 = (if ctrl.add then l.ACTIVITIES_NEW else "#{l.CONTACTS_EDIT}  #{a.label}")
+    h2 = (if ctrl.add then l.ACTIVITIES_NEW else "#{l.EDITION_OF}  #{a.label}")
     mainContent = m 'section', { class: 'ui piled segment' }, [
       m 'h2', h2
       m 'form',

@@ -169,7 +169,7 @@ form = golem.widgets.form =
 
       # Children Modules
       @helpButton = new form.helpButton.controller(@label, @content,
-        form.addButton @addField, l.MENU_NEW)
+        form.addButton @addField, l.NEW)
 
       # Remove Modal
       removeField = =>
