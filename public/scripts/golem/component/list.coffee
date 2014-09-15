@@ -37,41 +37,43 @@ golem.component.list =
         ]
       ]
 
-  tagsBox: (tags, ctrl) ->
-    tagsIconAttrs = class: 'tags icon'
+  tagsBox: (config, ctrl) ->
+    field = config.field or 'tags'
+    tags = ctrl[(config.field or 'tags')]
+    tagsIconAttrs = class: "#{config.tagsIcon or 'tags'} icon"
     tagsClass = ''
     if ctrl.tagFilter
       tagsIconAttrs =
         class: 'eraser icon'
         title: l.FILTERS_REMOVE
       tagsClass = ' active'
-    head: m 'div', class: 'header item', l.FILTERS
+    return { head: m 'div', class: 'header item', l.FILTERS
     groups: m 'a', class: 'item', [
       m 'i', class: 'users icon'
-      l.BY_GROUPS
+      l.BY_GROUP
     ]
     tags: m 'div', [
       m 'a',
         class: 'item' + tagsClass
-        onclick: ctrl.filterByTag.bind(ctrl, null),
+        onclick: ctrl.filterByTag.bind(ctrl, null, field),
         [
           m 'i', tagsIconAttrs
-          l.BY_TAGS
+          config.label or l.BY_TAG
         ]
       m 'a', tags.map (tag) ->
         items = [
           tag.key[1]
           m 'div',
-            class: 'ui small teal label',
+            class: "ui small #{config.counterCls or 'teal'} label",
             tag.value
         ]
         classTag = 'item'
         classTag += ' active' if ctrl.tagFilter is tag.key[1]
         m 'a',
           class: classTag
-          onclick: ctrl.filterByTag.bind(ctrl, tag.key[1]),
+          onclick: ctrl.filterByTag.bind(ctrl, tag.key[1], field),
           items
-    ]
+    ] }
 
   sortTableHeaderHelper: (config) ->
     varName = config.field + 'IconDisplay'

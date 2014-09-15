@@ -23,11 +23,11 @@ module.component.list =
         @items = results.rows.map (r) -> new golem.Member r.doc
       m.endComputation()
 
-    @filterByTag = (tag) =>
+    @filterByTag = (tag, field) =>
       if tag
         @tagFilter = tag
         @activeFilters.tags = (member) ->
-          member.tags and tag in member.tags
+          member[field] and tag in member[field]
       else
         @tagFilter = null
         delete @activeFilters.tags
@@ -37,12 +37,13 @@ module.component.list =
     @items = []
     @filteredItems = null
     @activeFilters = {}
-    getMembers = =>
-      m.startComputation()
-      golem.model.getBySchema 'member', callback
 
-    module.data.getTags getMembers
-    window.ctrl = @
+    m.startComputation()
+    module.data.getTags =>
+      @tags = module.data.tags[0..4] # Only the first five tags for listing, thx
+      module.data.getSkills =>
+        @skills = module.data.skills[0..4]
+        golem.model.getBySchema 'member', callback
     return
 
   view: (ctrl) ->
@@ -106,7 +107,13 @@ module.component.list =
       ]
     ]
     searchBox = golem.component.list.searchBox ctrl.search
-    tagsBox = golem.component.list.tagsBox module.data.tags, ctrl
+    tagsBox = golem.component.list.tagsBox { tags: ctrl.tags }, ctrl
+    skillsBox = golem.component.list.tagsBox
+      field: 'skills'
+      label: l.BY_SKILL
+      tagsIcon: 'briefcase'
+      counterCls: 'blue',
+      ctrl
     contextMenuContent = m 'section', { class: 'four wide column' },
       m 'nav', [
         m 'menu', { class: 'ui small vertical menu' }, [
@@ -114,6 +121,7 @@ module.component.list =
           searchBox.content
           tagsBox.head
           tagsBox.tags
+          skillsBox.tags
         ]
       ]
     return [
