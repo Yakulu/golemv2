@@ -8,7 +8,8 @@ member.component.skills =
       field: 'skills'
       getTagsFn: member.data.getSkills
       getDocsKey: 'memberskills'
-      removeMsg: l.TAGS_MANAGEMENT_HELP_MSG
+      helpMsg: l.SKILLS_MANAGEMENT_HELP_MSG
+      removeMsg: l.SKILLS_MANAGEMENT_REMOVE_MSG
 
   view: (ctrl) ->
     new golem.component.tags.view ctrl

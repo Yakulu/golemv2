@@ -3,10 +3,11 @@ widgets = golem.widgets.common
 golem.component.tags =
   controller: (config) ->
     # Defaults
-    {@title, getTagsFn, getDocsKey, removeMsg} = config
+    {@title, getTagsFn, getDocsKey} = config
     mi = config.menuItems
     # Defaults
     field = config.field or 'tags'
+    removeMsg = config.removeMsg or l.TAGS_MANAGEMENT_REMOVE_MSG
     @helpMsg = config.helpMsg or l.TAGS_MANAGEMENT_HELP_MSG
     # Init
     golem.menus.secondary.items = [mi.list, mi.add, mi.tags, mi.skills]
