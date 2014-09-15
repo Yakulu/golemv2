@@ -8,14 +8,18 @@ golem.component.list =
         (if a[field] > b[field] then 1 else (if b[field] < a[field] then -1 else 0))
       items.reverse() if first is items[0]
 
-  search: (e, items) ->
-    val = e.target.value
-    if val.length > 2
-      items.filter (item) ->
-        json = JSON.stringify(item).toLowerCase()
-        json.indexOf(val.toLowerCase()) isnt -1
+  search: (value, item) ->
+    json = JSON.stringify(item).toLowerCase()
+    json.indexOf(value.toLowerCase()) isnt -1
+
+  filter: (ctrl) ->
+    if _(ctrl.activeFilters).isEmpty()
+      ctrl.filteredItems = null
     else
-      false
+      ctrl.filteredItems = ctrl.items.filter (item) ->
+        for fn in _(ctrl.activeFilters).values()
+          return false unless fn item
+        true
 
   searchBox: (searchFn) ->
     head: m 'div',
@@ -49,7 +53,7 @@ golem.component.list =
     tags: m 'div', [
       m 'a',
         class: 'item' + tagsClass
-        onclick: ctrl.unsetTagFilter,
+        onclick: ctrl.filterByTag.bind(ctrl, null),
         [
           m 'i', tagsIconAttrs
           l.BY_TAGS
@@ -65,6 +69,25 @@ golem.component.list =
         classTag += ' active' if ctrl.tagFilter is tag.key[1]
         m 'a',
           class: classTag
-          onclick: ctrl.setTagFilter.bind(ctrl, tag.key[1]),
+          onclick: ctrl.filterByTag.bind(ctrl, tag.key[1]),
           items
     ]
+
+  sortTableHeaderHelper: (config) ->
+    varName = config.field + 'IconDisplay'
+    config.ctrl[varName] ?= 'hidden'
+    attributes =
+      'data-sort-by': config.field
+      onmouseover: -> config.ctrl[varName] = 'visible'
+      onmouseout: -> config.ctrl[varName] = 'hidden'
+      onclick: config.ctrl.sort
+      style: { cursor: 'pointer' }
+    title = config.title or config.field.toUpperCase()
+    content = [
+      m 'span', attributes, golem.config.locale[title]
+      m 'i',
+        class: 'icon sort'
+        style: { visibility: config.ctrl[varName], marginLeft: '3px' }
+    ]
+    m 'th', { 'data-sort-by': config.field }, content
+

@@ -108,26 +108,6 @@ form = golem.widgets.form =
       validationElement
     ]
 
-  sortTableHeaderHelper: (config) ->
-    varName = config.field + 'IconDisplay'
-    config.ctrl[varName] ?= 'hidden'
-    attributes =
-      'data-sort-by': config.field
-      onmouseover: -> config.ctrl[varName] = 'visible'
-      onmouseout: -> config.ctrl[varName] = 'hidden'
-      onclick: config.ctrl.sort
-      style: { cursor: 'pointer' }
-    title = config.title or config.field.toUpperCase()
-    content = [
-      m 'span', attributes, golem.config.locale[title]
-      m 'i',
-        class: 'icon sort'
-        style:
-          visibility: config.ctrl[varName]
-          marginLeft: '3px'
-    ]
-    m 'th', { 'data-sort-by': config.field }, content
-
   multiFieldWidget:
     # TODO : non trivial, make fidel representation of fields in reactive elements for m.withAttr...
     controller: (config) ->

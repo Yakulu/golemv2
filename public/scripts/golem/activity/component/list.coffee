@@ -3,12 +3,21 @@ module.component.list =
   controller: ->
     l = golem.config.locale
     mi = module.data.menuItems
+    gcl = golem.component.list
     golem.menus.secondary.items = [mi.list, mi.add]
     document.title = golem.utils.title l.ACTIVITIES_LIST
     @items = []
+    @filteredItems = null
+    @activeFilters = {}
 
     @sort = (e) => golem.component.list.sort e, @items
-    @search = (e) => @filteredItems = golem.component.list.search e, @items
+    @search = (e) =>
+      value = e.target.value
+      if value.length > 3
+        @activeFilters.search = gcl.search.bind null, value
+      else
+        delete @activeFilters.search
+      gcl.filter @
 
     callback = (err, results) =>
       if err
@@ -74,15 +83,15 @@ module.component.list =
         ]
       ]
 
-    gwf = golem.widgets.form
+    gcl = golem.component.list
     mainContent = m 'table', { class: 'ui basic table' }, [
       m 'thead', [
         m 'tr', [
-          gwf.sortTableHeaderHelper ctrl: ctrl, field: 'label'
-          gwf.sortTableHeaderHelper ctrl: ctrl, field: 'code'
+          gcl.sortTableHeaderHelper ctrl: ctrl, field: 'label'
+          gcl.sortTableHeaderHelper ctrl: ctrl, field: 'code'
           m 'th', l.TIMESLOT
           m 'th', l.MONITOR
-          gwf.sortTableHeaderHelper ctrl: ctrl, field: 'places'
+          gcl.sortTableHeaderHelper ctrl: ctrl, field: 'places'
           m 'th', l.PLACES_TAKEN
           m 'th', { width: '10%' }, l.ACTIONS
         ]

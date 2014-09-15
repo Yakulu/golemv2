@@ -3,10 +3,17 @@ module.component.list =
   controller: ->
     l = golem.config.locale
     mi = module.data.menuItems
+    gcl = golem.component.list
     golem.menus.secondary.items = [mi.list, mi.add, mi.tags, mi.skills]
     document.title = golem.utils.title l.MEMBERS_LIST
     @sort = (e) => golem.component.list.sort e, @items
-    @search = (e) => @filteredItems = golem.component.list.search e, @items
+    @search = (e) =>
+      value = e.target.value
+      if value.length > 3
+        @activeFilters.search = gcl.search.bind null, value
+      else
+        delete @activeFilters.search
+      gcl.filter @
 
     callback = (err, results) =>
       if err
@@ -16,23 +23,26 @@ module.component.list =
         @items = results.rows.map (r) -> new golem.Member r.doc
       m.endComputation()
 
-    @tagFilter ?= false
-    @setTagFilter = (tag) =>
-      @tagFilter = tag
-      m.startComputation()
-      golem.model.getMembersByTag tag, callback
-
-    @unsetTagFilter = =>
-      @tagFilter = false
-      getMembers()
+    @filterByTag = (tag) =>
+      if tag
+        @tagFilter = tag
+        @activeFilters.tags = (member) ->
+          member.tags and tag in member.tags
+      else
+        @tagFilter = null
+        delete @activeFilters.tags
+      gcl.filter @
 
     # Init
     @items = []
+    @filteredItems = null
+    @activeFilters = {}
     getMembers = =>
       m.startComputation()
       golem.model.getBySchema 'member', callback
 
     module.data.getTags getMembers
+    window.ctrl = @
     return
 
   view: (ctrl) ->
@@ -65,40 +75,34 @@ module.component.list =
         ]
       ]
 
-    itemsDom = (if ctrl.filteredItems then ctrl.filteredItems.map itemDom else ctrl.items.map itemDom)
-    gwf = golem.widgets.form
+    items = ctrl.filteredItems or ctrl.items
+    gcl = golem.component.list
     mainContent = m 'section', { class: 'twelve wide column' }, [
       m 'table', { class: 'ui basic table' }, [
         m 'thead', [
           m 'tr', [
-            gwf.sortTableHeaderHelper
+            gcl.sortTableHeaderHelper
               ctrl: ctrl
               field: 'number'
               title: 'MEMBER_NUMBER'
-            gwf.sortTableHeaderHelper
-              ctrl: ctrl
-              field: 'lastname'
-            gwf.sortTableHeaderHelper
+            gcl.sortTableHeaderHelper ctrl: ctrl, field: 'lastname'
+            gcl.sortTableHeaderHelper
               ctrl: ctrl
               field: 'city'
               title: 'ADDRESS'
             # m('th', l.FAMILY),
             m 'th', [
-              l.TEL
-              m 'i',
-                class: 'icon info'
-                title: l.DEFAULT_ONLY
+              m 'span', l.TEL
+              m 'i', { class: 'icon info', title: l.DEFAULT_ONLY }
             ]
             m 'th', [
-              l.MAIL
-              m 'i',
-                class: 'icon info'
-                title: l.DEFAULT_ONLY
+              m 'span', l.MAIL
+              m 'i', { class: 'icon info', title: l.DEFAULT_ONLY }
             ]
             m 'th', { width: '10%' }, l.ACTIONS
           ]
         ]
-        m 'tbody', itemsDom
+        m 'tbody', items.map itemDom
       ]
     ]
     searchBox = golem.component.list.searchBox ctrl.search
