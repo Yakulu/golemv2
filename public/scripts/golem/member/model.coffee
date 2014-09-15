@@ -1,3 +1,5 @@
+gm = golem.module
+
 class golem.Member extends golem.Doc
 
   constructor: (props) ->

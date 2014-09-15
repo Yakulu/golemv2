@@ -4,7 +4,7 @@ module.component.show =
     l = golem.config.locale
     key = m.route.param 'memberId'
     initController = =>
-      document.title = golem.utils.title l.DETAILS + module.model.fullname @member
+      document.title = golem.utils.title l.DETAILS + @member.fullname()
       mi = module.data.menuItems
       ['show', 'edit', 'remove'].forEach (action) =>
         mi[action].url = "#{mi[action].baseUrl}/#{@member._id}"
@@ -57,7 +57,7 @@ module.component.show =
       ]
       m 'p', [
         m 'div', { class: 'ui label teal' }, l.CONTACT_DETAILS
-        m 'div', module.model.fulladdress f
+        m 'div', f.fulladdress()
       ]
     ]
     if f.guardianLastname
@@ -112,7 +112,7 @@ module.component.show =
           skillsItems
       ]
       m 'h2', [
-        m 'span', module.model.fullname f
+        m 'span', f.fullname()
         m 'span', (if f.number then " (#{f.number})" else '')
       ]
       m 'p', { class: 'ui basic segment' }, f.note # m.trust f.note

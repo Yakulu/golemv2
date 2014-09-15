@@ -40,9 +40,9 @@ module.component.list =
     itemDom = (f) ->
       m 'tr', [
         m 'td', f.number
-        m 'td', module.model.fullname f
+        m 'td', f.fullname()
         #m('td', f.family),
-        m 'td', module.model.fulladdress f
+        m 'td', f.fulladdress()
         m 'td', f.tels.forEach (t) ->
           if t.default
             t.value.match(/\d{2}/g).join '.'

@@ -39,7 +39,7 @@ module.component.form =
       if @add
         document.title = golem.utils.title l.MEMBERS_NEW
       else
-        document.title = golem.utils.title l.CONTACTS_EDIT + module.model.fullname @member
+        document.title = golem.utils.title l.CONTACTS_EDIT + @member.fullname()
         ['show', 'edit', 'remove'].forEach (v) =>
           mi[v].url = mi[v].baseUrl + '/' + @member._id
         golem.menus.secondary.items.splice 2, 0, mi.show, mi.edit, mi.remove
@@ -100,7 +100,7 @@ module.component.form =
     l = golem.config.locale
     f = ctrl.member
     form = golem.widgets.form
-    h2 = (if ctrl.add then l.MEMBERS_NEW else "#{l.CONTACTS_EDIT} #{module.model.fullname f}")
+    h2 = (if ctrl.add then l.MEMBERS_NEW else "#{l.CONTACTS_EDIT} #{f.fullname()}")
     activitiesList = do ->
       content = if f.activities.length is 0 then l.NONE_F else ctrl.selectedActivities.join ', '
       m 'span', content
@@ -120,7 +120,7 @@ module.component.form =
         l.MEMBERS_NEW_FAMILY_FROM
     ]
     familyDom = (f) ->
-      m 'option', { value: f.doc._id }, f.doc.lastname + golem.module.family.model.fulladdress f.doc
+      m 'option', { value: f._id }, f.lastname + f.fulladdress()
 
     familyContent = ->
       m 'section', { class: 'ui piled segment' }, [
