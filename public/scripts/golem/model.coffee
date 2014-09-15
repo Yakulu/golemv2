@@ -104,4 +104,5 @@ golem.model =
 
 class golem.Doc
   constructor: (props) ->
-    {@_id, @_rev} = props if props._id
+    # From Database directly, avoiding costly operations
+    @[k] = v for k, v of props if props

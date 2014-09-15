@@ -1,6 +1,7 @@
 gm = golem.module
 gm.contact.model =
   create: (props) ->
+    props ?= {}
     contact = gm.family.model.create props
     contact.schema = 'contact'
     contact.firstname = props.firstname or ''

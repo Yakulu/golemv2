@@ -5,10 +5,11 @@ module.component.form =
     l = golem.config.locale
     mi = module.data.menuItems
     golem.menus.secondary.items = [mi.list, mi.add]
+    window.ctrl = @
     m.startComputation()
     newMember = =>
       @add = true
-      @member = new golem.Member {}
+      @member = new golem.Member()
 
     initController = =>
       if @member.activities.length is 0
