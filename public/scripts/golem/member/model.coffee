@@ -1,26 +1,23 @@
-gm = golem.module
-gm.member.model =
-  create: (props) ->
-    member = gm.contact.model.create props
-    member.schema = 'member'
-    member.number = props.number or null
-    member.birthday = props.birthday or null
-    member.gender = props.gender or null
-    member.nationality = props.nationality or null
-    member.profession = props.profession or null
-    member.communicationModes = props.communicationModes or
-      mail: false
-      tel: false
-    member.guardianLastname = props.guardianLastname or ''
-    member.guardianFirstname = props.guardianFirstname or ''
-    member.authorizations = props.authorizations or
+class golem.Member extends golem.Doc
+
+  constructor: (props) ->
+    super props
+    for k, v of gm.contact.model.create props
+      @[k] = v
+    @schema = 'member'
+    @number = props.number or null
+    @birthday = props.birthday or null
+    @gender = props.gender or null
+    @nationality = props.nationality or null
+    @profession = props.profession or null
+    @communicationModes = props.communicationModes or mail: false, tel: false
+    @guardianLastname = props.guardianLastname or ''
+    @guardianFirstname = props.guardianFirstname or ''
+    @authorizations = props.authorizations or
       activities: false
       photos: false
-    member.skills = props.skills or []
-    member.activities = props.activities or []
-    #member.family = false;
-    #member.cafNumber = props.cafNumber || null;
-    #member.familyQuotient = props.familyQuotient || null;
-    member
-  fullname: gm.contact.model.fullname
-  fulladdress: gm.family.model.fulladdress
+    @skills = props.skills or []
+    @activities = props.activities or []
+
+  fullname: -> gm.contact.model.fullname.call null, this
+  fulladdress: -> gm.family.model.fulladdress.call null, this

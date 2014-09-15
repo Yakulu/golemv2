@@ -25,6 +25,7 @@ acceptFn = (activity) ->
 
 module.component.remove = golem.component.remove
   module: module
+  class: golem.Activity,
   key: 'activityId'
   acceptFn: acceptFn
   nameFn: (item) -> item.label

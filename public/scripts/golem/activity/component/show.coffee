@@ -10,7 +10,7 @@ module.component.show =
         m.route '/member/list'
         m.endComputation()
       else
-        @activity = res
+        @activity = new golem.Activity res
         document.title = golem.utils.title(l.DETAILS) + @activity.label
         mi = module.data.menuItems
         for action in ['show', 'edit', 'remove']
@@ -28,7 +28,7 @@ module.component.show =
             golem.widgets.common.notifications.errorUnexpected body: err
             @members = []
           else
-            @members = res.rows
+            @members = res.rows.map (r) -> new golem.Member r.doc
           m.endComputation()
     return
 
@@ -37,12 +37,10 @@ module.component.show =
     a = ctrl.activity
     activityMembersContent = do ->
       if ctrl.members.length > 0
-        m 'ul', { class: 'ui list' }, ctrl.members.map((i) ->
-          fullname = golem.module.member.model.fullname i.doc
+        m 'ul', { class: 'ui list' }, ctrl.members.map (i) ->
           m 'li', [
-            m 'a', { href: '#/member/show/' + i.doc._id }, fullname
+            m 'a', { href: '#/member/show/' + i._id }, i.fullname()
           ]
-        )
       else
         m 'p', l.NONE
 

@@ -5,7 +5,7 @@ golem.component.list =
     if field
       first = items[0]
       items.sort (a, b) ->
-        (if a.doc[field] > b.doc[field] then 1 else (if b.doc[field] < a.doc[field] then -1 else 0))
+        (if a[field] > b[field] then 1 else (if b[field] < a[field] then -1 else 0))
       items.reverse() if first is items[0]
 
   search: (e, items) ->

@@ -16,7 +16,7 @@ module.component.list =
         @items = []
         m.endComputation()
       else
-        @items = results.rows
+        @items = results.rows.map (r) -> new golem.Activity r.doc
         golem.model.getMembersFromActivity null, (err, res) =>
           if err
             golem.widgets.common.notifications.errorUnexpected body: err
@@ -51,7 +51,6 @@ module.component.list =
         ctrl.takenPlacesByActivity[i._id]
 
     itemDom = (i) ->
-      i = i.doc
       m 'tr', [
         m 'td', i.label
         m 'td', i.code

@@ -13,7 +13,7 @@ module.component.list =
         golem.widgets.common.notifications.errorUnexpected body: err
         @items = []
       else
-        @items = results.rows
+        @items = results.rows.map (r) -> new golem.Member r.doc
       m.endComputation()
 
     @tagFilter ?= false
@@ -38,7 +38,6 @@ module.component.list =
   view: (ctrl) ->
     l = golem.config.locale
     itemDom = (f) ->
-      f = f.doc
       m 'tr', [
         m 'td', f.number
         m 'td', module.model.fullname f

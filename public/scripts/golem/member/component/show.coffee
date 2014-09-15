@@ -19,18 +19,18 @@ module.component.show =
         m.route '/member/list'
         m.endComputation()
       else
-        @member = res
+        @member = new golem.Member res
         if @member.activities.length > 0
           golem.model.db.allDocs
             keys: @member.activities
             include_docs: true,
             (err, res) =>
-            if err
-              @selectedActivities = null
-              golem.widgets.common.notifications.errorUnexpected body: err
-            else
-              @selectedActivities = r.doc for r in res.activities
-            initController()
+              if err
+                @selectedActivities = null
+                golem.widgets.common.notifications.errorUnexpected body: err
+              else
+                @selectedActivities = res.rows.map (r) -> new golem.Activity r.doc
+              initController()
         else
           @selectedActivities = null
           initController()

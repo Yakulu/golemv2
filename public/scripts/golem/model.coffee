@@ -101,3 +101,7 @@ golem.model =
             emitProp('mails', 'label', doc.mails) if doc.mails
           ).toString()
           reduce: '_count'
+
+class golem.Doc
+  constructor: (props) ->
+    {@_id, @_rev} = props if props._id

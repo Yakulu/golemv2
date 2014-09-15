@@ -6,7 +6,7 @@ module.component.form =
     mi = module.data.menuItems
     golem.menus.secondary.items = [mi.list, mi.add]
     newActivity = =>
-      @activity = module.model.create {}
+      @activity = new golem.Activity
       @add = true
       document.title = golem.utils.title l.ACTIVITIES_NEW
 
@@ -20,7 +20,7 @@ module.component.form =
           golem.widgets.common.notifications.warning body: l.ERROR_RECORD_NOT_FOUND
           m.route '/activity/list'
         else
-          @activity = res
+          @activity = new golem.Activity res
           unless @activity
             newMember()
           else

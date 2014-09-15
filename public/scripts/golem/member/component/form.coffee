@@ -8,16 +8,15 @@ module.component.form =
     m.startComputation()
     newMember = =>
       @add = true
-      @member = module.model.create({})
+      @member = new golem.Member {}
 
     initController = =>
       if @member.activities.length is 0
         @selectedActivities = []
       else
         @selectedActivities = @activities.filter (a) =>
-          @member.activities.indexOf(a.id) isnt -1
-        @selectedActivities = @selectedActivities.map (a) ->
-          golem.module.activity.model.fullLabel a.doc
+          @member.activities.indexOf(a._id) isnt -1
+        @selectedActivities = @selectedActivities.map (a) -> a.fullLabel()
       @minorExpanded = false
       @telsWidget = golem.component.form.telsWidget module, @member
       @mailsWidget = golem.component.form.mailsWidget module, @member
@@ -79,7 +78,7 @@ module.component.form =
             m.route '/member/list'
             m.endComputation()
           else
-            @member = res
+            @member = new golem.Member res
             initController()
             #@familyFromMember(false);
 
@@ -88,7 +87,7 @@ module.component.form =
         @activities = []
         golem.widgets.common.notifications.errorUnexpected body: err
       else
-        @activities = res.rows
+        @activities = res.rows.map (r) -> new golem.Activity r.doc
       golem.model.getLabels('tels',
         golem.model.getLabels.bind(this, 'mails',
           module.data.getTags.bind(this,
@@ -383,10 +382,10 @@ module.component.form =
                   , [
                       m 'optgroup', { label: l.MENU_ACTIVITIES }, ctrl.activities.map (a) ->
                         m 'option',
-                          value: a.id
-                          label: golem.module.activity.model.fullLabel a.doc
-                          selected: (a.id in f.activities),
-                          golem.module.activity.model.fullLabel a.doc
+                          value: a._id
+                          label: a.fullLabel()
+                          selected: (a._id in f.activities),
+                          a.fullLabel()
                     ]
                 m 'p', [
                   m 'span', l.ACTIVITIES_SELECTED
