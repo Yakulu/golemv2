@@ -7,7 +7,7 @@ module.component.list =
     golem.menus.secondary.items = [mi.list, mi.add, mi.tags, mi.skills]
     document.title = golem.utils.title l.MEMBERS_LIST
     @sort = (e) => golem.component.list.sort e, @items
-    @search = (e) =>
+    @searchGlobal = (e) =>
       value = e.target.value
       if value.length > 3
         @activeFilters.search = gcl.search.bind null, value
@@ -15,13 +15,8 @@ module.component.list =
         delete @activeFilters.search
       gcl.filter @
 
-    callback = (err, results) =>
-      if err
-        golem.widgets.common.notifications.errorUnexpected body: err
-        @items = []
-      else
-        @items = results.rows.map (r) -> new golem.Member r.doc
-      m.endComputation()
+    
+    @searchAdvanced = (reset, e) =>
 
     @filterByTag = (tag, field) =>
       if tag
@@ -33,10 +28,20 @@ module.component.list =
         delete @activeFilters.tags
       gcl.filter @
 
+    callback = (err, results) =>
+      if err
+        golem.widgets.common.notifications.errorUnexpected body: err
+        @items = []
+      else
+        @items = results.rows.map (r) -> new golem.Member r.doc
+      m.endComputation()
+
     # Init
     @items = []
     @filteredItems = null
     @activeFilters = {}
+    @searchAdvancedOn = false
+    @searches = label: m.prop(''), code: m.prop(''), monitor: m.prop('')
 
     m.startComputation()
     module.data.getTags =>
@@ -48,6 +53,18 @@ module.component.list =
 
   view: (ctrl) ->
     l = golem.config.locale
+    form = golem.widgets.form
+
+    advancedSearchDom = ->
+      m 'form',
+        class: 'ui small form'
+        onsubmit: crl.searchAdvanced.bind(ctrl, false),
+        [
+          m 'div.fields', [
+          ]
+        ]
+
+
     itemDom = (f) ->
       m 'tr', [
         m 'td', f.number
@@ -106,7 +123,7 @@ module.component.list =
         m 'tbody', items.map itemDom
       ]
     ]
-    searchBox = golem.component.list.searchBox ctrl.search
+    searchBox = golem.component.list.searchBox ctrl.searchGlobal
     tagsBox = golem.component.list.tagsBox { tags: ctrl.tags }, ctrl
     skillsBox = golem.component.list.tagsBox
       field: 'skills'

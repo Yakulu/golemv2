@@ -415,7 +415,7 @@ module.component.form =
             name: 'cancel'
             class: 'ui button'
             type: 'button'
-            onclick: -> window.location.hash = '#/member/list',
+            onclick: -> m.route '/member/list'
             l.CANCEL
       ]
     ]
@@ -429,7 +429,7 @@ module.component.form =
         m 'div',
           role: 'button'
           class: 'ui fluid button'
-          onclick: (e) -> window.location = '#/member/list'
+          onclick: -> m.route '/member/list'
         , l.CANCEL
       ]
     ]

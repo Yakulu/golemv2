@@ -10,6 +10,7 @@ module.component.list =
     @filteredItems = null
     @activeFilters = {}
     @searchAdvancedOn = false
+    @searches = label: m.prop(''), code: m.prop(''), monitor: m.prop('')
 
     @sort = (e) => golem.component.list.sort e, @items
 
@@ -21,8 +22,6 @@ module.component.list =
         delete @activeFilters.search
       gcl.filter @
 
-    window.ctrl = @
-    @searches = label: m.prop(''), code: m.prop(''), monitor: m.prop('')
     @searchAdvanced = (reset, e) =>
       e.preventDefault()
       #_(@searches).keys().each (field) =>
@@ -72,13 +71,12 @@ module.component.list =
 
     advancedSearchDom = ->
       m 'form',
-        id: 'activity-search-form'
         class: 'ui small form'
         onsubmit: ctrl.searchAdvanced.bind(ctrl, false),
         [
-          m 'div', { class: 'fields'}, [
+          m 'div.fields', [
             form.inputHelper
-              cls: 'five wide column field small input'
+              inputCls: 'five wide column field small input'
               name: 'label'
               placeholder: l.LABEL
               minlength: 2
@@ -86,7 +84,7 @@ module.component.list =
               value: ctrl.searches.label()
               oninput: m.withAttr 'value', ctrl.searches.label
             form.inputHelper
-              cls: 'two wide column field small input'
+              inputCls: 'two wide column field small input'
               name: 'code'
               placeholder: l.CODE
               minlength: 2
@@ -94,7 +92,7 @@ module.component.list =
               value: ctrl.searches.code()
               oninput: m.withAttr 'value', ctrl.searches.code
             form.inputHelper
-              cls: 'four wide column field small input'
+              inputCls: 'four wide column field small input'
               name: 'monitor'
               placeholder: l.MONITOR
               minlength: 2
