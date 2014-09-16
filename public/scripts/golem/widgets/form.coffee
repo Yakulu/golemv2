@@ -63,6 +63,7 @@ form = golem.widgets.form =
       type: type
       placeholder: placeholder
       value: config.value
+    inputAttr.class = config.cls if config.cls
     inputAttr.maxlength = config.maxlength if config.maxlength
     inputAttr.minlength = config.minlength if config.minlength
     inputAttr.size = config.size if config.size

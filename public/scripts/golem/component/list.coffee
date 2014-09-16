@@ -22,9 +22,10 @@ golem.component.list =
         true
 
   searchBox: (searchFn) ->
-    head: m 'div',
-      class: 'header item',
-      l.SEARCH_GLOBAL
+    head: m 'div', { class: 'header item' }, [
+      m 'span', l.SEARCH_GLOBAL
+      m 'i', { class: 'warning icon', title: l.SEARCH_GLOBAL_WARNING }
+    ]
     content: m 'div',
       class: 'item', [
         m 'div', class: 'ui small icon input', [

@@ -9,15 +9,37 @@ module.component.list =
     @items = []
     @filteredItems = null
     @activeFilters = {}
+    @searchAdvancedOn = false
 
     @sort = (e) => golem.component.list.sort e, @items
-    @search = (e) =>
+
+    @searchGlobal = (e) =>
       value = e.target.value
       if value.length > 3
         @activeFilters.search = gcl.search.bind null, value
       else
         delete @activeFilters.search
       gcl.filter @
+
+    window.ctrl = @
+    @searches = label: m.prop(''), code: m.prop(''), monitor: m.prop('')
+    @searchAdvanced = (reset, e) =>
+      e.preventDefault()
+      #_(@searches).keys().each (field) =>
+      _.each(_.keys(@searches), (field) =>
+        unless reset
+          if @searches[field]().length is 0
+            delete @activeFilters[field] if @activeFilters[field]
+          else
+            value = @searches[field]().toLowerCase()
+            @activeFilters[field] = (item) ->
+              item[field].toLowerCase().indexOf(value) isnt -1
+        else
+          @searches[field]('')
+          delete @activeFilters[field]
+        gcl.filter @
+      )
+
 
     callback = (err, results) =>
       if err
@@ -46,6 +68,54 @@ module.component.list =
 
   view: (ctrl) ->
     l = golem.config.locale
+    form = golem.widgets.form
+
+    advancedSearchDom = ->
+      m 'form',
+        id: 'activity-search-form'
+        class: 'ui small form'
+        onsubmit: ctrl.searchAdvanced.bind(ctrl, false),
+        [
+          m 'div', { class: 'fields'}, [
+            form.inputHelper
+              cls: 'five wide column field small input'
+              name: 'label'
+              placeholder: l.LABEL
+              minlength: 2
+              maxlength: 100
+              value: ctrl.searches.label()
+              oninput: m.withAttr 'value', ctrl.searches.label
+            form.inputHelper
+              cls: 'two wide column field small input'
+              name: 'code'
+              placeholder: l.CODE
+              minlength: 2
+              maxlength: 30
+              value: ctrl.searches.code()
+              oninput: m.withAttr 'value', ctrl.searches.code
+            form.inputHelper
+              cls: 'four wide column field small input'
+              name: 'monitor'
+              placeholder: l.MONITOR
+              minlength: 2
+              maxlength: 50
+              value: ctrl.searches.monitor()
+              oninput: m.withAttr 'value', ctrl.searches.monitor
+            m 'div', { class: 'ui buttons' }, [
+              m 'input',
+                class: 'ui green small submit button'
+                type: 'submit'
+                form: 'activity-search-form'
+                value: l.OK
+              m 'button',
+                name: 'cancel'
+                class: 'ui small button'
+                type: 'button'
+                onclick: ctrl.searchAdvanced.bind(ctrl, true),
+                l.CANCEL
+            ]
+          ]
+        ]
 
     placesDom = (i) ->
       color = 'inherit'
@@ -98,7 +168,7 @@ module.component.list =
       ]
       m 'tbody', (if ctrl.filteredItems then ctrl.filteredItems.map itemDom else ctrl.items.map itemDom)
     ]
-    searchBox = golem.component.list.searchBox ctrl.search
+    searchBox = golem.component.list.searchBox ctrl.searchGlobal
     contextMenuContent = m 'nav', [
       m 'menu', { class: 'ui small vertical menu' }, [
         searchBox.head
@@ -108,6 +178,23 @@ module.component.list =
     return [
       m 'section', { class: 'twelve wide column' }, [
         new golem.menus.secondary.view()
+        do ->
+          [
+            m 'h3', { class: 'ui inverted center aligned black header' }, [
+              m 'span', [
+                l.SEARCH_ADVANCED + ' '
+                do ->
+                  iconCls = (if ctrl.searchAdvancedOn then 'icon circle up' else 'icon circle down')
+                  icon = m 'i',
+                    class: iconCls
+                    style: { cursor: 'pointer' }
+                    onclick: -> ctrl.searchAdvancedOn = not ctrl.searchAdvancedOn
+                  icon
+              ]
+            ]
+            advancedSearchDom() if ctrl.searchAdvancedOn
+          ]
+        m 'h3', { class: 'ui inverted center aligned purple header' }, l.ACTIVITIES_LIST
         mainContent
       ]
       m 'section', { class: 'four wide column' }, contextMenuContent
