@@ -296,19 +296,11 @@ module.component.form =
               m 'label', { for: 'cmodes-tel' }, l.TEL
             ]
           ]
-          m 'h3',
-            class: 'ui inverted center aligned green header', [
-              m 'span', [
-                l.MINOR + ' '
-                do ->
-                  iconCls = (if ctrl.minorExpanded then 'icon circle up' else 'icon circle down')
-                  icon = m 'i',
-                    class: iconCls
-                    style: { cursor: 'pointer' }
-                    onclick: -> ctrl.minorExpanded = not ctrl.minorExpanded
-                  icon
-              ]
-            ]
+          golem.widgets.common.headerExpandible
+            ctrl: ctrl
+            activeField: 'minorExpanded'
+            title: l.MINOR
+            cls: 'inverted center aligned green'
           m 'div',
             class: 'fields'
             style: { display: (if ctrl.minorExpanded then 'block' else 'none') }, [

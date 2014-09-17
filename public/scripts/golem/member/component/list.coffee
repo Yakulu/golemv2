@@ -1,6 +1,7 @@
 module = golem.module.member
 module.component.list =
   controller: ->
+    window.ctrl = @
     l = golem.config.locale
     mi = module.data.menuItems
     gcl = golem.component.list
@@ -16,7 +17,39 @@ module.component.list =
       gcl.filter @
 
     
+    @searchAdd = => @searches.push field: null, value: ''
+    @searchRemove = (idx) =>
+      s = (@searches.splice idx, 1)[0]
+      if @activeFilters[s.field]
+        delete @activeFilters[s.field]
+        gcl.filter @
+    @searchSelect = (idx, e) =>
+      oldField = @searches[idx].field
+      delete @activeFilters[oldField] if @activeFilters[oldField]
+      @searches[idx].field = e.target.value
+    @searchValue = (idx, value) => @searches[idx].value = value
+
     @searchAdvanced = (reset, e) =>
+      e.preventDefault()
+      @searches.forEach (s) =>
+        switch s.field
+          when 'lastname', 'firstname', 'nationality', 'profession'
+          , 'postalCode', 'city', 'number'
+            value = s.value.toLowerCase()
+            @activeFilters[s.field] = (item) ->
+              item[s.field]?.toLowerCase().indexOf(value) isnt -1
+          when 'fullname', 'fulladdress', 'fullguardian'
+            value = s.value.toLowerCase()
+            @activeFilters[s.field] = (item) ->
+              item[s.field]?().toLowerCase().indexOf(value) isnt -1
+          when 'tels', 'mails'
+            value = s.value.toLowerCase()
+            @activeFilters[s.field] = (item) ->
+              for f in item[s.field]
+                return true if f.value.toLowerCase().indexOf(value) isnt -1
+              false
+      gcl.filter @
+
 
     @filterByTag = (tag, field) =>
       if tag
@@ -26,6 +59,13 @@ module.component.list =
       else
         @tagFilter = null
         delete @activeFilters.tags
+      gcl.filter @
+
+    @filtersRemoveAll = =>
+      @searches = []
+      @activeFilters = {}
+      @tagFilter = null
+      @searchAdvancedOn = false
       gcl.filter @
 
     callback = (err, results) =>
@@ -41,7 +81,7 @@ module.component.list =
     @filteredItems = null
     @activeFilters = {}
     @searchAdvancedOn = false
-    @searches = label: m.prop(''), code: m.prop(''), monitor: m.prop('')
+    @searches = [] # Arrays of objects representing search form
 
     m.startComputation()
     module.data.getTags =>
@@ -55,15 +95,80 @@ module.component.list =
     l = golem.config.locale
     form = golem.widgets.form
 
+
+    searchExtraFields = (s, idx) ->
+      switch s.field
+        when 'number', 'lastname', 'firstname', 'fullname', 'nationality'
+        , 'profession', 'fulladdress', 'postalCode', 'city', 'tels', 'mails'
+        , 'fullguardian'
+          m 'input',
+            class: 'six wide field input'
+            name: s.field
+            type: 'text'
+            required: true
+            placeholder: l.TYPE_HERE
+            value: s.value
+            oninput: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
+        else '' # TODO: gender, birthday, communicationModes, authorizations
+
     advancedSearchDom = ->
       m 'form',
         class: 'ui small form'
-        onsubmit: crl.searchAdvanced.bind(ctrl, false),
+        onsubmit: ctrl.searchAdvanced.bind(ctrl, false),
         [
-          m 'div.fields', [
+          m 'fieldset.fields', [
+            m 'legend', l.FILTERS
+            m 'div', { class: 'ui buttons' }, [
+              form.addButton ctrl.searchAdd, l.NEW
+              m 'input',
+                class: 'ui green tiny submit button'
+                type: 'submit'
+                value: l.SEARCH
+            ]
+            ctrl.searches.map (s, idx) ->
+              m 'div', { class: 'fields' }, [
+                m 'select',
+                  onchange: ctrl.searchSelect.bind(ctrl, idx)
+                  value: s.field
+                  class: 'five wide field'
+                  required: true
+                  'data-idx': idx
+                  name: "search-adv-#{idx}", [
+                    m 'option', { value: '', hidden: true }
+                    m 'optgroup', label: l.CIVILITY, [
+                      m 'option', value: 'number', l.MEMBER_NUMBER
+                      m 'option', value: 'lastname', l.LASTNAME
+                      m 'option', value: 'firstname', l.FIRSTNAME
+                      m 'option', value: 'fullname', l.FULLNAME
+                      m 'option', value: 'gender', l.GENDER
+                      m 'option', value: 'birthday', l.BIRTHDAY
+                      m 'option', value: 'nationality', l.NATIONALITY
+                      m 'option', value: 'profession', l.PROFESSION
+                    ]
+                    m 'optgroup', label: l.CONTACT_DETAILS, [
+                      m 'option', value: 'fulladdress', l.FULLADDRESS
+                      m 'option', value: 'postalCode', l.POSTAL_CODE
+                      m 'option', value: 'city', l.CITY
+                      m 'option', value: 'tels', l.TEL
+                      m 'option', value: 'mails', l.MAIL
+                      m 'option',
+                        value: 'communicationModes',
+                        l.COMMUNICATION_MODES
+                    ]
+                    m 'optgroup', label: l.MINOR, [
+                      m 'option', value: 'fullguardian', l.CHILD_GUARDIAN
+                      m 'option', value: 'authorizations', l.AUTHORIZATIONS
+                    ]
+                  ]
+                searchExtraFields s, idx
+                m 'button', # Remove button
+                  class: 'ui small red icon button'
+                  title: l.DELETE
+                  onclick: -> ctrl.searchRemove idx
+                , [ m 'i', { class: 'remove sign icon' } ]
+              ]
           ]
         ]
-
 
     itemDom = (f) ->
       m 'tr', [
@@ -123,7 +228,6 @@ module.component.list =
         m 'tbody', items.map itemDom
       ]
     ]
-    searchBox = golem.component.list.searchBox ctrl.searchGlobal
     tagsBox = golem.component.list.tagsBox { tags: ctrl.tags }, ctrl
     skillsBox = golem.component.list.tagsBox
       field: 'skills'
@@ -134,16 +238,45 @@ module.component.list =
     contextMenuContent = m 'section', { class: 'four wide column' },
       m 'nav', [
         m 'menu', { class: 'ui small vertical menu' }, [
-          searchBox.head
-          searchBox.content
           tagsBox.head
           tagsBox.tags
           skillsBox.tags
         ]
       ]
+    listHeaderDom = do ->
+      titleDom = [ l.MEMBERS_LIST + ' ' ]
+      unless _(ctrl.activeFilters).isEmpty()
+        titleDom.push m 'i'
+      m 'h3',
+        class: 'ui inverted center aligned purple header',
+        [ m 'span', titleDom ]
+
+    eraserVisibility = do ->
+      if _(ctrl.activeFilters).isEmpty() then 'hidden' else 'visible'
+
     return [
       m 'section', { class: 'twelve wide column' }, [
         new golem.menus.secondary.view()
+        golem.widgets.common.headerExpandible
+          ctrl: ctrl
+          activeField: 'searchAdvancedOn'
+          title: l.SEARCH_ADVANCED
+          cls: 'inverted center aligned black'
+        advancedSearchDom() if ctrl.searchAdvancedOn
+        m 'h3',
+          class: 'ui inverted center aligned purple header', 
+          [
+            m 'span', [
+              l.MEMBERS_LIST + ' '
+              m 'i',
+                title: l.FILTERS_REMOVE
+                class: 'icon eraser'
+                style:
+                  cursor: 'pointer'
+                  visibility: eraserVisibility
+                onclick: ctrl.filtersRemoveAll
+          ]
+        ]
         mainContent
       ]
       m 'section', { class: 'four wide column' }, contextMenuContent

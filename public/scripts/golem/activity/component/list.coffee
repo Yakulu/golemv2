@@ -67,32 +67,36 @@ module.component.list =
 
   view: (ctrl) ->
     l = golem.config.locale
-    form = golem.widgets.form
+    gwf = golem.widgets.form
 
     advancedSearchDom = ->
       m 'form',
         class: 'ui small form'
         onsubmit: ctrl.searchAdvanced.bind(ctrl, false),
         [
-          m 'div.fields', [
-            form.inputHelper
-              inputCls: 'five wide column field small input'
+          m 'fieldset.fields', [
+            m 'legend', [
+              m 'i', { class: 'icon help' }
+              m 'span', l.SEARCH_ADVANCED_HELP
+            ]
+            gwf.inputHelper
+              inputCls: 'five wide column field input'
               name: 'label'
               placeholder: l.LABEL
               minlength: 2
               maxlength: 100
               value: ctrl.searches.label()
               oninput: m.withAttr 'value', ctrl.searches.label
-            form.inputHelper
-              inputCls: 'two wide column field small input'
+            gwf.inputHelper
+              inputCls: 'two wide column field input'
               name: 'code'
               placeholder: l.CODE
               minlength: 2
               maxlength: 30
               value: ctrl.searches.code()
               oninput: m.withAttr 'value', ctrl.searches.code
-            form.inputHelper
-              inputCls: 'four wide column field small input'
+            gwf.inputHelper
+              inputCls: 'four wide column field input'
               name: 'monitor'
               placeholder: l.MONITOR
               minlength: 2
@@ -103,7 +107,6 @@ module.component.list =
               m 'input',
                 class: 'ui green small submit button'
                 type: 'submit'
-                form: 'activity-search-form'
                 value: l.OK
               m 'button',
                 name: 'cancel'
@@ -176,22 +179,12 @@ module.component.list =
     return [
       m 'section', { class: 'twelve wide column' }, [
         new golem.menus.secondary.view()
-        do ->
-          [
-            m 'h3', { class: 'ui inverted center aligned black header' }, [
-              m 'span', [
-                l.SEARCH_ADVANCED + ' '
-                do ->
-                  iconCls = (if ctrl.searchAdvancedOn then 'icon circle up' else 'icon circle down')
-                  icon = m 'i',
-                    class: iconCls
-                    style: { cursor: 'pointer' }
-                    onclick: -> ctrl.searchAdvancedOn = not ctrl.searchAdvancedOn
-                  icon
-              ]
-            ]
-            advancedSearchDom() if ctrl.searchAdvancedOn
-          ]
+        golem.widgets.common.headerExpandible
+          ctrl: ctrl
+          activeField: 'searchAdvancedOn'
+          title: l.SEARCH_ADVANCED
+          cls: 'inverted center aligned black'
+        advancedSearchDom() if ctrl.searchAdvancedOn
         m 'h3', { class: 'ui inverted center aligned purple header' }, l.ACTIVITIES_LIST
         mainContent
       ]

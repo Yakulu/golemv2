@@ -1,5 +1,15 @@
 l = golem.config.locale
 golem.widgets.common =
+  headerExpandible: (c) ->
+    m 'h3', { class: "ui header #{c.cls}" }, [
+      m 'span', [
+        c.title + ' '
+        icon = m 'i',
+          class: (if c.ctrl[c.activeField] then 'icon collapse' else 'icon expand')
+          style: { cursor: 'pointer' }
+          onclick: -> c.ctrl[c.activeField] = not c.ctrl[c.activeField]
+      ]
+    ]
   modal:
     controller: (config) ->
       # Defaults

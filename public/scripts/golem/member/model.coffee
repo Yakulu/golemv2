@@ -24,3 +24,4 @@ class golem.Member extends golem.Doc
 
   fullname: -> gm.contact.model.fullname.call null, this
   fulladdress: -> gm.family.model.fulladdress.call null, this
+  fullguardian: -> "#{@guardianLastname} #{@guardianFirstname}"

@@ -25,6 +25,11 @@ fieldset {
   border: 0;
 }
 
+select {
+  padding-top: 0.65em !important;
+  padding-bottom: 0.65em !important;
+}
+
 div.multitext {
   margin-top: 3% !important;
 }
