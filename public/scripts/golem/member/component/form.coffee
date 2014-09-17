@@ -203,38 +203,18 @@ module.component.form =
               pattern: '\\d{2}/\\d{2}/\\d{4}'
               value: (if f.birthday then moment(f.birthday).format('L') else '')
               onchange: m.withAttr 'value', (v) ->
-                unless v
-                  f.birthday = null
+                v = golem.component.form.dateFormat v
+                if v
+                  f.birthday = v.toString()
+                  # If the person is minor, expand the fields
+                  isMinor = v.isAfter(moment().subtract(18, 'years'))
+                  if isMinor
+                    ctrl.minorExpanded = true
+                    if ctrl.add
+                      f.authorizations.activities = true
+                      f.authorizations.photos = true
                 else
-                  v = v.replace(/\//g, '')
-                  if v and /^\d+$/.test v
-                    switch v.length
-                      when 1
-                        v = "0#{v}"
-                      when 2
-                        birthday = moment v, 'DD'
-                      when 4
-                        birthday = moment v, 'DDMM'
-                      when 6
-                        # FIX for DDMMYY problems
-                        year = moment().format 'YY'
-                        ddmm = v.substr 0, 4
-                        yy = v.substr 4
-                        v = (if (yy > year) then "#{ddmm}19#{yy}" else "#{ddmm}20#{yy}")
-                        birthday = moment v, 'DDMMYYYY'
-                      when 8
-                        birthday = moment v, 'DDMMYYYY'
-                  if birthday and birthday.isValid()
-                    f.birthday = birthday.toString()
-                    # If the person is minor, expand the fields
-                    isMinor = birthday.isAfter(moment().subtract(18, 'years'))
-                    if isMinor
-                      ctrl.minorExpanded = true
-                      if ctrl.add
-                        f.authorizations.activities = true
-                        f.authorizations.photos = true
-                  else
-                    f.birthday = null
+                  f.birthday = null
             form.textHelper
               cls: 'four wide field'
               name: 'nationality'

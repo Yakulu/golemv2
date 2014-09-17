@@ -17,37 +17,65 @@ module.component.list =
       gcl.filter @
 
     
-    @searchAdd = => @searches.push field: null, value: ''
+    @searchCounter = 0
+    @searchAdd = =>
+      @searchCounter += 1
+      @searches.push field: null, value: ''
     @searchRemove = (idx) =>
       s = (@searches.splice idx, 1)[0]
-      if @activeFilters[s.field]
-        delete @activeFilters[s.field]
+      if @activeFilters[s.name]
+        delete @activeFilters[s.name]
         gcl.filter @
     @searchSelect = (idx, e) =>
-      oldField = @searches[idx].field
-      delete @activeFilters[oldField] if @activeFilters[oldField]
-      @searches[idx].field = e.target.value
+      s = @searches[idx]
+      delete @activeFilters[s.name] if @activeFilters[s.name]
+      s.field = e.target.value
+      s.name = "#{e.target.value}-#{@searchCounter}"
+    @searchBirthdaySelect = (idx, value) =>
+      @searches[idx].constraint = value
     @searchValue = (idx, value) => @searches[idx].value = value
 
     @searchAdvanced = (reset, e) =>
       e.preventDefault()
-      @searches.forEach (s) =>
+      @searches.forEach (s, idx) =>
         switch s.field
           when 'lastname', 'firstname', 'nationality', 'profession'
           , 'postalCode', 'city', 'number'
             value = s.value.toLowerCase()
-            @activeFilters[s.field] = (item) ->
+            @activeFilters[s.name] = (item) ->
               item[s.field]?.toLowerCase().indexOf(value) isnt -1
           when 'fullname', 'fulladdress', 'fullguardian'
             value = s.value.toLowerCase()
-            @activeFilters[s.field] = (item) ->
+            @activeFilters[s.name] = (item) ->
               item[s.field]?().toLowerCase().indexOf(value) isnt -1
           when 'tels', 'mails'
             value = s.value.toLowerCase()
-            @activeFilters[s.field] = (item) ->
+            @activeFilters[s.name] = (item) ->
               for f in item[s.field]
                 return true if f.value.toLowerCase().indexOf(value) isnt -1
               false
+          when 'communicationModes'
+            @activeFilters[s.name] = (item) -> item[s.field][s.value]
+          when 'gender'
+            @activeFilters[s.name] = (item) -> item[s.field] is s.value
+          when 'isMinor'
+            @activeFilters[s.name] = (item) -> 
+              s.value = false if _(s.value).isString()
+              false unless item.birthday
+              isMinor = moment(item.birthday).isAfter(moment().subtract(18, 'years'))
+              isMinor is s.value
+          when 'birthday'
+            #@activeFilters[s.field] = (item) ->
+            @activeFilters[s.name] = (item) ->
+              false unless item.birthday
+              switch s.constraint
+                when 'equality'
+                  moment(item.birthday).format() is s.value.format()
+                when 'before'
+                  moment(item.birthday).isBefore s.value
+                when 'after'
+                  moment(item.birthday).isAfter s.value
+
       gcl.filter @
 
 
@@ -101,15 +129,100 @@ module.component.list =
         when 'number', 'lastname', 'firstname', 'fullname', 'nationality'
         , 'profession', 'fulladdress', 'postalCode', 'city', 'tels', 'mails'
         , 'fullguardian'
-          m 'input',
-            class: 'six wide field input'
-            name: s.field
-            type: 'text'
-            required: true
-            placeholder: l.TYPE_HERE
-            value: s.value
-            oninput: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
-        else '' # TODO: gender, birthday, communicationModes, authorizations
+          [
+            m 'input',
+              class: 'six wide field input'
+              name: "#{s.field}-#{idx}"
+              type: 'text'
+              required: true
+              placeholder: l.TYPE_HERE
+              value: s.value
+              oninput: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
+          ]
+        when 'gender'
+          [
+            m 'div', { class: 'ui radio checkbox' }, [
+              m 'input',
+                type: 'radio'
+                name: "#{s.field}-#{idx}"
+                value: 'm'
+                checked: s.value is 'm'
+                onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
+              m 'label', { onclick: -> s.value = 'm' }, l.GENDER_MALE
+            ]
+            m 'div', { class: 'ui radio checkbox' }, [
+              m 'input',
+                type: 'radio'
+                name: "#{s.field}-#{idx}"
+                value: 'f'
+                checked: (s.value is 'f')
+                onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
+              m 'label', { onclick: -> s.value = 'f' }, l.GENDER_FEMALE
+            ]
+            m 'div', { class: 'ui radio checkbox' }, [
+              m 'input',
+                type: 'radio'
+                name: "#{s.field}-#{idx}"
+                value: ''
+                checked: s.value is ''
+                onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
+              m 'label', { onclick: -> s.value = '' }, l.NOT_INFORMED
+            ]
+          ]
+        when 'communicationModes'
+          [
+            m 'div', { class: 'ui radio checkbox' }, [
+              m 'input',
+                type: 'radio'
+                name: "#{s.field}-#{idx}"
+                checked: s.value is 'mail'
+                value: 'mail'
+                onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
+              m 'label', { onclick: -> s.value = 'mail' }, l.MAIL
+            ]
+            m 'div', { class: 'ui radio checkbox' }, [
+              m 'input',
+                type: 'radio'
+                name: "#{s.field}-#{idx}"
+                checked: s.value is 'tel'
+                value: 'tel'
+                onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
+              m 'label', { onclick: -> s.value = 'tel' }, l.TEL
+            ]
+          ]
+        when 'isMinor'
+          [
+            m 'input',
+              type: 'checkbox'
+              name: 'isMinor'
+              checked: s.value
+              onchange: m.withAttr 'checked', ctrl.searchValue.bind(ctrl, idx)
+          ]
+        when 'birthday'
+          [
+            m 'select',
+              class: 'three wide field'
+              required: true
+              onchange: m.withAttr 'value', ctrl.searchBirthdaySelect.bind(ctrl, idx)
+            , [
+              m 'option', { value: '', hidden: true }
+              m 'option', value: 'before', l.BORN_BEFORE
+              m 'option', value: 'equality', l.BORN
+              m 'option', value: 'after', l.BORN_AFTER
+            ]
+            m 'input',
+              class: 'six wide field input'
+              name: "#{s.field}-#{idx}"
+              type: 'text'
+              required: true
+              placeholder: l.BIRTHDAY_PLACEHOLDER
+              value: if (_(s.value).isString() is false) then s.value.format 'L' else ''
+              onchange: m.withAttr 'value', (v) ->
+                v = golem.component.form.dateFormat v
+                v ?= ''
+                ctrl.searchValue idx, v
+          ]
+        else []
 
     advancedSearchDom = ->
       m 'form',
@@ -156,11 +269,12 @@ module.component.list =
                         l.COMMUNICATION_MODES
                     ]
                     m 'optgroup', label: l.MINOR, [
+                      m 'option', value: 'isMinor', l.MINOR_IS
                       m 'option', value: 'fullguardian', l.CHILD_GUARDIAN
                       m 'option', value: 'authorizations', l.AUTHORIZATIONS
                     ]
                   ]
-                searchExtraFields s, idx
+                searchExtraFields(s, idx).map (xfield) -> xfield
                 m 'button', # Remove button
                   class: 'ui small red icon button'
                   title: l.DELETE
