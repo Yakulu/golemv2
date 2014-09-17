@@ -43,7 +43,8 @@ module.component.list =
           , 'postalCode', 'city', 'number'
             value = s.value.toLowerCase()
             @activeFilters[s.name] = (item) ->
-              item[s.field]?.toLowerCase().indexOf(value) isnt -1
+              return false unless item[s.field]
+              item[s.field].toLowerCase().indexOf(value) isnt -1
           when 'fullname', 'fulladdress', 'fullguardian'
             value = s.value.toLowerCase()
             @activeFilters[s.name] = (item) ->
