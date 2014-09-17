@@ -45,7 +45,7 @@ form = golem.widgets.form =
         m 'p.content', m.trust ctrl.content
       ]
       box.unshift popup  if ctrl.isPopupVisible
-      m 'div', box
+      m 'span', box
 
   selectHelper: (config) ->
     selectAttr = {}

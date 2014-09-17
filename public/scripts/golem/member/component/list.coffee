@@ -5,6 +5,7 @@ module.component.list =
     l = golem.config.locale
     mi = module.data.menuItems
     gcl = golem.component.list
+    gwf = golem.widgets.form
     golem.menus.secondary.items = [mi.list, mi.add, mi.tags, mi.skills]
     document.title = golem.utils.title l.MEMBERS_LIST
     @sort = (e) => golem.component.list.sort e, @items
@@ -17,6 +18,7 @@ module.component.list =
       gcl.filter @
 
     
+    @searchHelp = new gwf.helpButton.controller l.HELP, l.SEARCH_ADVANCED_EXTENDED_HELP
     @searchCounter = 0
     @searchAdd = =>
       @searchCounter += 1
@@ -233,11 +235,8 @@ module.component.list =
           m 'fieldset.fields', [
             m 'legend', l.FILTERS
             m 'div', { class: 'ui buttons' }, [
+              new golem.widgets.form.helpButton.view ctrl.searchHelp
               form.addButton ctrl.searchAdd, l.NEW
-              m 'input',
-                class: 'ui green tiny submit button'
-                type: 'submit'
-                value: l.SEARCH
             ]
             ctrl.searches.map (s, idx) ->
               m 'div', { class: 'fields' }, [
@@ -277,11 +276,18 @@ module.component.list =
                   ]
                 searchExtraFields(s, idx).map (xfield) -> xfield
                 m 'button', # Remove button
+                  type: 'button'
                   class: 'ui small red icon button'
                   title: l.DELETE
-                  onclick: -> ctrl.searchRemove idx
+                  onclick: (e) -> console.log(e); ctrl.searchRemove idx
                 , [ m 'i', { class: 'remove sign icon' } ]
               ]
+            m 'p', [
+              m 'input',
+                class: 'ui teal tiny submit button'
+                type: 'submit'
+                value: l.SEARCH
+            ]
           ]
         ]
 
