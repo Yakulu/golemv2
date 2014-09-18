@@ -5,7 +5,6 @@ module.component.form =
     l = golem.config.locale
     mi = module.data.menuItems
     golem.menus.secondary.items = [mi.list, mi.add]
-    window.ctrl = @
     m.startComputation()
     newMember = =>
       @add = true
@@ -177,22 +176,24 @@ module.component.form =
               m 'div', { class: 'ui radio checkbox' }, [
                 m 'input',
                   type: 'radio'
+                  id: 'gender-m',
                   name: 'gender'
                   value: 'm'
                   checked: (f.gender is 'm')
                   onchange: (v) -> f.gender = 'm'
-                m 'label', { onclick: (v) -> f.gender = 'm' }, l.GENDER_MALE
+                m 'label', { for: 'gender-m' }, l.GENDER_MALE
               ]
             ]
             m 'div', { class: 'two wide field' }, [
               m 'div', { class: 'ui radio checkbox' }, [
                 m 'input',
                   type: 'radio'
+                  id: 'gender-f'
                   name: 'gender'
                   value: 'f'
                   checked: (f.gender is 'f')
                   onchange: (v) -> f.gender = 'f'
-                m 'label', { onclick: (v) -> f.gender = 'f' }, l.GENDER_FEMALE
+                m 'label', { for: 'gender-f' }, l.GENDER_FEMALE
               ]
             ]
             form.textHelper
@@ -262,6 +263,7 @@ module.component.form =
             m 'div', { class: 'inline field' }, [
               m 'input',
                 type: 'checkbox'
+                id: 'cmodes-mail'
                 name: 'cmodes-mail'
                 checked: f.communicationModes['mail']
                 onchange: m.withAttr 'checked', (c) -> f.communicationModes['mail'] = c
@@ -270,6 +272,7 @@ module.component.form =
             m 'div', { class: 'inline field' }, [
               m 'input',
                 type: 'checkbox'
+                id: 'cmodes-tel'
                 name: 'cmodes-tel'
                 checked: f.communicationModes['tel']
                 onchange: m.withAttr 'checked', (c) -> f.communicationModes['tel'] = c
@@ -305,6 +308,7 @@ module.component.form =
               m 'div', { class: 'three wide inline field' }, [
                 m 'input',
                   type: 'checkbox'
+                  id: 'authorizations-activities'
                   name: 'authorizations-activities'
                   checked: f.authorizations['activities']
                   onchange: m.withAttr 'checked', (c) -> f.authorizations['activities'] = c
@@ -313,6 +317,7 @@ module.component.form =
               m 'div', { class: 'three wide inline field' }, [
                 m 'input',
                   type: 'checkbox'
+                  id: 'authorizations-photos'
                   name: 'authorizations-photos'
                   checked: f.authorizations['photos']
                   onchange: m.withAttr 'checked', (c) -> f.authorizations['photos'] = c

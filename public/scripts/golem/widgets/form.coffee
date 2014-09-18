@@ -178,6 +178,7 @@ form = golem.widgets.form =
             class: 'ui radio checkbox'
             title: l.DEFAULT
             type: 'radio'
+            id: "#{ctrl.name}-default-#{num}"
             name: "#{ctrl.name}-default"
             required: 'required'
             value: num
@@ -185,7 +186,7 @@ form = golem.widgets.form =
             onchange: ctrl.change.bind ctrl, num, 'default'
           fields.push m 'div', { class: 'two wide inline field' }, [
             radioField
-            m 'label.small', { for: ctrl.name }, l.DEFAULT
+            m 'label.small', { for: "#{ctrl.name}-default-#{num}" }, l.DEFAULT
           ]
         # Label field
         if ctrl.labelField

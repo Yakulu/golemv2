@@ -1,7 +1,6 @@
 module = golem.module.member
 module.component.list =
   controller: ->
-    window.ctrl = @
     l = golem.config.locale
     mi = module.data.menuItems
     gcl = golem.component.list
@@ -147,29 +146,32 @@ module.component.list =
             m 'div', { class: 'ui radio checkbox' }, [
               m 'input',
                 type: 'radio'
+                id: "#{s.field}-#{idx}-m"
                 name: "#{s.field}-#{idx}"
                 value: 'm'
                 checked: s.value is 'm'
                 onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
-              m 'label', { onclick: -> s.value = 'm' }, l.GENDER_MALE
+              m 'label', { for: "#{s.field}-#{idx}-m" }, l.GENDER_MALE
             ]
             m 'div', { class: 'ui radio checkbox' }, [
               m 'input',
                 type: 'radio'
+                id: "#{s.field}-#{idx}-f"
                 name: "#{s.field}-#{idx}"
                 value: 'f'
                 checked: (s.value is 'f')
                 onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
-              m 'label', { onclick: -> s.value = 'f' }, l.GENDER_FEMALE
+              m 'label', { for: "#{s.field}-#{idx}-f" }, l.GENDER_FEMALE
             ]
             m 'div', { class: 'ui radio checkbox' }, [
               m 'input',
                 type: 'radio'
+                id: "#{s.field}-#{idx}-false"
                 name: "#{s.field}-#{idx}"
                 value: ''
                 checked: s.value is ''
                 onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
-              m 'label', { onclick: -> s.value = '' }, l.NOT_INFORMED
+              m 'label', { for: "#{s.field}-#{idx}-false" }, l.NOT_INFORMED
             ]
           ]
         when 'communicationModes'
@@ -177,20 +179,22 @@ module.component.list =
             m 'div', { class: 'ui radio checkbox' }, [
               m 'input',
                 type: 'radio'
+                id: "#{s.field}-#{idx}-mail"
                 name: "#{s.field}-#{idx}"
                 checked: s.value is 'mail'
                 value: 'mail'
                 onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
-              m 'label', { onclick: -> s.value = 'mail' }, l.MAIL
+              m 'label', { for: "#{s.field}-#{idx}-mail" }, l.MAIL
             ]
             m 'div', { class: 'ui radio checkbox' }, [
               m 'input',
                 type: 'radio'
+                id: "#{s.field}-#{idx}-tel"
                 name: "#{s.field}-#{idx}"
                 checked: s.value is 'tel'
                 value: 'tel'
                 onchange: m.withAttr 'value', ctrl.searchValue.bind(ctrl, idx)
-              m 'label', { onclick: -> s.value = 'tel' }, l.TEL
+              m 'label', { for: "#{s.field}-#{idx}-tel" }, l.TEL
             ]
           ]
         when 'isMinor'
@@ -279,7 +283,7 @@ module.component.list =
                   type: 'button'
                   class: 'ui small red icon button'
                   title: l.DELETE
-                  onclick: (e) -> console.log(e); ctrl.searchRemove idx
+                  onclick: (e) -> ctrl.searchRemove idx
                 , [ m 'i', { class: 'remove sign icon' } ]
               ]
             m 'p', [

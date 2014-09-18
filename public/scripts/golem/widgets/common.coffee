@@ -93,8 +93,9 @@ golem.widgets.common =
       @delayClose = (id, timeout) =>
         if timeout and not @toClose[id]
           @toClose[id] = window.setTimeout =>
+            m.startComputation()
             @close id, 'timeout'
-            m.redraw()
+            m.endComputation()
           , timeout * 1000
       return
 
