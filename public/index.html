@@ -11,12 +11,13 @@
       }
     </style>
     <!-- App dependencies -->
-    <script src='vendor/mithril.js'></script>
-    <script src='vendor/notify.js'></script>
+    <script src='vendor/jquery.min.js'></script>
+    <script src='vendor/underscore-min.js'></script>
     <script src='vendor/moment.min.js'></script>
     <script src='vendor/moment-fr.js'></script>
-    <script src='vendor/underscore-min.js'></script>
     <script src='vendor/pouchdb.min.js'></script>
+    <script src='vendor/reactive-coffee.js'></script>
+    <script src='vendor/lightrouter.min.js'></script>
   </head>
   <body>
     <!-- Application architecture -->
@@ -28,31 +29,29 @@
       </div>
     </main>
     <footer id='golem-footer'></footer>
-    <section id='golem-notifications' class='notification'></section>
+    <section id='golem-notification' class='notification'></section>
     <script>
       // Global namespace
       var golem = {
-        config: {},
-        module: { // Official
-          family: { component: {} },
-          contact: { component: {} },
-          member: { component: {} },
-          activity: { component: {} }
-        },
-        widgets: {},
-        component: {}
+        config: {}
       };
       // Main Script
+      var bind = rx.bind;
+      var rxt = rx.rxt;
+      rx.rxt.importTags();
+      var T = rx.rxt.tags;
+      var L = function (str) { return golem.config.locale.get(str); }
     </script>
     <script src='scripts/l10n/locale_fr-FR.js'></script>
-    <script src='scripts/golem/utils.js'></script>
     <script src='scripts/golem/menus.js'></script>
-    <script src='scripts/golem/widgets/common.js'></script>
-    <script src='scripts/golem/widgets/form.js'></script>
-    <script src='scripts/golem/model.js'></script>
+    <script src='scripts/golem/utils.js'></script>
     <script src='vendor/sha1.js'></script>
     <script src='scripts/golem/auth.js'></script>
     <script src='scripts/golem/home.js'></script>
+    <script src='scripts/golem/widgets/common.js'></script>
+    <!--
+    <script src='scripts/golem/widgets/form.js'></script>
+    <script src='scripts/golem/model.js'></script>
     <script src='scripts/golem/header.js'></script>
     <script src='scripts/golem/footer.js'></script>
     <script src='scripts/golem/component/form.js'></script>
@@ -60,11 +59,11 @@
     <script src='scripts/golem/component/remove.js'></script>
     <script src='scripts/golem/component/list.js'></script>
     <script src='scripts/golem/component/tags.js'></script>
-    <!-- Family Module -->
+    < Family Module >
     <script src='scripts/golem/family/model.js'></script>
-    <!-- Contact Module -->
+    < Contact Module >
     <script src='scripts/golem/contact/model.js'></script>
-    <!-- Member Module -->
+    < Member Module >
     <script src='scripts/golem/member/model.js'></script>
     <script src='scripts/golem/member/data.js'></script>
     <script src='scripts/golem/member/component/list.js'></script>
@@ -73,13 +72,14 @@
     <script src='scripts/golem/member/component/remove.js'></script>
     <script src='scripts/golem/member/component/tags.js'></script>
     <script src='scripts/golem/member/component/skills.js'></script>
-    <!-- Activity Module -->
+    < Activity Module >
     <script src='scripts/golem/activity/model.js'></script>
     <script src='scripts/golem/activity/data.js'></script>
     <script src='scripts/golem/activity/component/list.js'></script>
     <script src='scripts/golem/activity/component/form.js'></script>
     <script src='scripts/golem/activity/component/show.js'></script>
     <script src='scripts/golem/activity/component/remove.js'></script>
+    -->
     <!-- Bootstrap Application -->
     <script src='scripts/golem.js'></script>
   </body>

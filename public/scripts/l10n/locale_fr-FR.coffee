@@ -1,5 +1,5 @@
 # Localization, french
-golem.config.locale =
+golem.config.locale = rx.map
   ACCOUNTING: 'Comptabilité'
   ACTIONS: 'Actions'
   ACTIVITIES: 'Activités'
