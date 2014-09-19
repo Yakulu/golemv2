@@ -35,10 +35,10 @@ most important part of the layout and populates them.
         g.roots =
           $main: $ '#golem-main'
         $('#golem-header').append $header
-        $('#golem-mainmenu').append g.menus.main
+        $('#golem-mainmenu').append g.menus.$main
         $('#golem-footer').append $footer
-        $('#golem-notification').append g.widgets.common.notification.Template
-        g.roots.$main.append g.auth()
+        $('#golem-notification').append g.widgets.notification.$notifications
+        g.roots.$main.append g.$auth()
 
 The `initRouting` part is executed only is authentification is valid (TMP
 FIXME, of course). This function is here to put the router in place and
@@ -49,7 +49,7 @@ launches it.
       router = new LightRouter
         routes:
           '': -> replaceMain golem.home()
-          'auth': -> replaceMain golem.auth()
+          'auth': -> replaceMain golem.$auth()
       router.run()
 
     init()

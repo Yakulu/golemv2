@@ -1,10 +1,10 @@
 # Homepage
 
 A very static version of home, full with HTML markup. It explains the history
-of the project and things like that !
+of the project and things like that ! And first, changing the document-s title.
 
-    home = -> document.title = golem.utils.title L 'HOME'
-    homeDom = """
+    init = -> document.title = golem.utils.title L 'HOME'
+    $home = """
             <section class='fourteen wide column'>
               <h2>Bienvenue</h2>
               <p>Bienvenue sur GOLEM, logiciel libre de Gestion et d'Organisation dédié aux MJC. GOLEM est publié sous licence <a href='http://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a>.</p>
@@ -41,5 +41,5 @@ of the project and things like that !
 ## Public API
 
     golem.home = ->
-      home()
-      homeDom
+      init()
+      $home

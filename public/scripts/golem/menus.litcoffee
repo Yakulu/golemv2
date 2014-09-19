@@ -26,25 +26,43 @@ The defaults `MenuItems`.
 
 ## Menus templates
 
-The template for the `mainMenu` formats each `MenuItem` into a <li> box. It's
+Each `MenuItem` is represented as a link which can be active according to the
+URL.
+
+    $menuItem = (item) ->
+      active = bind ->
+          if window.location.hash.indexOf(item.url) > 0 then ' active' else ''
+      a { class: "#{item.cls}#{active.get()}", href: "##{item.url}" }, [
+        i { class: "#{item.icon} icon" }
+        item.title
+      ]
+
+The template for the `$mainMenu` formats each `MenuItem` into a <menu> box. It's
 reactive, so it can be changed at runtime without much effort.
 
-    mainMenu = nav [
+    $mainMenu = nav [
       menu {
         id: 'main-menu'
         class: 'ui vertical labeled icon menu'
-      }, mainMenusItems.map (item) ->
-        active = bind ->
-          if window.location.hash.indexOf(item.url) > 0 then ' active' else ''
-        a { class: "#{item.cls}#{active.get()}", href: "##{item.url}" }, [
-          i { class: "#{item.icon} icon" }
-          item.title
-        ]
+      }, mainMenusItems.map $menuItem
     ]
 
-Public API
+The same thing happens to the `$secondaryMenu`, whith different classes.
+
+    $secondaryMenu = ->
+      items: []
+      view: ->
+      m 'nav', [
+        m 'menu',
+          class: 'ui small secondary pointing menu',
+          menus.secondary.items.map $menuItem
+      ]
+
+## Public API
 
     golem.menus =
       Menu: MenuItem
       mainItems: mainMenusItems
-      main: mainMenu
+      $main: $mainMenu
+      secondaryItems: rx.array()
+      $secondary: $secondaryMenu
