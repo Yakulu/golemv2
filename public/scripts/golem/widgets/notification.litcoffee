@@ -16,28 +16,29 @@ This one can have :
 * a `content`, recommended, that can be a bunch of HTML;
 * an `icon` class, according to Semantic and Font Awesome;
 * a `timeout`, in seconds, by default 10. It can be `false` for avoiding
-automatic close;
-* an optional `click` function, when the Notification is clicked, default to
-close.
+automatic close.
 
     class n.Notification
       constructor: (props) ->
-        {@title, @content, @icon, @cls, @timeout, @click} = props
+        {@title, @content, @icon, @cls, @timeout} = props
         @timeout ?= 10
 
 #### Sending
 
 `send` is the most basic and powerfull way of sending a notification to the
-user. It takes an optional callback function as argument.
+user. It takes an optional properties object with `displayCb` and `closeCb`
+functions callbacks and another optional `clickFn` function that will be called
+when the user clicks on the notifications elsewhere the close icon (defaults
+close the `Notification`).
 
-      send: (callback) ->
+      send: ({displayCb, @closeCb, @clickFn} = {}) ->
         n.items.push @
-        callback if callback?
+        displayCb() if displayCb
 
 ### Predefined Notifications
 
 A successfull `Notification` already provides a title, a class and an icon. It
-just needs the `content` and an optional `timeout` or `click` callback function.
+just needs the `content` and an optional `timeout`.
 
     class n.Success extends n.Notification
       constructor: (props) ->
@@ -47,7 +48,7 @@ just needs the `content` and an optional `timeout` or `click` callback function.
         super props
 
 An `Info` `Notification` only fixes the `cls` and `icon` and takes an optional
-`title` (default to `l.INFO`), `click` function and a required `content`.
+`title` (default to `l.INFO`) and a required `content`.
 
     class n.Info extends n.Notification
       constructor: (props) ->
@@ -55,18 +56,18 @@ An `Info` `Notification` only fixes the `cls` and `icon` and takes an optional
         props.cls = props.icon = 'info'
         super props
 
-A `Warning` `Notification` lets only gives the `content` and `click`. `title`,
-`cls` and `icon` are fixed. `timeout` is set to 15 seconds.
+A `Warning` `Notification` lets only gives the `content`. `title`, `cls` and
+`icon` are fixed. `timeout` is by default set to 15 seconds.
 
     class n.Warning extends n.Notification
       constructor: (props) ->
         props.title = L 'WARNING'
         props.cls = props.icon = 'warning'
-        props.timeout = 15
+        props.timeout ?= 15
         super props
 
-As `Warning`, an `Error` `Notification` just needs a `content` or a `click`
-function. The `timeout` is fixed to `false`.
+As `Warning`, an `Error` `Notification` just needs a `content` or a function.
+The `timeout` is fixed to `false`.
 
     class n.Error extends n.Notification
       constructor: ({ content }) ->
@@ -101,13 +102,13 @@ default 10 seconds.
       close = (notif, from) ->
         window.clearTimeout(notif.timeoutId) if notif.from isnt 'timeout'
         n.items.remove notif
+        notif.closeCb() if notif.closeCb
 
       delayClose = (notif) ->
         if notif.timeout
-          timeoutId = window.setTimeout ->
+          notif.timeoutId = window.setTimeout ->
             close(notif, 'timeout')
           , notif.timeout * 1000
-          notif.timeoutId = timeoutId
       [
         div n.items.map (notif) ->
             delayClose notif
@@ -116,7 +117,7 @@ default 10 seconds.
             nCls.push 'icon' if notif.icon
             div
               class: nCls.join ' '
-              click: if notif.click then notif.click else close.bind(null, notif)
+              click: notif.clickFn or close.bind(null, notif)
             , [
               if notif.icon then i { class: notif.icon + ' icon' } else ''
               i
