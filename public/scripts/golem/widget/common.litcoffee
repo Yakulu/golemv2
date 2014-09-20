@@ -28,6 +28,6 @@ argument with a `title`, a `class` and the boolean `active`. All are required.
 
 ## Public API
 
-    golem.widgets.common =
+    golem.widget.common =
       headerExpandable: $headerExpandable
       modal: modal

@@ -7,7 +7,7 @@ Main module for GOLEM. It's intended to bootstrap the application.
 There are global to GOLEM but text can change, according to the application's
 configuration and localization : `$header` and `$footer`.
 
-    $header =  header [
+    $header = header [
       h1 { class: 'ui inverted black block small header center aligned' },
       bind -> "#{L 'TITLE'} : #{L 'HEADER'}"
     ]
@@ -26,30 +26,42 @@ configuration and localization : `$header` and `$footer`.
 ## GOLEM global initialization
 
 Outside of first globals import into `index.html`, here is the first function
-to be called into this app. `init`, after the initial DOM readyness, takes the
-most important part of the layout and populates them.
-
+to be called into this app.
+ 
     init = ->
       g = golem
+      g.router = new LightRouter
       $ ->
         g.roots =
           $main: $ '#golem-main'
+        replaceMain = (dom) -> golem.roots.$main.children().replaceWith dom
+
+Here we initialize the router and give it exhaustive routes to handle. Most of
+them replace the main part of the GOLEM app by new elements.
+
+        g.router = new LightRouter
+          type: 'hash'
+          routes:
+            '/home': -> replaceMain g.$home()
+            '/auth': -> replaceMain g.$auth()
+            '/activity/list': ->
+              replaceMain new g.activity.component.List().$list()
+        #/activity[\/list]?/ -> replaceMain golem.activity.$list()
+
+After the initial DOM readyness, the function takes the most important part of
+the layout and populates them.
+
         $('#golem-header').append $header
         $('#golem-mainmenu').append g.menus.$main
         $('#golem-footer').append $footer
-        $('#golem-notification').append g.widgets.notification.$notifications
+        $('#golem-notification').append g.widget.notification.$notifications
         g.roots.$main.append g.$auth()
 
+
 The `initRouting` part is executed only is authentification is valid (TMP
-FIXME, of course). This function is here to put the router in place and
-launches it.
+FIXME, of course). This function is here to launch the router.
 
     golem.initRouting = ->
-      replaceMain = (dom) -> golem.roots.$main.children().replaceWith dom
-      router = new LightRouter
-        routes:
-          '': -> replaceMain golem.home()
-          'auth': -> replaceMain golem.$auth()
-      router.run()
+      golem.router.run()
 
     init()

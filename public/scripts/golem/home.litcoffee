@@ -40,6 +40,6 @@ of the project and things like that ! And first, changing the document-s title.
 
 ## Public API
 
-    golem.home = ->
+    golem.$home = ->
       init()
       $home

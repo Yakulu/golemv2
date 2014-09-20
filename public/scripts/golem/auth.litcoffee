@@ -22,9 +22,11 @@ So I won't comment it much.
         login = $('[name=login]').val()
         password = $('[name=password]').val()
         if isAuthorized login, password
+          new golem.widget.notification.Info content: 'Bienvenue sur GOLEM'
+          .send()
           golem.initRouting()
         else
-          new golem.widgets.common.notification.Error
+          new golem.widget.notification.Error
             content: 'Mot de passe ou identifiant invalides'
           .send()
 

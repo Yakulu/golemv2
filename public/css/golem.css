@@ -102,3 +102,15 @@ div.notification {
 @keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
 @-moz-keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
 @-webkit-keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
+
+th.sortable {
+  cursor: pointer !important;
+}
+
+th.sortable i {
+  visibility: hidden;
+}
+
+th.sortable:hover i {
+  visibility: visible;
+}
