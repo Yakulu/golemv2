@@ -20,6 +20,10 @@ for the sum of all subscribed members by activity
 been applied;
 * `filters` contains an map of all active filters : a named field
 containing a filter function : for a given item, returning a boolean;
+* `searchAdvancedOn` is a simple reactive boolean for injecting or not the
+avdanced search DOM at the top of the list
+* `searches` is a reactive map containing searches values from the advanced
+search form. It's used in conjonction with `filters`.
 
       constructor: ->
         window.gList = @
@@ -27,6 +31,8 @@ containing a filter function : for a given item, returning a boolean;
         @activities = rx.array()
         @takenPlacesByActivity = rx.map()
         @filters = rx.map()
+        @searchAdvancedOn = rx.cell false
+        @searches = rx.map(label: '', code: '', monitor: '')
 
 Then we set the document's title and the secondary menu items.
 
@@ -74,7 +80,87 @@ function is called only if the search input is valid.
           @filters.remove 'search' if @filters.get 'search'
         @activities.replace(List.filter @_activities, @filters)
 
+### Advanced search
+
+`searchAdvanced` takes a `reset` boolean as first argument. If reset is true,
+the function makes all `searches` empty and removes the corresponding `filters`
+if they exist. Otherwise, it removes the filter only if the value of the search
+is empty and add the filters on `filters` if the value has been filled. The
+second argument, `e` is the jQuery event for the form submission. It's only
+here for preventing default behavior.
+
+      searchAdvanced: (reset, e) =>
+        e.preventDefault()
+        _.chain(@searches.all()).keys().each (field) =>
+          unless reset
+            if @searches.get(field).length is 0
+              @filters.remove field if @filters.get field
+            else
+              value = @searches.get(field).toLowerCase()
+              @filters.put field, (item) ->
+                item[field].get().toLowerCase().indexOf(value) isnt -1
+          else
+            @searches.put field, ''
+            @filters.remove field if @filters.get field
+        @activities.replace(List.filter @_activities, @filters)
+
 ## List Views
+
+### Advanced Search DOM
+
+`$avdancedSearch` is a form witch contains all fields where a user can search
+to filter the activities list. Each search can be cumulated, thanks to
+`filters` instance method. Search is submitted via a send button and can be
+globally canceled via a cancel button.
+
+      $advancedSearch: =>
+        form
+          class: 'ui small form'
+          submit: @searchAdvanced.bind(@, false),
+          [
+            fieldset { class: 'fields' }, [
+              legend [
+                i { class: 'icon help' }
+                span L 'SEARCH_ADVANCED_HELP'
+              ]
+              input
+                class: 'five wide column field input'
+                type: 'text'
+                name: 'label'
+                placeholder: L 'LABEL'
+                maxlength: 100
+                value: bind => @searches.get 'label'
+                keyup: (e) => @searches.put 'label', e.target.value
+              input
+                class: 'two wide column field input'
+                type: 'text'
+                name: 'code'
+                placeholder: L 'CODE'
+                maxlength: 30
+                value: bind => @searches.get 'code'
+                keyup: (e) => @searches.put 'code', e.target.value
+              input
+                class: 'four wide column field input'
+                type: 'text'
+                name: 'monitor'
+                placeholder: L 'MONITOR'
+                maxlength: 50
+                value: bind => @searches.get 'monitor'
+                keyup: (e) => @searches.put 'monitor', e.target.value
+              div { class: 'ui buttons' }, [
+                input
+                  class: 'ui green small submit button'
+                  type: 'submit'
+                  value: L 'OK'
+                button
+                  name: 'cancel'
+                  class: 'ui small button'
+                  type: 'button'
+                  click: @searchAdvanced.bind(@, true),
+                  L 'CANCEL'
+              ]
+            ]
+          ]
 
 ### Place DOM
 
@@ -160,6 +246,11 @@ the header and the table. It also inits the list state.
         [
           section { class: 'twelve wide column' }, [
             golem.menus.$secondary
+            golem.component.common.$headerExpandable
+              class: 'inverted center aligned black'
+              title: L 'SEARCH_ADVANCED'
+              active: @searchAdvancedOn
+            p bind => if @searchAdvancedOn.get() then @$advancedSearch() else ''
             h3 { class: 'ui inverted center aligned purple header' },
               span L 'ACTIVITIES_LIST'
             @$table()

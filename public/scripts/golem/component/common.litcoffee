@@ -16,7 +16,7 @@ argument with a `title`, a `class` and the boolean `active`. All are required.
         span [
           c.title + ' '
           i
-            class: if c.active.get() then 'icon collapse' else 'icon expand'
+            class: bind -> if c.active.get() then 'icon collapse' else 'icon expand'
             style: { cursor: 'pointer' }
             click: toggleActive
         ]
@@ -29,5 +29,5 @@ argument with a `title`, a `class` and the boolean `active`. All are required.
 ## Public API
 
     golem.component.common =
-      headerExpandable: $headerExpandable
+      $headerExpandable: $headerExpandable
       modal: modal
