@@ -55,7 +55,7 @@ as active if the URL contains the `item.url`.
       }, mainMenusItems.map $menuItem.bind(null, 'contains')
     ]
 
-The same thing happens to the `$secondaryMenu`, whith different classes. It's
+The same thing happens to the `$secondaryMenu`, with different classes. It's
 maked as active only if the `item.url` is exactly the `activeUrl`.
 
     secondaryItems = rx.array()

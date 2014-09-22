@@ -9,31 +9,30 @@ and advanced search.
 
 Here is the component initialization :
 
-* `activities` serves for the global list of all activities. It will be
-populated by database as a reactive array.
+* `\_activities` serves for the global list of all activities. It will be
+populated by database as an array.
+* `activities`  is the current list, fitlered or not, that will be populated
+* from the private \_activities property the first time and every time filters
+are emptied.
 * `takenPlacesByActivity` will be a reactive map, populated by a db request,
 for the sum of all subscribed members by activity
 * `filteredActivities` is the list of filtered one, after filter functions has
 been applied;
-* `activeFilters` contains an map of all active filters : a named field
+* `filters` contains an map of all active filters : a named field
 containing a filter function : for a given item, returning a boolean;
 
       constructor: ->
         window.gList = @
+        @_activities = []
         @activities = rx.array()
         @takenPlacesByActivity = rx.map()
-        @filteredActivities = rx.array()
-        @activeFilters = rx.map()
+        @filters = rx.map()
 
 Then we set the document's title and the secondary menu items.
 
         document.title = golem.utils.title L 'ACTIVITIES_LIST'
         mi = golem.activity.model.data.menuItems
         golem.menus.secondaryItems.replace [mi.list, mi.add]
-
-## List methods
-
-TODO: searches
 
 ## Activities
 
@@ -46,8 +45,8 @@ display of the taken and remaining places for each.
           if err
             golem.component.notification.Unexpected content: err
           else
-            @activities = @activities.replace(res.rows.map (r) ->
-              new golem.Activity r.doc)
+            @_activities = res.rows.map (r) -> new golem.Activity r.doc
+            @activities.replace @_activities
             # TODO: use count reduce for this purpose, instead of doing manually
             golem.model.getMembersFromActivity null, (err, res) =>
               if err
@@ -59,7 +58,23 @@ display of the taken and remaining places for each.
                   takenPlacesByActivity[aId] ?= 0
                   takenPlacesByActivity[aId] += 1
                 @takenPlacesByActivity.update takenPlacesByActivity
-## List
+
+## List methods
+
+### Global search
+
+`searchGlobal` is a function that employs the component common `search` helper
+to provide a full text, but slow, research in all activities. The search
+function is called only if the search input is valid.
+
+      searchGlobal: (e) =>
+        if e.target.checkValidity()
+          @filters.put 'search', List.search.bind(null, e.target.value)
+        else
+          @filters.remove 'search' if @filters.get 'search'
+        @activities.replace(List.filter @_activities, @filters)
+
+## List Views
 
 ### Place DOM
 
@@ -77,7 +92,7 @@ span DOM elementwith an adapted color, according to the remaining places
             else 'green'
         span
           style: { color: color },
-          @takenPlacesByActivity.get(activity._id.get())
+          @takenPlacesByActivity.get(activity._id.get()) or 0
 
 ### Activity DOM
 
@@ -113,7 +128,6 @@ activity.
 The `$table`, with sortable columns into the header.
 
       $table: ->
-        _items = @filteredActivities or @activities
         table { class: 'ui basic table' }, [
           thead [
             tr [
@@ -129,6 +143,14 @@ The `$table`, with sortable columns into the header.
           tbody @activities.map @$activity
         ]
 
+### Right Sidebar
+
+      $sidebar: ->
+        nav [
+          menu { class: 'ui small vertical menu' },
+            List.$search @searchGlobal, { pattern: '.{4,}' }
+        ]
+
 ### Global DOM
 
 Finally, a function returning the DOM list corresponding to the component, with
@@ -142,7 +164,7 @@ the header and the table. It also inits the list state.
               span L 'ACTIVITIES_LIST'
             @$table()
           ]
-          section { class: 'four wide column' }, 'empty atm'
+          section { class: 'four wide column' }, @$sidebar()
         ]
 
 ## Public API
