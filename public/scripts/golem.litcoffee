@@ -57,15 +57,17 @@ them replace the main part of the GOLEM app by new elements.
       g.router = new LightRouter
         type: 'hash'
         routes:
+          '': -> window.location.hash = '/home'
+          '/': -> window.location.hash = '/home'
           '/home': -> replaceMain g.$home()
           '/auth': -> replaceMain g.$auth()
-          '/activity': -> replaceMain new g.activity.component.List().$list()
+          '/activity': -> window.location.hash = '/activity/list'
           '/activity/list': ->
             replaceMain new g.activity.component.List().$list()
           '/activity/add': ->
-            replaceMain new g.activity.component.Form().$view()
+            new g.activity.component.Form replaceMain
           '/activity/edit/:id': (id) ->
-            replaceMain new g.activity.component.Form(id).$view()
+            new g.activity.component.Form replaceMain, id
       #/activity[\/list]?/ -> replaceMain golem.activity.$list()
 
 After the initial DOM readyness, the function takes the most important part of

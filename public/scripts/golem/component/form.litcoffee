@@ -5,22 +5,26 @@ This class offers common components and helpers for forms.
     class Form
 
 `@submit` function handles the form submission via the submission event and the
-model, displays success and error notifications and finally routes the user.
+model, unlifted before submissions. It displays success and error notifications
+and finally routes the user.
 
       @submit: (e, item) ->
-        schema = item.schema.get()
         e.preventDefault()
+        schema = item.schema.get()
         _submit = (verb) ->
+          item = rx.unlift item
           golem.db[verb] item, (err, res) =>
             if err
-              golem.component.common.notifications.error
-                body: '<em>' + err + '</em><br>' + l.ERROR_UPDATE,
+              new golem.component.notification.Error
+                content: '<em>' + err + '</em><br>' + L 'ERROR_UPDATE',
                 window.location.hash = "/#{schema}/list"
+              .send()
             else
-              golem.component.common.notifications.success
-                body: l.SUCCESS_UPDATE,
-                window.location.hash = "/#{schema}/show/#{res._id}"
-        verb = (if item._id.get() then 'put' else 'post')
+              new golem.component.notification.Success
+                content: L 'SUCCESS_UPDATE',
+                window.location.hash = "/#{schema}/show/#{res.id}"
+              .send()
+        verb = (if item._id then 'put' else 'post')
         _submit verb
 
 `@validate` is a function intended to build everything needed, around a form

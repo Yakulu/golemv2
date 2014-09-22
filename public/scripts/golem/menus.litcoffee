@@ -4,12 +4,13 @@ GOLEM is composed of two menus : a main one and a secondary.
 
 ## MenuItem
 
-Each menu shares the same `MenuItem` class.
-A `title`, an `URL` and the Semantic CSS `icon` class name are mandatory.
-An optional `cls` can be fixed, by default to 'item'.
+Each menu shares the same `MenuItem` class. A `title`, an `URL` and the
+Semantic CSS `icon` class name are mandatory. The `url` will be keeped as
+`baseUrl`. An optional `cls` can be fixed, by default to 'item'.
 
     class MenuItem
       constructor: (@title, @url, @icon, @cls = 'item') ->
+        @baseUrl = @url
 
 The defaults `MenuItems`.
       

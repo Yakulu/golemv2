@@ -3,13 +3,17 @@
 This component is the form for adding or editing activities.
 
     g = golem
+    notif = g.component.notification
+
     class Form extends g.component.Form
 
 The constructor property puts in place the secondary menu and initializes the
 model for the form, a blank one in the case of a new activity, or a filled one
-when editing.
+when editing. A callback can be passed as first argument, which be called when
+initialization is over with the main `$view` function, returning the whole DOM.
+The `id` is optional and refers to the document key in case of edition.
 
-      constructor: (id) ->
+      constructor: (callback, id) ->
         window.gForm = @
         mi = g.activity.model.data.menuItems
         g.menus.secondaryItems.replace [mi.list, mi.add]
@@ -18,6 +22,7 @@ when editing.
           @activity = new g.Activity
           @add = true
           document.title = g.utils.title L 'ACTIVITIES_NEW'
+          callback(@$view()) if callback
 
         unless id
           initNew()
@@ -26,25 +31,27 @@ when editing.
 In edit mode, we must check that the record is in database and gets it for
 filling the form.
 
-          g.db.get key, (err, res) =>
+          g.db.get id, (err, res) =>
             if err
-              g.component.notifications.Warning body: l.ERROR_RECORD_NOT_FOUND,
+              new notif.Warning body: l.ERROR_RECORD_NOT_FOUND,
                 window.location.hash = '#/activity/list'
+              .send()
             else
               @activity = new g.Activity res
               unless @activity # TODO: check if real
-                newMember()
+                initNew()
               else
                 document.title = g.utils.title(
                   L 'EDITION_OF' + @activity.label.get())
-                for action in ['show', 'edit', 'remove']
-                  mi[action].url = "#{mi[action].baseUrl}/#{@activity._id}"
+                for act in ['show', 'edit', 'remove']
+                  mi[act].url = "#{mi[act].baseUrl}/#{@activity._id.get()}"
                 g.menus.secondaryItems.splice 2, 0, mi.show, mi.edit, mi.remove
+                callback(@$view()) if callback
 
 `submit` is the generic function inherited from `golem.component.Form` that
 will send the form values.
 
-      submit: (e) -> super e, @activity
+      submit: (e) => golem.component.Form.submit e, @activity
 
 `$cancelButton` and `$sendInput` are the two buttons for sending and cancelling
 the form. They will be used at the bottom of the form and on the contextual
@@ -79,7 +86,7 @@ the component activity.
               type: 'text'
               name: 'label'
               placeholder: L 'LABEL'
-              pattern: '\\w{2,}'
+              pattern: '.{2,}'
               maxlength: 100
               required: 'required'
               value: @activity.label.get()
@@ -148,7 +155,7 @@ the component activity.
         form
           id: 'activity-form'
           class: 'ui small form'
-          submit: @submit,
+          submit: @submit
           [
             div { class:'fields' }, [$labelField, $codeField, $placesField]
             div { class:'fields' }, [$timeSlotField, $monitorField]
@@ -175,9 +182,9 @@ this form.
             section { class: 'ui piled segment' }, [
               h2 { class: 'ui inverted center aligned purple header' }, do =>
                 if @add
-                  L 'ACTIVITIES_NEW'
+                  L('ACTIVITIES_NEW')
                 else
-                  "#{L 'EDITION_OF'} #{@activity.label.get()}"
+                  "#{L('EDITION_OF')} #{@activity.label.get()}"
               @_$form()
             ]
           ]

@@ -19,8 +19,9 @@ been applied;
 containing a filter function : for a given item, returning a boolean;
 
       constructor: ->
-        @activities = []
-        @takenPlacesByActivity = {}
+        window.gList = @
+        @activities = rx.array()
+        @takenPlacesByActivity = rx.map()
         @filteredActivities = rx.array()
         @activeFilters = rx.map()
 
@@ -41,13 +42,14 @@ for it, passing a callback that displays an `Unexpected` error if a problem
 occurs. Otherwise it gets members subscribed for all activities, allowing
 display of the taken and remaining places for each.
 
-        golem.model.getBySchema 'activity', (err, res) ->
+        golem.model.getBySchema 'activity', (err, res) =>
           if err
             golem.component.notification.Unexpected content: err
           else
-            @activities = rx.array res.rows.map (r) -> new golem.Activity r.doc
+            @activities = @activities.replace(res.rows.map (r) ->
+              new golem.Activity r.doc)
             # TODO: use count reduce for this purpose, instead of doing manually
-            golem.model.getMembersFromActivity null, (err, res) ->
+            golem.model.getMembersFromActivity null, (err, res) =>
               if err
                 golem.component.notification.Unexpected content: err
               else
@@ -56,51 +58,52 @@ display of the taken and remaining places for each.
                   aId = r.key[0]
                   takenPlacesByActivity[aId] ?= 0
                   takenPlacesByActivity[aId] += 1
-                @takenPlacesByActivity = rx.map takenPlacesByActivity
+                @takenPlacesByActivity.update takenPlacesByActivity
 ## List
 
 ### Place DOM
 
-`@$place` is the static property, a function which returns, for a given
-activity, the span DOM elementwith an adapted color, according to the remaining
-places
+`$place` is the property, a function which returns, for a given activity, the
+span DOM elementwith an adapted color, according to the remaining places
 
-      @$place: (activity) ->
+      $place: (activity) =>
         color = 'inherit'
-        if activity.places
-          remaining = activity.places - takenPlacesByActivity[activity._id]
+        if activity.places.get()
+          takenPlaces = @takenPlacesByActivity.get(activity._id.get())
+          remain = activity.places.get() - takenPlaces
           color = switch
-            when remaining <= 0 then 'red'
-            when remaining < 5 then 'orange'
+            when remain <= 0 then 'red'
+            when remain < 5 then 'orange'
             else 'green'
         span
           style: { color: color },
-          takenPlacesByActivity[activity._id]
+          @takenPlacesByActivity.get(activity._id.get())
 
 ### Activity DOM
 
-`@$activity` is a static that returns the table row corresponding to the given activity.
+`$activity` is a method that returns the table row corresponding to the given
+activity.
 
-      @$activity: (activity) ->
+      $activity: (activity) =>
         tr [
-          td activity.label
-          td activity.code
-          td activity.timeSlot
-          td activity.monitor
-          td activity.places
-          td List.$place activity
+          td activity.label.get()
+          td activity.code.get()
+          td activity.timeSlot.get()
+          td activity.monitor.get()
+          td activity.places.get()
+          td @$place activity
           td { class: 'actions' }, [
             a
-              href: '#/activity/show/' + activity._id
-              title: L 'VIEW',
+              href: '#/activity/show/' + activity._id.get()
+              title: L('VIEW'),
               [i { class: 'unhide icon' }]
             a
-              href: '#/activity/edit/' + activity._id
-              title: L 'EDIT',
+              href: '#/activity/edit/' + activity._id.get()
+              title: L('EDIT'),
               [i { class: 'edit icon' }]
             a
-              href: '#/activity/remove/' + activity._id
-              title: L 'DELETE',
+              href: '#/activity/remove/' + activity._id.get()
+              title: L('DELETE'),
               [i { class: 'remove icon' }]
           ]
         ]
@@ -110,6 +113,7 @@ places
 The `$table`, with sortable columns into the header.
 
       $table: ->
+        _items = @filteredActivities or @activities
         table { class: 'ui basic table' }, [
           thead [
             tr [
@@ -122,9 +126,7 @@ The `$table`, with sortable columns into the header.
               th { width: '10%' }, L('ACTIONS')
             ]
           ]
-          tbody do =>
-            _items = @filteredActivities or @activities
-            _items.map List.$activity
+          tbody @activities.map @$activity
         ]
 
 ### Global DOM
