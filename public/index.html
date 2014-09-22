@@ -30,41 +30,26 @@
     </main>
     <footer id='golem-footer'></footer>
     <section id='golem-notification' class='notification'></section>
-    <script>
-      // Global namespace
-      var golem = {
-        config: {},
-        widget: {},
-        component: {},
-        activity: {
-          component: {}
-        }
-      };
-      // Main Script
-      var bind = rx.bind;
-      var rxt = rx.rxt;
-      rx.rxt.importTags();
-      var T = rx.rxt.tags;
-      var L = function (str) { return golem.config.locale.get(str); }
-    </script>
     <!-- Bootstrap Application, after the DOM insertion -->
-    <script src='scripts/l10n/locale_fr-FR.js'></script>
     <script src='scripts/golem.js'></script>
+    <script src='scripts/l10n/locale_fr-FR.js'></script>
     <!-- Commons -->
     <script src='scripts/golem/menus.js'></script>
     <script src='scripts/golem/utils.js'></script>
     <script src='vendor/sha1.js'></script>
     <script src='scripts/golem/auth.js'></script>
     <script src='scripts/golem/home.js'></script>
-    <script src='scripts/golem/widget/common.js'></script>
-    <script src='scripts/golem/widget/notification.js'></script>
+    <script src='scripts/golem/component/common.js'></script>
+    <script src='scripts/golem/component/notification.js'></script>
     <script src='scripts/golem/db.js'></script>
     <script src='scripts/golem/model.js'></script>
     <!-- Component commons -->
     <script src='scripts/golem/component/list.js'></script>
+    <script src='scripts/golem/component/form.js'></script>
     <!-- Activity Module -->
     <script src='scripts/golem/activity/model.js'></script>
     <script src='scripts/golem/activity/component/list.js'></script>
+    <script src='scripts/golem/activity/component/form.js'></script>
     <!--
     <script src='scripts/golem/widgets/form.js'></script>
     <script src='scripts/golem/header.js'></script>
@@ -87,7 +72,6 @@
     <script src='scripts/golem/member/component/tags.js'></script>
     <script src='scripts/golem/member/component/skills.js'></script>
     < Activity Module >
-    <script src='scripts/golem/activity/component/form.js'></script>
     <script src='scripts/golem/activity/component/show.js'></script>
     <script src='scripts/golem/activity/component/remove.js'></script>
     -->

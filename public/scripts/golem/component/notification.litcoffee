@@ -132,4 +132,4 @@ default 10 seconds.
 
 ## Public API
 
-    golem.widget.notification = n
+    golem.component.notification = n

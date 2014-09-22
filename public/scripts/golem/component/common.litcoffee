@@ -1,13 +1,13 @@
 # Widgets - common
 
 
-These widgets can be used everywhere in the GOLEM application.
+These components can be used everywhere in the GOLEM application.
 
 ## Header expandable
 
-The `$headerExpandable` is a widget that is intended to show a header that can
-be opened and closed with an icon. It just toggles a boolean, wich will be used
-to toggle the whole content. `$headerExpandable` take a `config` object as
+The `$headerExpandable` is a component that is intended to show a header that
+can be opened and closed with an icon. It just toggles a boolean, wich will be
+used to toggle the whole content. `$headerExpandable` take a `config` object as
 argument with a `title`, a `class` and the boolean `active`. All are required.
 
     $headerExpandable = (c) ->
@@ -28,6 +28,6 @@ argument with a `title`, a `class` and the boolean `active`. All are required.
 
 ## Public API
 
-    golem.widget.common =
+    golem.component.common =
       headerExpandable: $headerExpandable
       modal: modal

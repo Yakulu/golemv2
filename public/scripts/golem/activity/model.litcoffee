@@ -25,6 +25,7 @@ new instance with defaults.
           @monitor = props.monitor or ''
           @places = props.places or null
           @note = props.note or ''
+          rx.lift @
 
 `fullLabel` is a method helping to get a whole sentence representing the
 `Activity`.

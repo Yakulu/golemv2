@@ -21,7 +21,7 @@ performs a simple sorting. If the list has already been sorted, it's reversed.
           rawItems.reverse() if first is rawItems[0]
         items.replace rawItems
 
-`$sortableTableHeader` is a component taking a config object :
+`@$sortableTableHeader` is a static property, a component taking a config object :
 
 * the `field` intended for sorting the list;
 * the `title` for the table header, optional, default to the locale field

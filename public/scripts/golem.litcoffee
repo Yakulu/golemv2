@@ -7,12 +7,12 @@ Main module for GOLEM. It's intended to bootstrap the application.
 There are global to GOLEM but text can change, according to the application's
 configuration and localization : `$header` and `$footer`.
 
-    $header = header [
+    $header = -> header [
       h1 { class: 'ui inverted black block small header center aligned' },
       bind -> "#{L 'TITLE'} : #{L 'HEADER'}"
     ]
 
-    $footer = footer [
+    $footer = -> footer [
       div { class: 'ui horizontal icon divider' }, [
         i { class: 'icon html5' }
       ]
@@ -25,43 +25,65 @@ configuration and localization : `$header` and `$footer`.
 
 ## GOLEM global initialization
 
-Outside of first globals import into `index.html`, here is the first function
-to be called into this app.
+Here is the first function to be called into this app. It sets the globals.
  
-    init = ->
-      g = golem
-      g.router = new LightRouter
-      $ ->
-        g.roots =
-          $main: $ '#golem-main'
-        replaceMain = (dom) -> golem.roots.$main.children().replaceWith dom
+    window.golem = golem =
+      config: {}
+      component: {}
+      activity:
+        component: {}
+    window.bind = bind = rx.bind
+    window.rxt = rxt = rx.rxt
+    rx.rxt.importTags()
+    window.T = T = rx.rxt.tags
+    window.L = L = (str) -> golem.config.locale.get str
+    g = golem
+
+    g.router = new LightRouter
+    g.activeUrl = rx.cell ''
+
+`replaceMain` is the function used to update aggressively the DOM and simulates
+a page to page navigation.
+
+    $ ->
+      g.roots =
+        $main: $ '#golem-main'
+      #replaceMain = (dom) -> golem.roots.$main.children().replaceWith dom
+      replaceMain = (dom) -> g.roots.$main.empty().append dom
 
 Here we initialize the router and give it exhaustive routes to handle. Most of
 them replace the main part of the GOLEM app by new elements.
 
-        g.router = new LightRouter
-          type: 'hash'
-          routes:
-            '/home': -> replaceMain g.$home()
-            '/auth': -> replaceMain g.$auth()
-            '/activity/list': ->
-              replaceMain new g.activity.component.List().$list()
-        #/activity[\/list]?/ -> replaceMain golem.activity.$list()
+      g.router = new LightRouter
+        type: 'hash'
+        routes:
+          '/home': -> replaceMain g.$home()
+          '/auth': -> replaceMain g.$auth()
+          '/activity': -> replaceMain new g.activity.component.List().$list()
+          '/activity/list': ->
+            replaceMain new g.activity.component.List().$list()
+          '/activity/add': ->
+            replaceMain new g.activity.component.Form().$view()
+          '/activity/edit/:id': (id) ->
+            replaceMain new g.activity.component.Form(id).$view()
+      #/activity[\/list]?/ -> replaceMain golem.activity.$list()
 
 After the initial DOM readyness, the function takes the most important part of
 the layout and populates them.
 
-        $('#golem-header').append $header
-        $('#golem-mainmenu').append g.menus.$main
-        $('#golem-footer').append $footer
-        $('#golem-notification').append g.widget.notification.$notifications
-        g.roots.$main.append g.$auth()
+      $('#golem-header').append $header()
+      $('#golem-mainmenu').append g.menus.$main
+      $('#golem-footer').append $footer()
+      $('#golem-notification').append g.component.notification.$notifications
+      g.roots.$main.append g.$auth()
 
 
 The `initRouting` part is executed only is authentification is valid (TMP
-FIXME, of course). This function is here to launch the router.
+FIXME, of course). This function is here to launch the router and attaches it
+to the `onhashchange` event. It also uses a cell to handle current module URL.
 
     golem.initRouting = ->
       golem.router.run()
-
-    init()
+      window.onhashchange = ->
+        golem.activeUrl.set window.location.hash[1..]
+        golem.router.run()

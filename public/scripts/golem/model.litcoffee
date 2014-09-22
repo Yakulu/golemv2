@@ -31,7 +31,7 @@ field.
         endkey: [type, {}]
       , (err, res) ->
         if err
-          golem.widget.common.notifications.errorUnexpected body: err
+          golem.component.common.notifications.errorUnexpected body: err
         else
           if field is 'tags'
             res.rows.sort (a, b) -> b.value - a.value
@@ -63,6 +63,7 @@ expensive validation.
     class golem.Doc
       constructor: (props) ->
         @[k] = v for k, v of props if props
+        rx.lift @
 
 ## Public API
 

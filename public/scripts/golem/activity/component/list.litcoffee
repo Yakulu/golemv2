@@ -3,7 +3,7 @@
 This component represents the listing of activities, a table served with global
 and advanced search.
 
-    class List
+    class List extends golem.component.List
 
 ## Initialization
 
@@ -43,13 +43,13 @@ display of the taken and remaining places for each.
 
         golem.model.getBySchema 'activity', (err, res) ->
           if err
-            golem.widget.notification.Unexpected content: err
+            golem.component.notification.Unexpected content: err
           else
             @activities = rx.array res.rows.map (r) -> new golem.Activity r.doc
             # TODO: use count reduce for this purpose, instead of doing manually
             golem.model.getMembersFromActivity null, (err, res) ->
               if err
-                golem.widget.notification.Unexpected content: err
+                golem.component.notification.Unexpected content: err
               else
                 takenPlacesByActivity = {}
                 for r in res.rows
@@ -61,10 +61,11 @@ display of the taken and remaining places for each.
 
 ### Place DOM
 
-`$place` is the function the returns, for a given activity, the span DOM
-elementwith an adapted color, according to the remaining places
+`@$place` is the static property, a function which returns, for a given
+activity, the span DOM elementwith an adapted color, according to the remaining
+places
 
-      $place: (activity) ->
+      @$place: (activity) ->
         color = 'inherit'
         if activity.places
           remaining = activity.places - takenPlacesByActivity[activity._id]
@@ -78,16 +79,16 @@ elementwith an adapted color, according to the remaining places
 
 ### Activity DOM
 
-`$activity` returns the table row corresponding to the given activity.
+`@$activity` is a static that returns the table row corresponding to the given activity.
 
-      $activity: (activity) ->
+      @$activity: (activity) ->
         tr [
           td activity.label
           td activity.code
           td activity.timeSlot
           td activity.monitor
           td activity.places
-          td $place activity
+          td List.$place activity
           td { class: 'actions' }, [
             a
               href: '#/activity/show/' + activity._id
@@ -106,25 +107,24 @@ elementwith an adapted color, according to the remaining places
 
 ### Table
 
-The table, with sortable columns into the header.
+The `$table`, with sortable columns into the header.
 
       $table: ->
-        gcL = golem.component.List
         table { class: 'ui basic table' }, [
           thead [
             tr [
-              gcL.$sortableTableHeader field: 'label', items: @activities
-              gcL.$sortableTableHeader field: 'code', items: @activities
+              List.$sortableTableHeader field: 'label', items: @activities
+              List.$sortableTableHeader field: 'code', items: @activities
               th L('TIMESLOT')
-              gcL.$sortableTableHeader field: 'monitor', items: @activities
-              gcL.$sortableTableHeader field: 'places', items: @activities
+              List.$sortableTableHeader field: 'monitor', items: @activities
+              List.$sortableTableHeader field: 'places', items: @activities
               th L('PLACES_TAKEN')
               th { width: '10%' }, L('ACTIONS')
             ]
           ]
           tbody do =>
             _items = @filteredActivities or @activities
-            _items.map @$activity
+            _items.map List.$activity
         ]
 
 ### Global DOM
@@ -135,10 +135,9 @@ the header and the table. It also inits the list state.
       $list: ->
         [
           section { class: 'twelve wide column' }, [
-            golem.menus.$secondary [
-              h3 { class: 'ui inverted center aligned purple header' },
-                span L 'ACTIVITIES_LIST'
-            ]
+            golem.menus.$secondary
+            h3 { class: 'ui inverted center aligned purple header' },
+              span L 'ACTIVITIES_LIST'
             @$table()
           ]
           section { class: 'four wide column' }, 'empty atm'

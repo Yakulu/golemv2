@@ -156,6 +156,7 @@ golem.config.locale = rx.map
   PLACES: 'Places'
   PLACES_REMAIN: 'Restantes'
   PLACES_TAKEN: 'Prises'
+  PLACES_VALIDATION_MSG: 'Veuillez entrer un nombre entier compris entre 0 et 1000'
   POSTAL_CODE: 'Code postal'
   POSTAL_CODE_VALIDATION_MSG: 'Le code postal doit contenir 5 caractères numériques'
   PROFESSION: 'Profession'
