@@ -4,8 +4,9 @@ This component is the form for adding or editing activities.
 
     g = golem
     notif = g.component.notification
+    gcform = g.component.form
 
-    class Form extends g.component.Form
+    class Form
 
 The constructor property puts in place the secondary menu and initializes the
 model for the form, a blank one in the case of a new activity, or a filled one
@@ -51,7 +52,7 @@ filling the form.
 `submit` is the generic function inherited from `golem.component.Form` that
 will send the form values.
 
-      submit: (e) => golem.component.Form.submit e, @activity
+      submit: (e) => gcform.submit e, @activity
 
 `$cancelButton` and `$sendInput` are the two buttons for sending and cancelling
 the form. They will be used at the bottom of the form and on the contextual
@@ -78,7 +79,7 @@ the component activity.
 
       _$form: ->
         $labelField = do =>
-          validation = g.component.Form.validate L('LASTNAME_VALIDATION_MSG'),
+          validation = gcform.validate L('LASTNAME_VALIDATION_MSG'),
             (e) => @activity.label.set e.target.value
           div { class: 'eight wide field small input' }, [
             label { for: 'label' }, "#{L 'LABEL'} *"
@@ -106,7 +107,7 @@ the component activity.
         ]
         # TODO : use pattern validation and custom fn for it
         $placesField = do =>
-          validation = g.component.Form.validate L('PLACES_VALIDATION_MSG'),
+          validation = gcform.validate L('PLACES_VALIDATION_MSG'),
             (e) => @activity.places.set e.target.value
           div { class: 'four wide field small input' }, [
             label { for: 'places' }, L 'PLACES'

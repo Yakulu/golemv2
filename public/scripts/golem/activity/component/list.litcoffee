@@ -3,7 +3,9 @@
 This component represents the listing of activities, a table served with global
 and advanced search.
 
-    class List extends golem.component.List
+    gclist = golem.component.list
+
+    class List
 
 ## Initialization
 
@@ -75,10 +77,10 @@ function is called only if the search input is valid.
 
       searchGlobal: (e) =>
         if e.target.checkValidity()
-          @filters.put 'search', List.search.bind(null, e.target.value)
+          @filters.put 'search', gclist.search.bind(null, e.target.value)
         else
           @filters.remove 'search' if @filters.get 'search'
-        @activities.replace(List.filter @_activities, @filters)
+        @activities.replace(gclist.filter @_activities, @filters)
 
 ### Advanced search
 
@@ -102,7 +104,7 @@ here for preventing default behavior.
           else
             @searches.put field, ''
             @filters.remove field if @filters.get field
-        @activities.replace(List.filter @_activities, @filters)
+        @activities.replace(gclist.filter @_activities, @filters)
 
 ## List Views
 
@@ -217,11 +219,11 @@ The `$table`, with sortable columns into the header.
         table { class: 'ui basic table' }, [
           thead [
             tr [
-              List.$sortableTableHeader field: 'label', items: @activities
-              List.$sortableTableHeader field: 'code', items: @activities
+              gclist.$sortableTableHeader field: 'label', items: @activities
+              gclist.$sortableTableHeader field: 'code', items: @activities
               th L('TIMESLOT')
-              List.$sortableTableHeader field: 'monitor', items: @activities
-              List.$sortableTableHeader field: 'places', items: @activities
+              gclist.$sortableTableHeader field: 'monitor', items: @activities
+              gclist.$sortableTableHeader field: 'places', items: @activities
               th L('PLACES_TAKEN')
               th { width: '10%' }, L('ACTIONS')
             ]
@@ -234,7 +236,7 @@ The `$table`, with sortable columns into the header.
       $sidebar: ->
         nav [
           menu { class: 'ui small vertical menu' },
-            List.$search @searchGlobal, { pattern: '.{4,}' }
+            gclist.$search @searchGlobal, { pattern: '.{4,}' }
         ]
 
 ### Global DOM

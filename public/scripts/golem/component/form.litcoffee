@@ -1,14 +1,14 @@
 # Form Components
 
-This class offers common components and helpers for forms.
+This module offers common components and helpers for forms.
 
-    class Form
+    form =
 
-`@submit` function handles the form submission via the submission event and the
+`submit` function handles the form submission via the submission event and the
 model, unlifted before submissions. It displays success and error notifications
 and finally routes the user.
 
-      @submit: (e, item) ->
+      submit: (e, item) ->
         e.preventDefault()
         schema = item.schema.get()
         _submit = (verb) ->
@@ -27,7 +27,7 @@ and finally routes the user.
         verb = (if item._id then 'put' else 'post')
         _submit verb
 
-`@validate` is a function intended to build everything needed, around a form
+`validate` is a function intended to build everything needed, around a form
 field, to display validation errors when needed and hide them when the field is
 conform. It relies on HTML5 and browser API. It takes :
 
@@ -38,7 +38,7 @@ validation occurs, only if the data is valid.
 It returns an object containing the validation `$elt` to add to the form and
 the `fn` function to launch for validation.
 
-      @validate : (message, validCallback) ->
+      validate : (message, validCallback) ->
         $elt = div
           class: 'ui red pointing above label'
           style: display: 'none'
@@ -58,4 +58,4 @@ the `fn` function to launch for validation.
 
 ## Public API
 
-    golem.component.Form = Form
+    golem.component.form = form
