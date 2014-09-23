@@ -208,7 +208,7 @@ The `$table`, with sortable columns into the header.
               @$sortableTableHeader field: 'monitor'
               @$sortableTableHeader field: 'places'
               th L('PLACES_TAKEN')
-              th { width: '10%' }, L('ACTIONS')
+              th { width: '10%' }, L 'ACTIONS'
             ]
           ]
           tbody @items.map @$activity

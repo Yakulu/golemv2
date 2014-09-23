@@ -20,7 +20,7 @@ will just uses the standard removal for the activity.
                   new notif.Unexpected(content: err).send()
                 else
                   new notif.Success(content: L 'SUCCESS_UPDATE').send()
-                window.location.hash = '#/activity/list'
+                window.location.hash = '#/activity'
               if res.rows.length > 0
                 docs = res.rows.map (r) ->
                   r.doc.activities.remove(activity._id.get())
@@ -42,7 +42,7 @@ automatically runned on the initialization.
           approveCb: @approveCb
           nameField: 'label'
           content: 'ACTIVITIES_REMOVE_CONFIRM_MSG'
-          route: '#/activity/list'
+          route: '#/activity'
 
 ## Public APi
 

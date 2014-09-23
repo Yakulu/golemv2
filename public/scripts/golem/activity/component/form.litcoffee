@@ -34,7 +34,7 @@ filling the form.
           g.db.get id, (err, res) =>
             if err
               new notif.Warning content: L('ERROR_RECORD_NOT_FOUND'),
-                window.location.hash = '#/activity/list'
+                window.location.hash = '#/activity'
               .send()
             else
               @activity = new g.Activity res
@@ -62,7 +62,7 @@ menu too.
           name: 'cancel'
           class: "ui button #{cls}"
           type: 'button'
-          click: -> window.location.hash = '#/activity/list',
+          click: -> window.location.hash = '#/activity',
           L 'CANCEL'
 
       _$sendInput: (cls) ->

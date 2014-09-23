@@ -73,7 +73,7 @@ displaying.
 
     Menu = golem.menus.Menu
     menuItems =
-      list: new Menu L('LIST'), '/member/list', 'list'
+      list: new Menu L('LIST'), '/member', 'list'
       add: new Menu L('NEW'), '/member/add', 'add sign'
       show: new Menu L('VIEW'), '/member/show', 'search'
       edit: new Menu L('EDIT'), '/member/edit', 'edit'

@@ -63,8 +63,7 @@ them replace the main part of the GOLEM app by new elements.
           '/': -> window.location.hash = '/home'
           '/home': -> replaceMain g.$home()
           '/auth': -> replaceMain g.$auth()
-          '/activity': -> window.location.hash = '/activity/list'
-          '/activity/list': ->
+          '/activity': ->
             replaceMain new g.activity.component.List().$view()
           '/activity/add': ->
             new g.activity.component.Form replaceMain
@@ -74,8 +73,7 @@ them replace the main part of the GOLEM app by new elements.
             new g.activity.component.Show replaceMain, id
           '/activity/remove/:id': (id) ->
             new g.activity.component.Remove id
-          '/member': -> window.location.hash = '/member/list'
-          '/member/list': ->
+          '/member': ->
             replaceMain new g.member.component.List().$view()
       #/activity[\/list]?/ -> replaceMain golem.activity.$list()
 

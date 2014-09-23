@@ -21,7 +21,7 @@ identifier for the document stored in database.
         golem.db.get id, (err, res) =>
           if err
             new notif.Warning content: L('ERROR_RECORD_NOT_FOUND'),
-              window.location.hash = '#/activity/list'
+              window.location.hash = '#/activity'
             .send()
           else
             @activity = new golem.Activity res
