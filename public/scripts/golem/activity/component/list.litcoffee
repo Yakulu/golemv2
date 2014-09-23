@@ -28,7 +28,6 @@ avdanced search DOM at the top of the list
 search form. It's used in conjonction with `filters`.
 
       constructor: ->
-        window.gList = @
         @_activities = []
         @activities = rx.array()
         @takenPlacesByActivity = rx.map()
@@ -51,14 +50,14 @@ display of the taken and remaining places for each.
 
         golem.model.getBySchema 'activity', (err, res) =>
           if err
-            golem.component.notification.Unexpected content: err
+            new golem.component.notification.Unexpected(content: err).send()
           else
             @_activities = res.rows.map (r) -> new golem.Activity r.doc
             @activities.replace @_activities
             # TODO: use count reduce for this purpose, instead of doing manually
             golem.model.getMembersFromActivity null, (err, res) =>
               if err
-                golem.component.notification.Unexpected content: err
+                new golem.component.notification.Unexpected(content: err).send()
               else
                 takenPlacesByActivity = {}
                 for r in res.rows

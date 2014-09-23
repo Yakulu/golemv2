@@ -15,7 +15,6 @@ initialization is over with the main `$view` function, returning the whole DOM.
 The `id` is optional and refers to the document key in case of edition.
 
       constructor: (callback, id) ->
-        window.gForm = @
         mi = g.activity.model.data.menuItems
         g.menus.secondaryItems.replace [mi.list, mi.add]
 

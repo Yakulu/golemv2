@@ -31,7 +31,7 @@ field.
         endkey: [type, {}]
       , (err, res) ->
         if err
-          golem.component.common.notifications.errorUnexpected body: err
+          new golem.component.common.notifications.Unexpected(body: err).send()
         else
           if field is 'tags'
             res.rows.sort (a, b) -> b.value - a.value
