@@ -68,6 +68,8 @@ them replace the main part of the GOLEM app by new elements.
             new g.activity.component.Form replaceMain
           '/activity/edit/:id': (id) ->
             new g.activity.component.Form replaceMain, id
+          '/activity/show/:id': (id) ->
+            new g.activity.component.Show replaceMain, id
       #/activity[\/list]?/ -> replaceMain golem.activity.$list()
 
 After the initial DOM readyness, the function takes the most important part of

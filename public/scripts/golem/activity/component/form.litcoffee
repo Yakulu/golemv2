@@ -34,7 +34,7 @@ filling the form.
 
           g.db.get id, (err, res) =>
             if err
-              new notif.Warning body: l.ERROR_RECORD_NOT_FOUND,
+              new notif.Warning content: L('ERROR_RECORD_NOT_FOUND'),
                 window.location.hash = '#/activity/list'
               .send()
             else
