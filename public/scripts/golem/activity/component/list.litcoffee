@@ -15,7 +15,6 @@ request, for the sum of all subscribed members by activity;
 * replace `@searches` with the known three fields that we'll use here.
 
       constructor: ->
-        window.gList = @
         super()
         @takenPlacesByActivity = rx.map()
         @searches.update label: '', code: '', monitor: ''
@@ -217,6 +216,8 @@ The `$table`, with sortable columns into the header.
 
 ### Right Sidebar
 
+The right sidebar is only composed by the global search component.
+
       $sidebar: ->
         nav [
           menu { class: 'ui small vertical menu' },
@@ -226,7 +227,7 @@ The `$table`, with sortable columns into the header.
 ### Global DOM
 
 Finally, a function returning the DOM list corresponding to the component, with
-the header and the table. It also inits the list state.
+the header and the table.
 
       $view: ->
         [

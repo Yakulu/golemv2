@@ -32,6 +32,8 @@ Here is the first function to be called into this app. It sets the globals.
       component: {}
       activity:
         component: {}
+      member:
+        component: {}
     window.bind = bind = rx.bind
     window.rxt = rxt = rx.rxt
     rx.rxt.importTags()
@@ -72,6 +74,9 @@ them replace the main part of the GOLEM app by new elements.
             new g.activity.component.Show replaceMain, id
           '/activity/remove/:id': (id) ->
             new g.activity.component.Remove id
+          '/member': -> window.location.hash = '/member/list'
+          '/member/list': ->
+            replaceMain new g.member.component.List().$view()
       #/activity[\/list]?/ -> replaceMain golem.activity.$list()
 
 After the initial DOM readyness, the function takes the most important part of

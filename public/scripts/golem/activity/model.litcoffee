@@ -10,13 +10,13 @@ An `Activity` takes a `props` object as argument, with :
 * `note` for extra remarks;
 
 `Activity` inherits from `Doc`. In case of a new activity, the class creates a
-new instance with defaults.
+new instance with defaults. Lifting is done to enable precise reactivity.
 
     class golem.Activity extends golem.Doc
       constructor: (props) ->
         super props
         unless @_id
-          props = {}
+          props ?= {}
           @schema = 'activity'
           @creationDate = Date.now()
           @label = props.label or ''
