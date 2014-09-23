@@ -104,10 +104,9 @@ the component activity.
             value: @activity.code.get()
             change: (e) => @activity.code.set e.target.value
         ]
-        # TODO : use pattern validation and custom fn for it
         $placesField = do =>
           validation = gcform.validate L('PLACES_VALIDATION_MSG'),
-            (e) => @activity.places.set e.target.value
+            (e) => @activity.places.set parseInt(e.target.value)
           div { class: 'four wide field small input' }, [
             label { for: 'places' }, L 'PLACES'
             input

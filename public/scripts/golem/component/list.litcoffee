@@ -1,8 +1,32 @@
 # Common component list
 
-This module gathers helpers and subcomponents shared by many list components.
+This class gathers helpers and subcomponents shared by many list components.
 
-    list =
+    class List
+
+## Initialization
+
+All List components may need to show `items` and some kind of `filters` and
+`searches`. Here we initilialize the component :
+
+* `\_items` serves for the global list of all items. It will be populated by
+database as an array.
+* `items`  is the current list, filtered or not, that will be populated
+from the private \_items property the first time and every time filters are
+emptied.
+* `filters` contains an map of all active filters : a named field
+containing a filter function : for a given item, returning a boolean;
+* `searchAdvancedOn` is a simple reactive boolean for injecting or not the
+advanced search DOM at the top of the list
+* `searches` is a reactive map containing searches values from the advanced
+search form. It's used in conjonction with `filters`.
+
+      constructor: ->
+        @_items = []
+        @items = rx.array()
+        @filters = rx.map()
+        @searchAdvancedOn = rx.cell false
+        @searches = rx.map()
 
 ## Helpers
 
@@ -10,56 +34,51 @@ This module gathers helpers and subcomponents shared by many list components.
 
 #### sort
 
-`sort` function takes as arguments a field name and the item's list. It
-performs a simple sorting. If the list has already been sorted, it's reversed.
+`sort` function takes as argument a field name. It performs a simple sorting.
+If the list has already been sorted, it's reversed.
 
-      sort: (field, items) ->
-        rawItems = items.all()
-        if field
-          first = rawItems[0]
-          rawItems.sort (a, b) ->
-            switch
-              when a[field].get() > b[field].get() then 1
-              when b[field].get() > a[field].get() then -1
-              else 0
-          rawItems.reverse() if first is rawItems[0]
-        items.replace rawItems
+      sort: (field) =>
+        first = @items.at 0
+        sortedItems = _.sortBy @items.all(), (item) -> item[field].get()
+        sortedItems.reverse() if first is sortedItems[0]
+        @items.replace sortedItems
 
 #### filter
 
-The `filter` helper is quite simple : given a  native array of items and a
-reactive map of filters in values, it applies all the filters for each item and
-returns the filetered set, a native JS Array.
+The `filter` helper is quite simple : using the native array of items and
+the reactive map of filters in values, it applies all the filters for each item
+and returns the filetered set, a native JS Array.
 
-      filter: (items, filters) ->
-        return [] if items.length is 0
-        items.filter (item) ->
-          for fn in _(filters.all()).values()
+      filter: ->
+        return [] if @_items.length is 0
+        @_items.filter (item) =>
+          for fn in _(@filters.all()).values()
             return false unless fn item
           true
 
 #### search
 
-`search` is an helper that provides a simple way of looking full text around
-all given items. WARNING: it is slow because it uses an `indexOf` on a JSON
-version of the object !
+`@searchJSON` is a static helper that provides a simple way of looking full text
+around all given items.
+WARNING: it is slow because it uses an `indexOf` on a JSON version of the
+object !
 
-      search: (value, item) ->
+      @searchJSON: (value, item) ->
         json = JSON.stringify(item).toLowerCase()
         json.indexOf(value.toLowerCase()) isnt -1
 
-### View Helpers
+### View Static Helpers
 
-### $search
+#### $search
 
-`$search` is a function representing a component for the context menu,
+`@$search` is a static function representing a component for the context menu,
 providing a global search for a list. Its first argument is a `searchFn`
 function, called at each keystroke if the input field is valid. Validation of
 this field is provided by HTML5 `inputAttr` attributes, merged from the second
 argument.
 
 
-      $search: (searchFn, inputAttr) ->
+      @$search: (searchFn, inputAttr) ->
         _.defaults inputAttr,
           type: 'search'
           placeholder: L 'TYPE_HERE'
@@ -82,8 +101,8 @@ argument.
 
 #### $sortableTableHeader
 
-`$sortableTableHeader` is a static property, a component taking a config object
-:
+`@$sortableTableHeader` is a static property, a component taking a config
+object :
 
 * the `field` intended for sorting the list;
 * the `title` for the table header, optional, default to the locale field
@@ -97,7 +116,7 @@ displaying an icon for sorting comprehension and the `click` event for sorting.
         title = config.title or config.field.toUpperCase()
         th
           class: 'sortable'
-          click: list.sort.bind(null, config.field, config.items),
+          click: @sort.bind(@, config.field),
           [
             span L(title)
             i class: 'icon sort'
@@ -105,4 +124,4 @@ displaying an icon for sorting comprehension and the `click` event for sorting.
 
 ## Public API
 
-    golem.component.list = list
+    golem.component.List = List

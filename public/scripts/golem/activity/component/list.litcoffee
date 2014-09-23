@@ -1,39 +1,24 @@
 # Activity List
 
 This component represents the listing of activities, a table served with global
-and advanced search.
+and advanced search. It inherits from the common component `List`.
 
-    gclist = golem.component.list
-
-    class List
+    class List extends golem.component.List
 
 ## Initialization
 
-Here is the component initialization :
+Here is the component initialization. It calls the parent constructor. See
+`golem.component.List` for that. And :
 
-* `\_activities` serves for the global list of all activities. It will be
-populated by database as an array.
-* `activities`  is the current list, fitlered or not, that will be populated
-* from the private \_activities property the first time and every time filters
-are emptied.
-* `takenPlacesByActivity` will be a reactive map, populated by a db request,
-for the sum of all subscribed members by activity
-* `filteredActivities` is the list of filtered one, after filter functions has
-been applied;
-* `filters` contains an map of all active filters : a named field
-containing a filter function : for a given item, returning a boolean;
-* `searchAdvancedOn` is a simple reactive boolean for injecting or not the
-avdanced search DOM at the top of the list
-* `searches` is a reactive map containing searches values from the advanced
-search form. It's used in conjonction with `filters`.
+* creates `@takenPlacesByActivity` will be a reactive map, populated by a db
+request, for the sum of all subscribed members by activity;
+* replace `@searches` with the known three fields that we'll use here.
 
       constructor: ->
-        @_activities = []
-        @activities = rx.array()
+        window.gList = @
+        super()
         @takenPlacesByActivity = rx.map()
-        @filters = rx.map()
-        @searchAdvancedOn = rx.cell false
-        @searches = rx.map(label: '', code: '', monitor: '')
+        @searches.update label: '', code: '', monitor: ''
 
 Then we set the document's title and the secondary menu items.
 
@@ -43,7 +28,7 @@ Then we set the document's title and the secondary menu items.
 
 ## Activities
 
-List needs to get `activities`. It uses the db helper function `getBySchema`
+List needs to get `items`. It uses the db helper function `getBySchema`
 for it, passing a callback that displays an `Unexpected` error if a problem
 occurs. Otherwise it gets members subscribed for all activities, allowing
 display of the taken and remaining places for each.
@@ -52,8 +37,8 @@ display of the taken and remaining places for each.
           if err
             new golem.component.notification.Unexpected(content: err).send()
           else
-            @_activities = res.rows.map (r) -> new golem.Activity r.doc
-            @activities.replace @_activities
+            @_items = res.rows.map (r) -> new golem.Activity r.doc
+            @items.replace @_items
             # TODO: use count reduce for this purpose, instead of doing manually
             golem.model.getMembersFromActivity null, (err, res) =>
               if err
@@ -76,10 +61,10 @@ function is called only if the search input is valid.
 
       searchGlobal: (e) =>
         if e.target.checkValidity()
-          @filters.put 'search', gclist.search.bind(null, e.target.value)
+          @filters.put 'search', List.searchJSON.bind(null, e.target.value)
         else
           @filters.remove 'search' if @filters.get 'search'
-        @activities.replace(gclist.filter @_activities, @filters)
+        @items.replace @filter()
 
 ### Advanced search
 
@@ -103,7 +88,7 @@ here for preventing default behavior.
           else
             @searches.put field, ''
             @filters.remove field if @filters.get field
-        @activities.replace(gclist.filter @_activities, @filters)
+        @items.replace @filter()
 
 ## List Views
 
@@ -218,16 +203,16 @@ The `$table`, with sortable columns into the header.
         table { class: 'ui basic table' }, [
           thead [
             tr [
-              gclist.$sortableTableHeader field: 'label', items: @activities
-              gclist.$sortableTableHeader field: 'code', items: @activities
+              @$sortableTableHeader field: 'label'
+              @$sortableTableHeader field: 'code'
               th L('TIMESLOT')
-              gclist.$sortableTableHeader field: 'monitor', items: @activities
-              gclist.$sortableTableHeader field: 'places', items: @activities
+              @$sortableTableHeader field: 'monitor'
+              @$sortableTableHeader field: 'places'
               th L('PLACES_TAKEN')
               th { width: '10%' }, L('ACTIONS')
             ]
           ]
-          tbody @activities.map @$activity
+          tbody @items.map @$activity
         ]
 
 ### Right Sidebar
@@ -235,7 +220,7 @@ The `$table`, with sortable columns into the header.
       $sidebar: ->
         nav [
           menu { class: 'ui small vertical menu' },
-            gclist.$search @searchGlobal, { pattern: '.{4,}' }
+            List.$search @searchGlobal, { pattern: '.{4,}' }
         ]
 
 ### Global DOM
@@ -243,7 +228,7 @@ The `$table`, with sortable columns into the header.
 Finally, a function returning the DOM list corresponding to the component, with
 the header and the table. It also inits the list state.
 
-      $list: ->
+      $view: ->
         [
           section { class: 'twelve wide column' }, [
             golem.menus.$secondary
