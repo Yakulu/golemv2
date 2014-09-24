@@ -35,10 +35,10 @@ database helper `getBySchema`.
 
 ### Member row
 
-`$member` is a method that returns the table row corresponding to the given
+`memberView` is a method that returns the table row corresponding to the given
 item.
 
-      $member: (item) ->
+      memberView: (item) ->
         tr [
           td item.number.get()
           td item.fullname()
@@ -67,15 +67,15 @@ item.
 
 ### Table
 
-The `$table`, with sortable columns into the header.
+The `table`, with sortable columns into the header.
 
-      $table: ->
+      table: ->
         table { class: 'ui basic table' }, [
           thead [
             tr [
-              @$sortableTableHeader field: 'number', title: 'MEMBER_NUMBER'
-              @$sortableTableHeader field: 'lastname'
-              @$sortableTableHeader field: 'city', title: 'ADDRESS'
+              @sortableTableHeader field: 'number', title: 'MEMBER_NUMBER'
+              @sortableTableHeader field: 'lastname'
+              @sortableTableHeader field: 'city', title: 'ADDRESS'
               th [
                 span L 'TEL'
                 i { class: 'icon info', title: L 'DEFAULT_ONLY' }
@@ -87,32 +87,32 @@ The `$table`, with sortable columns into the header.
               th { width: '10%' }, L 'ACTIONS'
             ]
           ]
-          tbody @items.map @$member
+          tbody @items.map @memberView
         ]
 
 ### Right Sidebar
 
-      $sidebar: -> nav()
+      sidebar: -> nav()
 
 ### Global View
 
 Finally, a function returning the DOM list corresponding to the component, with
 the header and the table.
 
-      $view: ->
+      view: ->
         [
           section { class: 'twelve wide column' }, [
-            golem.menus.$secondary
-            golem.component.common.$headerExpandable
+            golem.menus.secondary
+            golem.component.common.headerExpandable
               class: 'inverted center aligned black'
               title: L 'SEARCH_ADVANCED'
               active: @searchAdvancedOn
-            p bind => if @searchAdvancedOn.get() then @$advancedSearch() else ''
+            p bind => if @searchAdvancedOn.get() then @advancedSearch() else ''
             h3 { class: 'ui inverted center aligned purple header' },
               span L 'MEMBERS_LIST'
-            @$table()
+            @table()
           ]
-          section { class: 'four wide column' }, @$sidebar()
+          section { class: 'four wide column' }, @sidebar()
         ]
 
 ## Public API

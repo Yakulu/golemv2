@@ -14,7 +14,7 @@ The class inherits from the shared `golem.component.Form`.
 The constructor property puts in place the secondary menu and initializes the
 model for the form, a blank one in the case of a new member, or a filled one
 when editing. A callback can be passed as first argument, which be called when
-initialization is over with the main `$view` function, returning the whole DOM.
+initialization is over with the main `view` function, returning the whole DOM.
 The `id` is optional and refers to the document key in case of edition.
 
       constructor: (@callback, @id) ->
@@ -34,7 +34,7 @@ also call the `@callback`.
         @add = true
         @member = new g.Member()
         document.title = g.utils.title L 'ACTIVITIES_NEW'
-        @callback(@$view()) if @callback
+        @callback(@view()) if @callback
 
 `initMember` gets the document from the given identifier and returns a warning
 if it's not found. It then affects the converted response to the `@member`
@@ -42,22 +42,22 @@ instance and change document title and secondary menu.
 
       _initMember: ->
         g.db.get @id, (err, res) =>
-          warn = new notif.Warning content: L('ERROR_RECORD_NOT_FOUND'),
-            window.location.hash = '#/member'
+          warn = ->
+            new notif.Warning(content: L('ERROR_RECORD_NOT_FOUND'))
+              .send(displayCb: -> window.location.hash = '/activity')
           if err
-            warn.send()
+            warn()
           else
             @member = new g.Member res
             unless @member
-              warn.send()
+              warn()
             else
-              warn = undefined
               title = L('EDITION_OF') + @member.fullname.get()
               document.title = g.utils.title title
               for act in ['show', 'edit', 'remove']
                 mi[act].url = "#{mi[act].baseUrl}/#{@member._id.get()}"
               g.menus.secondaryItems.splice 2, 0, mi.show, mi.edit, mi.remove
-              callback(@$view()) if callback
+              callback(@view()) if callback
 
 `submit` is the generic function inherited from `golem.component.Form` that
 will send the form values.
@@ -67,10 +67,10 @@ will send the form values.
 ### Views
 
 
-`$civility` contains all fields around the member's civility.
+`civility` contains all fields around the member's civility.
 
-      _$civility: ->
-        $number = div { class: 'four wide field' }, [
+      _civility: ->
+        number = div { class: 'four wide field' }, [
           label { for: 'number' }, L 'MEMBER_NUMBER'
           input
             type: 'text'
@@ -80,7 +80,7 @@ will send the form values.
             value: @member.number.get()
             change: (e) => @member.number.set e.target.value
         ]
-        $lastname = do =>
+        lastname = do =>
           validation = Form.validate L('LASTNAME_VALIDATION_MSG'),
             (e) => @member.lastname.set e.target.value
           div { class: 'six wide field' }, [
@@ -96,7 +96,7 @@ will send the form values.
               keyup: validation.fn
             validation.$elt
           ]
-        $firstname = do =>
+        firstname = do =>
           validation = Form.validate L('LASTNAME_VALIDATION_MSG'),
             (e) => @member.firstname.set e.target.value
           div { class: 'six wide field' }, [
@@ -112,7 +112,7 @@ will send the form values.
               keyup: validation.fn
             validation.$elt
           ]
-        $gender =
+        gender =
           label: div { class: 'one wide field' }, L 'GENDER'
           male: div { class: 'two wide field' }, [
             div { class: 'ui radio checkbox' }, [
@@ -138,7 +138,7 @@ will send the form values.
               label { for: 'gender-f' }, L 'GENDER_FEMALE'
             ]
           ]
-        $birthday = div { class: 'three wide field' }, [
+        birthday = div { class: 'three wide field' }, [
           label { for: 'birthday' }, L 'BIRTHDAY'
           input
             type: 'text'
@@ -160,7 +160,7 @@ will send the form values.
               else
                 @member.birthday.set null
         ]
-        $nationality = div { class: 'four wide field' }, [
+        nationality = div { class: 'four wide field' }, [
           label { for: 'nationality' }, L 'NATIONALITY'
           input
             type: 'text'
@@ -169,7 +169,7 @@ will send the form values.
             value: @member.nationality.get()
             change: (e) => @member.nationality.set e.target.value
         ]
-        $profession = div { class: 'four wide field' }, [
+        profession = div { class: 'four wide field' }, [
           label { for: 'profession' }, L 'PROFESSION'
           input
             type: 'text'
@@ -182,30 +182,30 @@ will send the form values.
           h3
             class: 'ui inverted center aligned purple header',
             L 'CIVILITY'
-          div { class:'fields' }, [$number, $lastname, $firstname]
+          div { class:'fields' }, [number, lastname, firstname]
           div { class:'fields' }, [
-            $gender.label, $gender.male, $gender.female,
-            $birthday, $nationality, $profession
+            gender.label, gender.male, gender.female,
+            birthday, nationality, profession
           ]
         ]
 
-`$form` represents the whole form for adding or editing a member.
+`form` represents the whole form for adding or editing a member.
 
-      _$form: ->
+      _form: ->
         form
           id: 'member-form'
           class: 'ui small form'
           submit: @submit,
-          [@_$civility()]
+          [@_civility()]
 
-`$sidebar`
+`sidebar`
 
-      _$sidebar: -> div()
+      _sidebar: -> div()
 
-`$view` represents the whole DOM of the page, inclufing the form, the sidebar
+`view` represents the whole DOM of the page, inclufing the form, the sidebar
 and some DOM around.
 
-      $view: ->
+      view: ->
         title = do =>
           if @add
             L('MEMBERS_NEW')
@@ -213,13 +213,13 @@ and some DOM around.
             "#{L('EDITION_OF')} #{@member.fullname.get()}"
         [
           section { class: 'twelve wide column' }, [
-            golem.menus.$secondary
+            golem.menus.secondary
             section { class: 'ui piled segment' }, [
               h2 title
-              @_$form()
+              @_form()
             ]
           ]
-          section { class: 'four wide column' }, [@_$sidebar()]
+          section { class: 'four wide column' }, [@_sidebar()]
         ]
 
 ## Public API

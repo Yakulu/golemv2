@@ -69,16 +69,16 @@ object !
 
 ### View Static Helpers
 
-#### $search
+#### search
 
-`@$search` is a static function representing a component for the context menu,
+`@searchBox` is a static function representing a component for the context menu,
 providing a global search for a list. Its first argument is a `searchFn`
 function, called at each keystroke if the input field is valid. Validation of
 this field is provided by HTML5 `inputAttr` attributes, merged from the second
 argument.
 
 
-      @$search: (searchFn, inputAttr) ->
+      @searchBox: (searchFn, inputAttr) ->
         _.defaults inputAttr,
           type: 'search'
           placeholder: L 'TYPE_HERE'
@@ -99,9 +99,9 @@ argument.
         ]
 
 
-#### $sortableTableHeader
+#### sortableTableHeader
 
-`@$sortableTableHeader` is a static property, a component taking a config
+`@sortableTableHeader` is a static property, a component taking a config
 object :
 
 - the `field` intended for sorting the list;
@@ -112,7 +112,7 @@ object :
 It returns a _th_ DOM object with bound events, like `mouseover` and `mouseout`
 displaying an icon for sorting comprehension and the `click` event for sorting.
 
-      $sortableTableHeader: (config) ->
+      sortableTableHeader: (config) ->
         title = config.title or config.field.toUpperCase()
         th
           class: 'sortable'

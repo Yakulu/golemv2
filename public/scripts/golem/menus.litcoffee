@@ -31,7 +31,7 @@ Each `MenuItem` is represented as a link which can be active according to the
 URL. If the active hash contains or is exactly the item url, this one will be
 marked as active.
 
-    $menuItem = (activeType, item) ->
+    menuItemView = (activeType, item) ->
       active = bind =>
         isActive = do =>
           if activeType is 'contains'
@@ -44,25 +44,25 @@ marked as active.
         item.title
       ]
 
-The template for the `$mainMenu` formats each `MenuItem` into a <menu> box.
+The template for the `mainMenu` formats each `MenuItem` into a <menu> box.
 It's reactive, so it can be changed at runtime without much effort. Its marked
 as active if the URL contains the `item.url`.
 
-    $mainMenu = nav bind -> [
+    mainMenu = nav bind -> [
       menu {
         id: 'main-menu'
         class: 'ui vertical labeled icon menu'
-      }, mainMenusItems.map $menuItem.bind(null, 'contains')
+      }, mainMenusItems.map menuItemView.bind(null, 'contains')
     ]
 
-The same thing happens to the `$secondaryMenu`, with different classes. It's
+The same thing happens to the `secondaryMenu`, with different classes. It's
 maked as active only if the `item.url` is exactly the `activeUrl`.
 
     secondaryItems = rx.array()
-    $secondaryMenu = nav [
+    secondaryMenu = nav [
       menu
         class: 'ui small secondary pointing menu',
-        secondaryItems.map $menuItem.bind(null, 'is')
+        secondaryItems.map menuItemView.bind(null, 'is')
     ]
 
 ## Public API
@@ -70,6 +70,6 @@ maked as active only if the `item.url` is exactly the `activeUrl`.
     golem.menus =
       Menu: MenuItem
       mainItems: mainMenusItems
-      $main: $mainMenu
+      main: mainMenu
       secondaryItems: secondaryItems
-      $secondary: $secondaryMenu
+      secondary: secondaryMenu

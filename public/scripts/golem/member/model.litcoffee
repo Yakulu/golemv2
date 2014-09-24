@@ -62,9 +62,9 @@ creation of the instance.  Lifting is done to enable precise reactivity.
 `fullname`, `fulladdress` and `fullguardian` are all helpers for displaying the
 merge of several fields.
 
-      fullname: -> "#{@firstname} #{@lastname}"
-      fullguardian: -> "#{@guardianFirstname} #{@guardianLastname}"
-      fulladdress: -> [@address, @postalCode, @city].join ' '
+      fullname: -> "#{@firstname.get()} #{@lastname.get()}"
+      fullguardian: -> "#{@guardianFirstname.get()} #{@guardianLastname.get()}"
+      fulladdress: -> [@address.get(), @postalCode.get(), @city.get()].join ' '
 
 ## MenuItems
 

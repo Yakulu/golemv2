@@ -6,13 +6,13 @@ This component offers common components and helpers for forms.
 
 ## Views
 
-`$cancelButton` and `$sendInput` are the two buttons for sending and cancelling
+`cancelButton` and `sendInput` are the two buttons for sending and cancelling
 the form. They will be used at the bottom of the form and on the contextual
 menu too. Both takes a `cls` argument for extending the default class.
-`$cancelButton` have an extra `clickFn` function that will be called when the
+`cancelButton` have an extra `clickFn` function that will be called when the
 button is clicked.
 
-      $cancelButton: (cls, clickFn) ->
+      cancelButton: (cls, clickFn) ->
         button
           name: 'cancel'
           class: "ui button #{cls}"
@@ -20,7 +20,7 @@ button is clicked.
           click: clickFn
           L 'CANCEL'
 
-      $sendInput: (cls) ->
+      sendInput: (cls) ->
         input
           id: 'activity-submit'
           class: "ui teal submit button #{cls}"

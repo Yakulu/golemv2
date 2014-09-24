@@ -93,12 +93,12 @@ here for preventing default behavior.
 
 ### Advanced Search DOM
 
-`$avdancedSearch` is a form witch contains all fields where a user can search
+`avdancedSearch` is a form witch contains all fields where a user can search
 to filter the activities list. Each search can be cumulated, thanks to
 `filters` instance method. Search is submitted via a send button and can be
 globally canceled via a cancel button.
 
-      $advancedSearch: =>
+      advancedSearch: =>
         form
           class: 'ui small form'
           submit: @searchAdvanced.bind(@, false),
@@ -149,10 +149,10 @@ globally canceled via a cancel button.
 
 ### Place DOM
 
-`$place` is the property, a function which returns, for a given activity, the
+`placeView` is the property, a function which returns, for a given activity, the
 span DOM elementwith an adapted color, according to the remaining places
 
-      $place: (activity) =>
+      placeView: (activity) =>
         color = 'inherit'
         if activity.places.get()
           takenPlaces = @takenPlacesByActivity.get(activity._id.get())
@@ -167,17 +167,17 @@ span DOM elementwith an adapted color, according to the remaining places
 
 ### Activity DOM
 
-`$activity` is a method that returns the table row corresponding to the given
+`activityView` is a method that returns the table row corresponding to the given
 activity.
 
-      $activity: (activity) =>
+      activityView: (activity) =>
         tr [
           td activity.label.get()
           td activity.code.get()
           td activity.timeSlot.get()
           td activity.monitor.get()
           td activity.places.get()
-          td @$place activity
+          td @placeView activity
           td { class: 'actions' }, [
             a
               href: '#/activity/show/' + activity._id.get()
@@ -196,32 +196,32 @@ activity.
 
 ### Table
 
-The `$table`, with sortable columns into the header.
+The `table`, with sortable columns into the header.
 
-      $table: ->
+      table: ->
         table { class: 'ui basic table' }, [
           thead [
             tr [
-              @$sortableTableHeader field: 'label'
-              @$sortableTableHeader field: 'code'
+              @sortableTableHeader field: 'label'
+              @sortableTableHeader field: 'code'
               th L('TIMESLOT')
-              @$sortableTableHeader field: 'monitor'
-              @$sortableTableHeader field: 'places'
+              @sortableTableHeader field: 'monitor'
+              @sortableTableHeader field: 'places'
               th L('PLACES_TAKEN')
               th { width: '10%' }, L 'ACTIONS'
             ]
           ]
-          tbody @items.map @$activity
+          tbody @items.map @activityView
         ]
 
 ### Right Sidebar
 
 The right sidebar is only composed by the global search component.
 
-      $sidebar: ->
+      sidebar: ->
         nav [
           menu { class: 'ui small vertical menu' },
-            List.$search @searchGlobal, { pattern: '.{4,}' }
+            List.searchBox @searchGlobal, { pattern: '.{4,}' }
         ]
 
 ### Global DOM
@@ -229,20 +229,20 @@ The right sidebar is only composed by the global search component.
 Finally, a function returning the DOM list corresponding to the component, with
 the header and the table.
 
-      $view: ->
+      view: ->
         [
           section { class: 'twelve wide column' }, [
-            golem.menus.$secondary
-            golem.component.common.$headerExpandable
+            golem.menus.secondary
+            golem.component.common.headerExpandable
               class: 'inverted center aligned black'
               title: L 'SEARCH_ADVANCED'
               active: @searchAdvancedOn
-            p bind => if @searchAdvancedOn.get() then @$advancedSearch() else ''
+            p bind => if @searchAdvancedOn.get() then @advancedSearch() else ''
             h3 { class: 'ui inverted center aligned purple header' },
               span L 'ACTIVITIES_LIST'
-            @$table()
+            @table()
           ]
-          section { class: 'four wide column' }, @$sidebar()
+          section { class: 'four wide column' }, @sidebar()
         ]
 
 ## Public API

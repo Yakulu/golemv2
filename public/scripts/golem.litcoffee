@@ -5,14 +5,14 @@ Main module for GOLEM. It's intended to bootstrap the application.
 ## Resident components
 
 There are global to GOLEM but text can change, according to the application's
-configuration and localization : `$header` and `$footer`.
+configuration and localization : `headerView` and `footerView`.
 
-    $header = -> header [
+    headerView = -> header [
       h1 { class: 'ui inverted black block small header center aligned' },
       bind -> "#{L 'TITLE'} : #{L 'HEADER'}"
     ]
 
-    $footer = -> footer [
+    footerView = -> footer [
       div { class: 'ui horizontal icon divider' }, [
         i { class: 'icon html5' }
       ]
@@ -49,9 +49,9 @@ a page to page navigation.
 
     $ ->
       g.roots =
-        $main: $ '#golem-main'
-      #replaceMain = (dom) -> golem.roots.$main.children().replaceWith dom
-      replaceMain = (dom) -> g.roots.$main.empty().append dom
+        main: $ '#golem-main'
+      #replaceMain = (dom) -> golem.roots.main.children().replaceWith dom
+      replaceMain = (dom) -> g.roots.main.empty().append dom
 
 Here we initialize the router and give it exhaustive routes to handle. Most of
 them replace the main part of the GOLEM app by new elements.
@@ -59,12 +59,12 @@ them replace the main part of the GOLEM app by new elements.
       g.router = new LightRouter
         type: 'hash'
         routes:
-          '': -> window.location.hash = '/home'
-          '/': -> window.location.hash = '/home'
-          '/home': -> replaceMain g.$home()
-          '/auth': -> replaceMain g.$auth()
+          '': -> window.location.hash = '#/home'
+          '/': -> window.location.hash = '#/home'
+          '/home': -> replaceMain g.home()
+          '/auth': -> replaceMain g.auth()
           '/activity': ->
-            replaceMain new g.activity.component.List().$view()
+            replaceMain new g.activity.component.List().view()
           '/activity/add': ->
             new g.activity.component.Form replaceMain
           '/activity/edit/:id': (id) ->
@@ -74,7 +74,7 @@ them replace the main part of the GOLEM app by new elements.
           '/activity/remove/:id': (id) ->
             new g.activity.component.Remove id
           '/member': ->
-            replaceMain new g.member.component.List().$view()
+            replaceMain new g.member.component.List().view()
           '/member/add': ->
             new g.member.component.Form replaceMain
           '/member/edit/:id': (id) ->
@@ -84,11 +84,11 @@ them replace the main part of the GOLEM app by new elements.
 After the initial DOM readyness, the function takes the most important part of
 the layout and populates them.
 
-      $('#golem-header').append $header()
-      $('#golem-mainmenu').append g.menus.$main
-      $('#golem-footer').append $footer()
-      $('#golem-notification').append g.component.notification.$notifications
-      g.roots.$main.append g.$auth()
+      $('#golem-header').append headerView()
+      $('#golem-mainmenu').append g.menus.main
+      $('#golem-footer').append footerView()
+      $('#golem-notification').append g.component.notification.notifications
+      g.roots.main.append g.auth()
 
 
 The `initRouting` part is executed only is authentification is valid (TMP

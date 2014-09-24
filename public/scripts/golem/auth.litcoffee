@@ -3,7 +3,7 @@
 ATM it's just a fake, specifically created for the MJC of Valentigney...
 So I won't comment it much.
 
-    $auth = ->
+    auth = ->
       document.title = golem.utils.title L('AUTHENTIFICATION')
       credentials =
         login: '8d143618d8af1efbade9dba8b6c93434d98d3da1'
@@ -63,4 +63,4 @@ So I won't comment it much.
 
 ## Public API
 
-    golem.$auth = $auth
+    golem.auth = auth

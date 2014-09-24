@@ -98,7 +98,7 @@ default 10 seconds.
 `Notification` if no `click` function has been provided. It removes the
 `Notification` from the reactive array and clears the timeout.
 
-    n.$notifications = do ->
+    n.notifications = do ->
       close = (notif, from) ->
         window.clearTimeout(notif.timeoutId) if notif.from isnt 'timeout'
         n.items.remove notif

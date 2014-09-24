@@ -49,10 +49,10 @@ Here are view helpers for formatting pieces of objects :
 
 ## Multi container
 
-`$multi` is a simple container around different `items`, formatted with a
+`multi` is a simple container around different `items`, formatted with a
 `formatFn` function and with the specicied `header`.
 
-      $multi: (header, items, formatFn) ->
+      multi: (header, items, formatFn) ->
         if items.length > 0
           div [
             div { class: 'ui black label' }, header

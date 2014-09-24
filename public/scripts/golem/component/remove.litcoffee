@@ -1,6 +1,6 @@
 # Remove component
 
-This module provides common actions around a `$modal` component to remove a
+This module provides common actions around a `modal` component to remove a
 record from database.
 It takes a `config` object as argument :
 
@@ -34,7 +34,7 @@ It takes a `config` object as argument :
           item = new config.Class res
           document.title = golem.utils.title(
             L('REMOVAL_OF') + item[config.nameField].get())
-          golem.component.common.$modal
+          golem.component.common.modal
             title: L 'SURE'
             content: "<p>#{L(config.content)}</p>"
             approveCb: config.approveCb.bind(null, item)

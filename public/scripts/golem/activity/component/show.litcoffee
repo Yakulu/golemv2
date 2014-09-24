@@ -38,14 +38,14 @@ identifier for the document stored in database.
                 @members = []
               else
                 @members = res.rows.map (r) -> new golem.Member r.doc
-              callback(@$view()) if callback
+              callback(@view()) if callback
 
 ## Views
 
-`$activityMembers` lists all members, by their fullname, who have been
+`activityMembers` lists all members, by their fullname, who have been
 subscribed to this activity. A link to their page is provided.
 
-      $activityMembers: =>
+      activityMembers: =>
         if @members.length > 0
           ul { class: 'ui list' }, @members.map (member) ->
             li [
@@ -55,9 +55,9 @@ subscribed to this activity. A link to their page is provided.
         else
           p L 'NONE'
 
-`$activity` consists of the main view, an inline list of fields and values.
+`activityView` consists of the main view, an inline list of fields and values.
 
-      $activity: =>
+      activityView: =>
         section { class: 'ui piled segment' }, [
           h2 @activity.label.get()
           p @activity.note.get()
@@ -103,17 +103,17 @@ subscribed to this activity. A link to their page is provided.
             ]
           ]
           h3 L 'ACTIVITIES_MEMBERS'
-          @$activityMembers()
+          @activityMembers()
         ]
 
-`$view` provides the global view, containing the whole activity record and
+`view` provides the global view, containing the whole activity record and
 associated members.
 
-      $view: =>
+      view: =>
         [
           section { class: 'sixteen wide column' }, [
-            golem.menus.$secondary
-            @$activity()
+            golem.menus.secondary
+            @activityView()
           ]
         ]
 
