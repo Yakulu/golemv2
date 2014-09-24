@@ -42,9 +42,9 @@ creation of the instance.  Lifting is done to enable precise reactivity.
           props ?= {}
           @schema = 'member'
           @creationDate = Date.now()
-          nullFields = ['number', 'birthday', 'gender', 'address', 'postalCode',
-            'city', 'nationality', 'profession', 'note', 'guardianLastname',
-            'guardianFirstname' ]
+          nullFields = ['firstname', 'lastname', 'number', 'birthday', 'gender',
+            'address', 'postalCode', 'city', 'nationality', 'profession',
+            'note', 'guardianLastname', 'guardianFirstname' ]
           for field in nullFields
             @[field] = props[field] or null
           for field in ['tels', 'mails', 'tags', 'skills']

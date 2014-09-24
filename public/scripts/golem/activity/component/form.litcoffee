@@ -6,7 +6,10 @@ by a class that inherits from `golem.component.Form`.
     g = golem
     notif = g.component.notification
 
-    class Form extends golem.component.Form
+    class Form extends g.component.Form
+
+
+## Initialization
 
 The constructor property puts in place the secondary menu and initializes the
 model for the form, a blank one in the case of a new activity, or a filled one
@@ -32,15 +35,16 @@ In edit mode, we must check that the record is in database and gets it for
 filling the form.
 
           g.db.get id, (err, res) =>
+            warn = new notif.Warning content: L('ERROR_RECORD_NOT_FOUND'),
+              window.location.hash = '#/activity'
             if err
-              new notif.Warning content: L('ERROR_RECORD_NOT_FOUND'),
-                window.location.hash = '#/activity'
-              .send()
+              warn.send()
             else
               @activity = new g.Activity res
               unless @activity # TODO: check if real
-                initNew()
+                warn.send()
               else
+                warn = undefined
                 document.title = g.utils.title(
                   L 'EDITION_OF' + @activity.label.get())
                 for act in ['show', 'edit', 'remove']
@@ -48,10 +52,14 @@ filling the form.
                 g.menus.secondaryItems.splice 2, 0, mi.show, mi.edit, mi.remove
                 callback(@$view()) if callback
 
+## Methods
+
 `submit` is the generic function inherited from `golem.component.Form` that
 will send the form values.
 
       submit: (e) => Form.submit e, @activity
+
+## Views
 
 `$form` is the private view function for building the whole view according to
 the component activity.
@@ -79,7 +87,6 @@ the component activity.
             type: 'text'
             name: 'code'
             placeholder: L 'CODE'
-            minlength: 2
             maxlength: 30
             value: @activity.code.get()
             change: (e) => @activity.code.set e.target.value

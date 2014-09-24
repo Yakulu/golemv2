@@ -30,6 +30,37 @@ button is clicked.
 
 ## Static properties
 
+### Date formatting
+
+Using moment.js and a little workaroung for DDMMYY random problems, given a
+string value, `dateFormat` returns a moment Date Object or `null` if invalid.
+
+      @dateFormat: (v) ->
+        unless v
+          null
+        else
+          v = v.replace(/\//g, '')
+          if v and /^\d+$/.test v
+            switch v.length
+              when 1
+                v = moment "0#{v}", 'DD'
+              when 2
+                v = moment v, 'DD'
+              when 4
+                v = moment v, 'DDMM'
+              when 6
+                # FIX for DDMMYY problems
+                year = moment().format 'YY'
+                ddmm = v.substr 0, 4
+                yy = v.substr 4
+                v = (if (yy > year) then "#{ddmm}19#{yy}" else "#{ddmm}20#{yy}")
+                v = moment v, 'DDMMYYYY'
+              when 8
+                v = moment v, 'DDMMYYYY'
+          else
+            return null
+          if v.isValid() then v else null
+
 ### Submission
 
 `@submit` static property handles the form submission via the submission event
