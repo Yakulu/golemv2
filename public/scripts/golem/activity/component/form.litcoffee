@@ -53,26 +53,6 @@ will send the form values.
 
       submit: (e) => Form.submit e, @activity
 
-`$cancelButton` and `$sendInput` are the two buttons for sending and cancelling
-the form. They will be used at the bottom of the form and on the contextual
-menu too.
-
-      _$cancelButton: (cls) ->
-        button
-          name: 'cancel'
-          class: "ui button #{cls}"
-          type: 'button'
-          click: -> window.location.hash = '#/activity',
-          L 'CANCEL'
-
-      _$sendInput: (cls) ->
-        input
-          id: 'activity-submit'
-          class: "ui teal submit button #{cls}"
-          type: 'submit'
-          form: 'activity-form'
-          value: (if @add then L 'SAVE' else L 'UPDATE')
-
 `$form` is the private view function for building the whole view according to
 the component activity.
 
@@ -159,8 +139,8 @@ the component activity.
             div { class:'fields' }, [$labelField, $codeField, $placesField]
             div { class:'fields' }, [$timeSlotField, $monitorField]
             $noteField
-            @_$sendInput()
-            @_$cancelButton()
+            @$sendInput()
+            @$cancelButton(null, -> window.location.hash = '#/activity')
           ]
 
 `$context` is a private property defining the contextuel content. Here are only
@@ -168,7 +148,8 @@ fixed position button for sending and cancelling the form. Usefull for finding
 these buttons easily.
 
       _$context: -> menu { class: 'ui buttons fixed-right' }, [
-        @_$sendInput('fluid'), @_$cancelButton('fluid')
+        @$sendInput('fluid')
+        @$cancelButton('fluid', -> window.location.hash = '#/activity')
       ]
 
 `$view` is the main view function, returning all the DOM elements needed for
