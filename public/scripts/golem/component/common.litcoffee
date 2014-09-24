@@ -27,10 +27,10 @@ argument with a `title`, a `class` and the boolean `active`. All are required.
 
 `$modal` is a component that takes a config object as argument with :
 
-* a `title` string, for the header
-* a `content` HTML body
-* a `approvedCb` function callback, called if accepted
-* a `deniedCb` function callback, invoked if refused
+- a `title` string, for the header
+- a `content` HTML body
+- a `approvedCb` function callback, called if accepted
+- a `deniedCb` function callback, invoked if refused
 
 It creates a jQuery element containing the modal and displays the modal before
 returning. It uses the modal module helper from SemanticUI.

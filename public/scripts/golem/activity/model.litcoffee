@@ -2,12 +2,12 @@
 
 An `Activity` takes a `props` object as argument, with :
 
-* `label`, string required;
-* `code` string, an optional shortcut for the activity;
-* `places` integer, the number of places available;
-* `timeSlot` string;
-* `monitor` string;
-* `note` for extra remarks;
+- `label`, string required;
+- `code` string, an optional shortcut for the activity;
+- `places` integer, the number of places available;
+- `timeSlot` string;
+- `monitor` string;
+- `note` for extra remarks;
 
 `Activity` inherits from `Doc`. In case of a new activity, the class creates a
 new instance with defaults. Lifting is done to enable precise reactivity.

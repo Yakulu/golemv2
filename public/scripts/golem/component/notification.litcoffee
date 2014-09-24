@@ -12,11 +12,11 @@ namespace, as a reactive array.
 A `Notification` is an object that can be created through a `props` JS object.
 This one can have :
 
-* a `title`, required;
-* a `content`, recommended, that can be a bunch of HTML;
-* an `icon` class, according to Semantic and Font Awesome;
-* a `timeout`, in seconds, by default 10. It can be `false` for avoiding
-automatic close.
+- a `title`, required;
+- a `content`, recommended, that can be a bunch of HTML;
+- an `icon` class, according to Semantic and Font Awesome;
+- a `timeout`, in seconds, by default 10. It can be `false` for avoiding
+  automatic close.
 
     class n.Notification
       constructor: (props) ->

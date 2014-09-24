@@ -1,12 +1,12 @@
 # Activity form
 
-This component is the form for adding or editing activities.
+This component is the form for adding or editing activities. It's materialized
+by a class that inherits from `golem.component.Form`.
 
     g = golem
     notif = g.component.notification
-    gcform = g.component.form
 
-    class Form
+    class Form extends golem.component.Form
 
 The constructor property puts in place the secondary menu and initializes the
 model for the form, a blank one in the case of a new activity, or a filled one
@@ -51,7 +51,7 @@ filling the form.
 `submit` is the generic function inherited from `golem.component.Form` that
 will send the form values.
 
-      submit: (e) => gcform.submit e, @activity
+      submit: (e) => Form.submit e, @activity
 
 `$cancelButton` and `$sendInput` are the two buttons for sending and cancelling
 the form. They will be used at the bottom of the form and on the contextual
@@ -78,7 +78,7 @@ the component activity.
 
       _$form: ->
         $labelField = do =>
-          validation = gcform.validate L('LASTNAME_VALIDATION_MSG'),
+          validation = Form.validate L('LASTNAME_VALIDATION_MSG'),
             (e) => @activity.label.set e.target.value
           div { class: 'eight wide field small input' }, [
             label { for: 'label' }, "#{L 'LABEL'} *"
@@ -105,7 +105,7 @@ the component activity.
             change: (e) => @activity.code.set e.target.value
         ]
         $placesField = do =>
-          validation = gcform.validate L('PLACES_VALIDATION_MSG'),
+          validation = Form.validate L('PLACES_VALIDATION_MSG'),
             (e) => @activity.places.set parseInt(e.target.value)
           div { class: 'four wide field small input' }, [
             label { for: 'places' }, L 'PLACES'
@@ -115,7 +115,7 @@ the component activity.
               placeholder: L 'PLACES'
               type: 'number'
               min: 0
-              max: 10000
+              max: 1000
               step: 1
               value: @activity.places.get()
               keyup: validation.fn

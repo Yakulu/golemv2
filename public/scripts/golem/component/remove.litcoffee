@@ -4,16 +4,16 @@ This module provides common actions around a `$modal` component to remove a
 record from database.
 It takes a `config` object as argument :
 
-* `approveCb` is the callback that will be called after approval. If not given,
-the module provides a default one, with removing from the database and
-displaying standard notifications
-* `route` is the hash where the user will be redirect after approval or deny
-* `id` is the document identifier for removal
-* `Class` is the component Class (CoffeeScript sense), usefull for instantiate
-it before removal
-* `nameField` is the field to be used to update the document's title according
-to the name of the removed document
-* `content` is the key of the locale containing the HTML content for the modal
+- `approveCb` is the callback that will be called after approval. If not given,
+  the module provides a default one, with removing from the database and
+  displaying standard notifications
+- `route` is the hash where the user will be redirect after approval or deny
+- `id` is the document identifier for removal
+- `Class` is the component Class (CoffeeScript sense), usefull for instantiate
+  it before removal
+- `nameField` is the field to be used to update the document's title according
+  to the name of the removed document
+- `content` is the key of the locale containing the HTML content for the modal
 
     notif = golem.component.notification
 

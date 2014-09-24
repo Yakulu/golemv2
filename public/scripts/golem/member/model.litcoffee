@@ -6,30 +6,30 @@
 
 A `Member` takes a `props` object with :
 
-* `number`, optional home made identifier for the member;
-* `birthday` a JS Date Object, default to null;
-* `gender` an enum like string, 'f' for female and 'm' for male, default to
-null;
-* `address`, a string default to null;
-* `postalCode`, a string of 5 numeric, default to null;
-* `city`, a string default to null;
-* `nationality`, a string default to null;
-* `profession` string, default to null;
-* `note`, a big string default to null;
-* `communicationModes`, an object with keys `mail` and `tel`, by defaults fixed
-both to false;
-* `guardianLastname`, a string for the child's guardian lastname;
-* `guardianFirstname`, a string for the child's guardian firstname;
-* `authorizations` for children, an object to confirm the possibility to
-participate and to be taken in photos, default to false both;
-* `tels`, an array of objects, each with a label, value strings and a default
-boolean option;
-* `mails`, an array of objects, each with a label, value strings and a default
-boolean option;
-* `skills`, an array of strings, default to empty;
-* `tags`, an array of strings, default to empty;
-* `activities`, an array of strings, the documents identifiers of
-subscribed Activities, default to empty.
+- `number`, optional home made identifier for the member;
+- `birthday` a JS Date Object, default to null;
+- `gender` an enum like string, 'f' for female and 'm' for male, default to
+  null;
+- `address`, a string default to null;
+- `postalCode`, a string of 5 numeric, default to null;
+- `city`, a string default to null;
+- `nationality`, a string default to null;
+- `profession` string, default to null;
+- `note`, a big string default to null;
+- `communicationModes`, an object with keys `mail` and `tel`, by defaults fixed
+  both to false;
+- `guardianLastname`, a string for the child's guardian lastname;
+- `guardianFirstname`, a string for the child's guardian firstname;
+- `authorizations` for children, an object to confirm the possibility to
+  participate and to be taken in photos, default to false both;
+- `tels`, an array of objects, each with a label, value strings and a default
+  boolean option;
+- `mails`, an array of objects, each with a label, value strings and a default
+  boolean option;
+- `skills`, an array of strings, default to empty;
+- `tags`, an array of strings, default to empty;
+- `activities`, an array of strings, the documents identifiers of subscribed
+  Activities, default to empty.
 
 It inherits from `golem.Doc`. If no identifier is provided, then we create a
 new document and initalize all defaults, including the `schema` and the Date of

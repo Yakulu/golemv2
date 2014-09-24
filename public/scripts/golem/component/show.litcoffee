@@ -8,12 +8,12 @@ This module gathers common functions for show components.
 
 Here are view helpers for formatting pieces of objects :
 
-* `default` : add a little checked icon when the corresponding field is true
-* `tels`: formats the phone numbers for better readability and push the
-`default` format if needed
-* `mails`: formats the mail addresses for using on mail apps and push the
-`default` format if needed
-* `www`: returns a Web link with its value
+- `default` : add a little checked icon when the corresponding field is true
+- `tels`: formats the phone numbers for better readability and push the
+  `default` format if needed
+- `mails`: formats the mail addresses for using on mail apps and push the
+  `default` format if needed
+- `www`: returns a Web link with its value
 
       format:
         default: (def) ->

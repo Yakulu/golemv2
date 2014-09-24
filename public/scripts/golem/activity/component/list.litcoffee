@@ -10,9 +10,9 @@ and advanced search. It inherits from the common component `List`.
 Here is the component initialization. It calls the parent constructor. See
 `golem.component.List` for that. And :
 
-* creates `@takenPlacesByActivity` will be a reactive map, populated by a db
-request, for the sum of all subscribed members by activity;
-* replace `@searches` with the known three fields that we'll use here.
+- creates `@takenPlacesByActivity` will be a reactive map, populated by a db
+  request, for the sum of all subscribed members by activity;
+- replace `@searches` with the known three fields that we'll use here.
 
       constructor: ->
         super()

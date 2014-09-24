@@ -9,17 +9,17 @@ This class gathers helpers and subcomponents shared by many list components.
 All List components may need to show `items` and some kind of `filters` and
 `searches`. Here we initilialize the component :
 
-* `\_items` serves for the global list of all items. It will be populated by
-database as an array.
-* `items`  is the current list, filtered or not, that will be populated
-from the private \_items property the first time and every time filters are
-emptied.
-* `filters` contains an map of all active filters : a named field
-containing a filter function : for a given item, returning a boolean;
-* `searchAdvancedOn` is a simple reactive boolean for injecting or not the
-advanced search DOM at the top of the list
-* `searches` is a reactive map containing searches values from the advanced
-search form. It's used in conjonction with `filters`.
+- `\_items` serves for the global list of all items. It will be populated by
+  database as an array.
+- `items`  is the current list, filtered or not, that will be populated from
+  the private \_items property the first time and every time filters are
+  emptied.
+- `filters` contains an map of all active filters : a named field containing a
+  filter function : for a given item, returning a boolean;
+- `searchAdvancedOn` is a simple reactive boolean for injecting or not the
+  advanced search DOM at the top of the list
+- `searches` is a reactive map containing searches values from the advanced
+  search form. It's used in conjonction with `filters`.
 
       constructor: ->
         @_items = []
@@ -104,10 +104,10 @@ argument.
 `@$sortableTableHeader` is a static property, a component taking a config
 object :
 
-* the `field` intended for sorting the list;
-* the `title` for the table header, optional, default to the locale field
-uppercased;
-* the `items` list, for passing to the sort function
+- the `field` intended for sorting the list;
+- the `title` for the table header, optional, default to the locale field
+  uppercased;
+- the `items` list, for passing to the sort function
 
 It returns a _th_ DOM object with bound events, like `mouseover` and `mouseout`
 displaying an icon for sorting comprehension and the `click` event for sorting.
