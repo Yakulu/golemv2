@@ -1,4 +1,4 @@
-# Show Component
+# Show component
 
 This module gathers common functions for show components.
 

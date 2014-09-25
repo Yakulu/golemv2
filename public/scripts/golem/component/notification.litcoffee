@@ -1,15 +1,15 @@
 ## Notification system
 
 Homemade notification system. It proposes boxes with different styles and
-optionally a close timeout. The list of active Notifications is handled by the
-namespace, as a reactive array.
+optionally a close timeout. The list of active notifications is handled by the
+namespace, on `items` as a reactive array.
 
     n = items: rx.array()
 
 ### Classic Notification
 
 
-A `Notification` is an object that can be created through a `props` JS object.
+A `notification` is an object that can be created through a `props` JS object.
 This one can have :
 
 - a `title`, required;
@@ -17,112 +17,115 @@ This one can have :
 - an `icon` class, according to Semantic and Font Awesome;
 - a `timeout`, in seconds, by default 10. It can be `false` for avoiding
   automatic close.
+- optional `displayCb`, `closeCb` and `clickFn` functions callbacks that will
+  be called respectively when the notification is displayed,closed and when the
+  user clicks on the notification elsewhere the close icon (clickFn by default
+  closes the notification).
 
-    class n.Notification
-      constructor: (props) ->
-        {@title, @content, @icon, @cls, @timeout} = props
-        @timeout ?= 10
+Then the notification is automatically sent.
+
+    n.notification = (me) ->
+      me.timeout ?= 10
+      me
 
 #### Sending
 
 `send` is the most basic and powerfull way of sending a notification to the
-user. It takes an optional properties object with `displayCb` and `closeCb`
-functions callbacks and another optional `clickFn` function that will be called
-when the user clicks on the notifications elsewhere the close icon (defaults
-close the `Notification`).
+user. It takes a notification as required parameter.
 
-      send: ({displayCb, @closeCb, @clickFn} = {}) ->
-        n.items.push @
-        displayCb() if displayCb
+    n.send = (notification) ->
+      n.items.push notification
+      notification.displayCb() if notification.displayCb
 
 ### Predefined Notifications
 
-A successfull `Notification` already provides a title, a class and an icon. It
+A successfull `notification` already provides a title, a class and an icon. It
 just needs the `content` and an optional `timeout`.
 
-    class n.Success extends n.Notification
-      constructor: (props) ->
-        props.title = L 'SUCCESS'
-        props.cls = 'success'
-        props.icon = 'checkmark'
-        super props
+    n.success = (me) ->
+      _.extend me, title: L('SUCCESS'), cls: 'success', icon: 'checkmark'
+      n.notification me
 
-An `Info` `Notification` only fixes the `cls` and `icon` and takes an optional
-`title` (default to `l.INFO`) and a required `content`.
+An `info` `notification` only fixes the `cls` and `icon` and takes an optional
+`title` (default to locale INFO) and a required `content`.
 
-    class n.Info extends n.Notification
-      constructor: (props) ->
-        props.title ?= L 'INFO'
-        props.cls = props.icon = 'info'
-        super props
+    n.info = (me) ->
+      me.title ?= L 'INFO'
+      me.cls = me.icon = 'info'
+      n.notification me
 
-A `Warning` `Notification` lets only gives the `content`. `title`, `cls` and
+A `warning` `notification` lets only gives the `content`. `title`, `cls` and
 `icon` are fixed. `timeout` is by default set to 15 seconds.
 
-    class n.Warning extends n.Notification
-      constructor: (props) ->
-        props.title = L 'WARNING'
-        props.cls = props.icon = 'warning'
-        props.timeout ?= 15
-        super props
+    n.warning = (me) ->
+      me.title = L 'WARNING'
+      me.cls = me.icon = 'warning'
+      me.timeout ?= 15
+      n.notification me
 
-As `Warning`, an `Error` `Notification` just needs a `content` or a function.
+As `warning`, an `error` `notification` just needs a `content` or a function.
 The `timeout` is fixed to `false`.
 
-    class n.Error extends n.Notification
-      constructor: ({ content }) ->
-        props =
-          title: L 'ERROR'
-          cls: 'error'
-          icon: 'attention'
-          timeout: false
-          content: content
-        super props
+    n.error = (props) ->
+      me =
+        title: L 'ERROR'
+        cls: 'error'
+        icon: 'attention'
+        timeout: false
+      me = _.extend props, me
+      n.notification me
 
-`Unexpected` is an `Error` `Notification` with partially defined `content`.
+`unexpected` is an `error` `notification` with partially defined `content`.
 
-    class n.Unexpected extends n.Error
-      constructor: (props) ->
-        props.content = "<em>#{props.content}</em><br/>#{L 'ERROR_UNEXPECTED'}"
-        super props
+    n.unexpected = (me) ->
+      me.content = "<em>#{me.content}</em><br/>#{L 'ERROR_UNEXPECTED'}"
+      n.error me
 
 ### Notification Template
 
-The reactive DOM that iterates over the reactive array.
+`close` function is used when the user clicked on the close icon or on the
+`notification` if no `click` function has been provided. It removes the
+`notification` from the reactive array and clears the timeout.
+
+    close = (notif, from) ->
+      window.clearTimeout(notif.timeoutId) if notif.from isnt 'timeout'
+      n.items.remove notif
+      notif.closeCb() if notif.closeCb
+
 
 `delayClose` is called after each drawning into the DOM : if the `timeout`
-isn't `false` then the `Notification` will be automatically closed after by
+isn't `false` then the `notification` will be automatically closed after by
 default 10 seconds.
 
-`close` function is used when the user clicked on the close icon or on the
-`Notification` if no `click` function has been provided. It removes the
-`Notification` from the reactive array and clears the timeout.
+    delayClose = (notif) ->
+      if notif.timeout
+        notif.timeoutId = window.setTimeout ->
+          close(notif, 'timeout')
+        , notif.timeout * 1000
 
-    n.notifications = do ->
-      close = (notif, from) ->
-        window.clearTimeout(notif.timeoutId) if notif.from isnt 'timeout'
-        n.items.remove notif
-        notif.closeCb() if notif.closeCb
+`nClass` takes a notification and returns the string class to use with the
+wrapping div element.
 
-      delayClose = (notif) ->
-        if notif.timeout
-          notif.timeoutId = window.setTimeout ->
-            close(notif, 'timeout')
-          , notif.timeout * 1000
+     nClass = (notif) ->
+        cls = ['ui', 'floating', 'message', 'notification']
+        cls.push notif.cls if notif.cls
+        cls.push 'icon' if notif.icon
+        cls.join ' '
+
+The reactive DOM that iterates over the reactive array.
+
+    n.notifications =
       [
         div n.items.map (notif) ->
             delayClose notif
-            nCls = ['ui', 'floating', 'message', 'notification']
-            nCls.push notif.cls if notif.cls
-            nCls.push 'icon' if notif.icon
             div
-              class: nCls.join ' '
-              click: notif.clickFn or close.bind(null, notif)
+              class: nClass notif
+              click: notif.clickFn or _.partial(close, notif)
             , [
               if notif.icon then i { class: notif.icon + ' icon' } else ''
               i
                 class: 'close icon'
-                click: close.bind(null, notif)
+                click: _.partial(close, notif)
               div { class: 'content' }, [
                 div { class: 'header' }, notif.title
                 div $.parseHTML("<p>#{notif.content}</p>")

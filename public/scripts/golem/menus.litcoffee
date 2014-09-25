@@ -4,42 +4,48 @@ GOLEM is composed of two menus : a main one and a secondary.
 
 ## MenuItem
 
-Each menu shares the same `MenuItem` class. A `title`, an `URL` and the
-Semantic CSS `icon` class name are mandatory. The `url` will be keeped as
+Each menu shares the same `menuitem` creation function. A `title`, an `URL` and
+the Semantic CSS `icon` class name are mandatory. The `url` will be keeped as
 `baseUrl`. An optional `cls` can be fixed, by default to 'item'.
 
-    class MenuItem
-      constructor: (@title, @url, @icon, @cls = 'item') ->
-        @baseUrl = @url
+    menuitem = (title, url, icon, cls = 'item') ->
+      title: title
+      url: url
+      baseUrl: url
+      icon: icon
+      cls: cls
 
 The defaults `MenuItems`.
       
     mainMenusItems = rx.array [
-      new MenuItem L('HOME'), '/home', 'home'
-      new MenuItem L('CONTACTS'), '/contact', 'book', 'item disabled'
-      #new MenuItem L('FAMILIES'), '/family', 'sitemap'
-      new MenuItem L('MEMBERS'), '/member', 'user'
-      new MenuItem L('MESSAGES'), '/mail', 'mail', 'item disabled'
-      new MenuItem L('ACTIVITIES'), '/activity', 'globe'
-      new MenuItem L('STATISTICS'), '/stats', 'pie chart basic', 'item disabled'
-      new MenuItem L('ADMINISTRATION'), '/admin', 'wrench', 'item disabled'
+      menuitem L('HOME'), '/home', 'home'
+      menuitem L('CONTACTS'), '/contact', 'book', 'item disabled'
+      #menuitem L('FAMILIES'), '/family', 'sitemap'
+      menuitem L('MEMBERS'), '/member', 'user'
+      menuitem L('MESSAGES'), '/mail', 'mail', 'item disabled'
+      menuitem L('ACTIVITIES'), '/activity', 'globe'
+      menuitem L('STATISTICS'), '/stats', 'pie chart basic', 'item disabled'
+      menuitem L('ADMINISTRATION'), '/admin', 'wrench', 'item disabled'
     ]
 
 ## Menus templates
 
-Each `MenuItem` is represented as a link which can be active according to the
+Each `menuitem` is represented as a link which can be active according to the
 URL. If the active hash contains or is exactly the item url, this one will be
-marked as active.
+marked as active. `isActive` is the function that checks the activity whereas
+`activeClass` is the one that returns the string class.
+
+    _isActive = (type, activeUrl, itemUrl) ->
+      if type is 'contains'
+        activeUrl.indexOf(itemUrl) isnt -1
+      else # is
+        itemUrl is activeUrl
+
+    _active = (bool) -> if bool then ' active' else ''
 
     menuItemView = (activeType, item) ->
-      active = bind =>
-        isActive = do =>
-          if activeType is 'contains'
-            golem.activeUrl.get().indexOf(item.url) isnt -1
-          else # is
-            item.url is golem.activeUrl.get()
-        if isActive then ' active' else ''
-      a { class: "#{item.cls}#{active.get()}", href: "##{item.url}" }, [
+      active = _active(_isActive(activeType, golem.activeUrl.get(), item.url))
+      a { class: "#{item.cls}#{active}", href: "##{item.url}" }, [
         i { class: "#{item.icon} icon" }
         item.title
       ]
@@ -68,7 +74,7 @@ maked as active only if the `item.url` is exactly the `activeUrl`.
 ## Public API
 
     golem.menus =
-      Menu: MenuItem
+      menuitem: menuitem
       mainItems: mainMenusItems
       main: mainMenu
       secondaryItems: secondaryItems

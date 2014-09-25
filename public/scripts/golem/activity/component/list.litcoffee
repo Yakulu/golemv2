@@ -3,6 +3,8 @@
 This component represents the listing of activities, a table served with global
 and advanced search. It inherits from the common component `List`.
 
+    notif = golem.component.notification
+    ns = golem.activity
     class List extends golem.component.List
 
 ## Initialization
@@ -34,14 +36,14 @@ display of the taken and remaining places for each.
 
         golem.model.getBySchema 'activity', (err, res) =>
           if err
-            new golem.component.notification.Unexpected(content: err).send()
+            notif.send(notif.unexpected content: err)
           else
-            @_items = res.rows.map (r) -> new golem.Activity r.doc
+            @_items = res.rows.map (r) -> ns.model.activity r.doc
             @items.replace @_items
             # TODO: use count reduce for this purpose, instead of doing manually
             golem.model.getMembersFromActivity null, (err, res) =>
               if err
-                new golem.component.notification.Unexpected(content: err).send()
+                notif.send(notif.unexpected content: err)
               else
                 takenPlacesByActivity = {}
                 for r in res.rows

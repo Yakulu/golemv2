@@ -84,6 +84,7 @@ menu.fixed-right {
 
 .notification {
   z-index: 99 !important;
+  cursor: pointer !important;
 }
 
 section.notification {

@@ -1,6 +1,7 @@
 # Member form
 
     g = golem
+    ns = g.member
     notif = g.component.notification
 
 This component represents the Member form, for adding and for editing entities.
@@ -32,7 +33,7 @@ also call the `@callback`.
 
       _initNew: ->
         @add = true
-        @member = new g.Member()
+        @member = ns.model.member()
         document.title = g.utils.title L 'ACTIVITIES_NEW'
         @callback(@view()) if @callback
 
@@ -43,12 +44,14 @@ instance and change document title and secondary menu.
       _initMember: ->
         g.db.get @id, (err, res) =>
           warn = ->
-            new notif.Warning(content: L('ERROR_RECORD_NOT_FOUND'))
-              .send(displayCb: -> window.location.hash = '/activity')
+            notif.send(
+              notif.warning
+                content: L('ERROR_RECORD_NOT_FOUND')
+                displayCb: -> window.location.hash = '/activity')
           if err
             warn()
           else
-            @member = new g.Member res
+            @member = ns.model.member res
             unless @member
               warn()
             else

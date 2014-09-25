@@ -5,6 +5,7 @@ takes care of subscribed members : it will unsubscribe every member on removal
 and makes the whole request as a BULK transaction.  If no member is linked, it
 will just uses the standard removal for the activity.
 
+    ns = golem.activity
     notif = golem.component.notification
 
     class Remove
@@ -13,13 +14,13 @@ will just uses the standard removal for the activity.
         @approveCb = (activity) ->
           golem.model.getMembersFromActivity activity._id.get(), (err, res) ->
             if err
-              new notif.Unexpected(content: err).send()
+              notif.send(notif.unexpected content: err)
             else
               callback = (err, res) ->
                 if err
-                  new notif.Unexpected(content: err).send()
+                  notif.send(notif.unexpected content: err)
                 else
-                  new notif.Success(content: L 'SUCCESS_UPDATE').send()
+                  notif.send(notif.success content: L('SUCCESS_UPDATE'))
                 window.location.hash = '#/activity'
               if res.rows.length > 0
                 docs = res.rows.map (r) ->
@@ -37,7 +38,7 @@ automatically runned on the initialization.
 
       launch: =>
         golem.component.remove
-          Class: golem.Activity
+          model: ns.model.activity
           id: @id
           approveCb: @approveCb
           nameField: 'label'

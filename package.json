@@ -9,7 +9,7 @@
     "compile": "cd public && coffee -mc scripts/",
     "coffeewatch": "cd public && coffee -mcw scripts/",
     "lint": "find public/ -name *.coffee -exec coffeelint {} \\;",
-    "doc": "docco -o doc ./public/scripts/**/*.coffee",
+    "doc": "docco -o doc ./public/scripts/**/*.litcoffee",
     "test": "node ./tests/*.js",
     "default": "npm run compile && npm run lint"
   },

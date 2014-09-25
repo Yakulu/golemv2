@@ -1,5 +1,7 @@
 # Form Components
 
+    notif = golem.component.notification
+
 This component offers common components and helpers for forms.
 
     class golem.component.Form
@@ -74,15 +76,15 @@ notifications and finally routes the user.
           item = rx.unlift item
           golem.db[verb] item, (err, res) =>
             if err
-              new golem.component.notification.Error
-                content: '<em>' + err + '</em><br>' + L 'ERROR_UPDATE',
-                window.location.hash = "/#{schema}/list"
-              .send()
+              notif.send(
+                notif.error
+                  content: '<em>' + err + '</em><br>' + L 'ERROR_UPDATE',
+                  displayCb: -> window.location.hash = "/#{schema}/list")
             else
-              new golem.component.notification.Success
-                content: L 'SUCCESS_UPDATE',
-                window.location.hash = "/#{schema}/show/#{res.id}"
-              .send()
+              notif.send(
+                notif.success
+                  content: L('SUCCESS_UPDATE'),
+                  displayCb: -> window.location.hash = "/#{schema}/show/#{res.id}")
         verb = (if item._id then 'put' else 'post')
         _submit verb
 

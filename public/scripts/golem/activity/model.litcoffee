@@ -9,47 +9,57 @@ An `Activity` takes a `props` object as argument, with :
 - `monitor` string;
 - `note` for extra remarks;
 
-`Activity` inherits from `Doc`. In case of a new activity, the class creates a
-new instance with defaults. Lifting is done to enable precise reactivity.
+`activity` is the model for activities. In case of a new activity, the function
+creates a new object with defaults, otherwise it checks if the identifier is
+provided. If yes, it returns the object, else it just overwrites eventual
+missing defaults. Lifting is then done to enable precise reactivity.
 
-    class golem.Activity extends golem.Doc
-      constructor: (props) ->
-        super props
-        unless @_id
-          props ?= {}
-          @schema = 'activity'
-          @creationDate = Date.now()
-          @label = props.label or ''
-          @code = props.code or ''
-          @timeSlot = props.timeSlot or ''
-          @monitor = props.monitor or ''
-          @places = props.places or null
-          @note = props.note or ''
-          rx.lift @
+    activity = (props) ->
+      defaults =
+        schema: 'activity'
+        creationDate: Date.now()
+        label: ''
+        code: ''
+        timeSlot: ''
+        monitor: ''
+        places: null
+        note: ''
+      unless props
+        me = _.clone defaults
+      else
+        me = if props._id then props else _.defaults props, defaults
+      rx.lift me
 
-`fullLabel` is a method helping to get a whole sentence representing the
-`Activity`.
+`fullLabel` is a method helping to get a whole sentence representing an
+`activity`, passed as argument. It creates a dependent cell.
 
-      fullLabel: -> if @code then "#{@code} #{@label}" else @label
+    fullLabel = (activity) ->
+      bind ->
+        if activity.code.get()
+          "#{activity.code.get()} #{activity.label.get()}"
+        else
+          activity.label.get()
 
 ## menuItems
 
 Here are the items for the secondary menu. Module will pick into them for
 displaying.
 
-    Menu = golem.menus.Menu
+    menuitem = golem.menus.menuitem
     menuItems =
-      list: new Menu L('LIST'), '/activity', 'list'
-      add: new Menu L('NEW'), '/activity/add', 'add sign'
-      show: new Menu L('VIEW'), '/activity/show', 'search'
-      edit: new Menu L('EDIT'), '/activity/edit', 'edit'
-      remove: new Menu L('DELETE'), '/activity/remove', 'remove'
+      list: menuitem L('LIST'), '/activity', 'list'
+      add: menuitem L('NEW'), '/activity/add', 'add sign'
+      show: menuitem L('VIEW'), '/activity/show', 'search'
+      edit: menuitem L('EDIT'), '/activity/edit', 'edit'
+      remove: menuitem L('DELETE'), '/activity/remove', 'remove'
 
 ## Public API
 
 Global shares
 
     golem.activity.model =
+      activity: activity
+      fullLabel: fullLabel
       data:
         items: []
         menuItems: menuItems

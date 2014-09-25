@@ -4,6 +4,7 @@ This component is the form for adding or editing activities. It's materialized
 by a class that inherits from `golem.component.Form`.
 
     g = golem
+    ns = g.activity
     notif = g.component.notification
 
     class Form extends g.component.Form
@@ -22,7 +23,7 @@ The `id` is optional and refers to the document key in case of edition.
         g.menus.secondaryItems.replace [mi.list, mi.add]
 
         initNew = =>
-          @activity = new g.Activity
+          @activity = ns.model.activity()
           @add = true
           document.title = g.utils.title L 'ACTIVITIES_NEW'
           callback(@view()) if callback
@@ -36,12 +37,14 @@ filling the form.
 
           g.db.get id, (err, res) =>
             warn = ->
-              new notif.Warning(content: L('ERROR_RECORD_NOT_FOUND'))
-                .send(displayCb: -> window.location.hash = '/activity')
+              notif.send(
+                notif.warning
+                  content: L('ERROR_RECORD_NOT_FOUND'),
+                  displayCb: -> window.location.hash = '/activity')
             if err
               warn()
             else
-              @activity = new g.Activity res
+              @activity = ns.model.activity res
               unless @activity # TODO: check if real
                 warn()
               else

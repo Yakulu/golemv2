@@ -3,6 +3,8 @@
 This component is the list of member, composed by a table, an advanced search
 and filters on the right sidebar. It inherits from `golem.component.List`.
 
+    notif = golem.component.notification
+    ns = golem.member
     class List extends golem.component.List
 
 ## Initialization
@@ -26,9 +28,9 @@ database helper `getBySchema`.
 
         golem.model.getBySchema 'member', (err, res) =>
           if err
-            new golem.component.notification.Unexpected(content: err).send()
+            notif.send(notif.unexpected content: err)
           else
-            @_items = res.rows.map (r) -> new golem.Member r.doc
+            @_items = res.rows.map (r) -> ns.model.member r.doc
             @items.replace @_items
 
 ## List Views
@@ -41,8 +43,8 @@ item.
       memberView: (item) ->
         tr [
           td item.number.get()
-          td item.fullname()
-          td item.fulladdress()
+          td ns.model.fullname(item).get()
+          td ns.model.fulladdress(item).get()
           td item.tels.all().forEach (t) ->
             if t.default
               t.value.match(/\d{2}/g).join '.'

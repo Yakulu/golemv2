@@ -70,7 +70,7 @@ them replace the main part of the GOLEM app by new elements.
           '/activity/edit/:id': (id) ->
             new g.activity.component.Form replaceMain, id
           '/activity/show/:id': (id) ->
-            new g.activity.component.Show replaceMain, id
+            g.activity.component.show.launch replaceMain, id
           '/activity/remove/:id': (id) ->
             new g.activity.component.Remove id
           '/member': ->
@@ -96,6 +96,7 @@ FIXME, of course). This function is here to launch the router and attaches it
 to the `onhashchange` event. It also uses a cell to handle current module URL.
 
     golem.initRouting = ->
+      golem.activeUrl.set window.location.hash[1..]
       golem.router.run()
       window.onhashchange = ->
         golem.activeUrl.set window.location.hash[1..]
