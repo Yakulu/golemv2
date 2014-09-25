@@ -4,7 +4,7 @@ This component is the form for adding or editing activities. It's materialized
 by a class that inherits from `golem.component.Form`.
 
     g = golem
-    ns = g.activity
+    ns = g.module.activity
     notif = g.component.notification
 
     class Form extends g.component.Form
@@ -19,7 +19,7 @@ initialization is over with the main `view` function, returning the whole DOM.
 The `id` is optional and refers to the document key in case of edition.
 
       constructor: (callback, id) ->
-        mi = g.activity.model.data.menuItems
+        mi = ns.model.data.menuItems
         g.menus.secondaryItems.replace [mi.list, mi.add]
 
         initNew = =>
@@ -184,4 +184,4 @@ this form.
 
 ## Public API
 
-    g.activity.component.Form = Form
+    ns.component.Form = Form

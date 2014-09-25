@@ -57,7 +57,7 @@ displaying.
 
 Global shares
 
-    golem.activity.model =
+    golem.module.activity.model =
       activity: activity
       fullLabel: fullLabel
       data:

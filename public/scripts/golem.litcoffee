@@ -30,16 +30,19 @@ Here is the first function to be called into this app. It sets the globals.
     window.golem = golem =
       config: {}
       component: {}
-      activity:
-        component: {}
-      member:
-        component: {}
+      module:
+        activity:
+          component: {}
+        member:
+          component: {}
     window.bind = bind = rx.bind
     window.rxt = rxt = rx.rxt
     rx.rxt.importTags()
     window.T = T = rx.rxt.tags
     window.L = L = (str) -> golem.config.locale.get str
     g = golem
+    activity = g.module.activity
+    member = g.module.member
 
     g.router = new LightRouter
     g.activeUrl = rx.cell ''
@@ -64,21 +67,21 @@ them replace the main part of the GOLEM app by new elements.
           '/home': -> replaceMain g.home()
           '/auth': -> replaceMain g.auth()
           '/activity': ->
-            replaceMain new g.activity.component.List().view()
+            replaceMain new activity.component.List().view()
           '/activity/add': ->
-            new g.activity.component.Form replaceMain
+            new activity.component.Form replaceMain
           '/activity/edit/:id': (id) ->
-            new g.activity.component.Form replaceMain, id
+            new activity.component.Form replaceMain, id
           '/activity/show/:id': (id) ->
-            g.activity.component.show.launch replaceMain, id
+            activity.component.show.launch replaceMain, id
           '/activity/remove/:id': (id) ->
-            new g.activity.component.Remove id
+            new activity.component.Remove id
           '/member': ->
-            replaceMain new g.member.component.List().view()
+            replaceMain new member.component.List().view()
           '/member/add': ->
-            new g.member.component.Form replaceMain
+            new member.component.Form replaceMain
           '/member/edit/:id': (id) ->
-            new g.member.component.Form replaceMain, id
+            new member.component.Form replaceMain, id
       #/activity[\/list]?/ -> replaceMain golem.activity.$list()
 
 After the initial DOM readyness, the function takes the most important part of

@@ -5,7 +5,7 @@ takes care of subscribed members : it will unsubscribe every member on removal
 and makes the whole request as a BULK transaction.  If no member is linked, it
 will just uses the standard removal for the activity.
 
-    ns = golem.activity
+    ns = golem.module.activity
     notif = golem.component.notification
 
     class Remove
@@ -47,4 +47,4 @@ automatically runned on the initialization.
 
 ## Public APi
 
-    golem.activity.component.Remove = Remove
+    ns.component.Remove = Remove

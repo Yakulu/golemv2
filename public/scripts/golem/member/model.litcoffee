@@ -80,7 +80,7 @@ displaying.
 
 ## Public API
 
-    golem.member.model =
+    golem.module.member.model =
       member: member
       fullname: fullname
       fulladdress: fulladdress

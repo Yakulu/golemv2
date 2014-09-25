@@ -2,7 +2,7 @@
 
 This module represents the show page for a given activity.
 
-    ns = golem.activity
+    ns = golem.module.activity
     notif = golem.component.notification
     show =
 
@@ -44,7 +44,7 @@ The title and the secondary menu are created in accordance to the current
 activity.
 
       setMenus: (activity) ->
-        mi = golem.activity.model.data.menuItems
+        mi = ns.model.data.menuItems
         for act in ['show', 'edit', 'remove']
           mi[act].url = "#{mi[act].baseUrl}/#{activity._id.get()}"
         golem.menus.secondaryItems.replace [
@@ -72,8 +72,8 @@ version from this with a fixed callback.
 Views use composition : a technique allowing replacement of each component by
 another one. For achieving this, every view has a props object they take as
 argument and then returns. A special `dom` attribute is used to share the
-result, a DOM element, of the precedent component. Each view should not update
-the props object, except for the `dom` property.
+result, a jQuery DOM element or an array of them, of the precedent component.
+Each view should not update the props object, except for the `dom` property.
 
       views:
 
@@ -160,7 +160,8 @@ associated members.
           props
 
 `launch` is the function that composes all views, for global displaying. It's
-the initiator of the shares `props` object between views.
+the initiator of the shares `props` object between views and it returns the
+global DOM object.
 
         launch: (activity, members) ->
           v = show.views
@@ -171,4 +172,4 @@ the initiator of the shares `props` object between views.
 
 ## Public API
 
-    golem.activity.component.show = show
+    ns.component.show = show

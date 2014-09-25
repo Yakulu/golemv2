@@ -4,7 +4,7 @@ This component represents the listing of activities, a table served with global
 and advanced search. It inherits from the common component `List`.
 
     notif = golem.component.notification
-    ns = golem.activity
+    ns = golem.module.activity
     class List extends golem.component.List
 
 ## Initialization
@@ -24,7 +24,7 @@ Here is the component initialization. It calls the parent constructor. See
 Then we set the document's title and the secondary menu items.
 
         document.title = golem.utils.title L 'ACTIVITIES_LIST'
-        mi = golem.activity.model.data.menuItems
+        mi = ns.model.data.menuItems
         golem.menus.secondaryItems.replace [mi.list, mi.add]
 
 ## Activities
@@ -249,4 +249,4 @@ the header and the table.
 
 ## Public API
 
-    golem.activity.component.List = List
+    ns.component.List = List

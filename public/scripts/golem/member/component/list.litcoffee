@@ -4,7 +4,7 @@ This component is the list of member, composed by a table, an advanced search
 and filters on the right sidebar. It inherits from `golem.component.List`.
 
     notif = golem.component.notification
-    ns = golem.member
+    ns = golem.module.member
     class List extends golem.component.List
 
 ## Initialization
@@ -18,7 +18,7 @@ The List makes a call to its parent for initialization.
 Then we set the document's title and the secondary menu items.
 
         document.title = golem.utils.title L 'MEMBERS_LIST'
-        mi = golem.member.model.data.menuItems
+        mi = ns.model.data.menuItems
         golem.menus.secondaryItems.replace [mi.list, mi.add, mi.tags, mi.skills]
 
 ### Members
@@ -119,4 +119,4 @@ the header and the table.
 
 ## Public API
 
-    golem.member.component.List = List
+    ns.component.List = List

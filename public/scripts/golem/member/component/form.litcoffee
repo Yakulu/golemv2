@@ -1,7 +1,7 @@
 # Member form
 
     g = golem
-    ns = g.member
+    ns = g.module.member
     notif = g.component.notification
 
 This component represents the Member form, for adding and for editing entities.
@@ -20,7 +20,7 @@ The `id` is optional and refers to the document key in case of edition.
 
       constructor: (@callback, @id) ->
         window.gForm = @
-        mi = g.member.model.data.menuItems
+        mi = ns.model.data.menuItems
         g.menus.secondaryItems.replace [mi.list, mi.add]
         if @id then @_initMember() else @_initNew()
 
@@ -227,4 +227,4 @@ and some DOM around.
 
 ## Public API
 
-    g.member.component.Form = Form
+    ns.component.Form = Form
