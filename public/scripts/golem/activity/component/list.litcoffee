@@ -5,7 +5,9 @@ and advanced search. It inherits from the common component `List`.
 
     notif = golem.component.notification
     ns = golem.module.activity
-    class List extends golem.component.List
+    gclist = golem.component.list
+
+    class List
 
 ## Initialization
 
@@ -17,7 +19,7 @@ Here is the component initialization. It calls the parent constructor. See
 - replace `@searches` with the known three fields that we'll use here.
 
       constructor: ->
-        super()
+        {@_items, @items, @filters, @searchAdvancedOn, @searches} = gclist.init()
         @takenPlacesByActivity = rx.map()
         @searches.update label: '', code: '', monitor: ''
 
@@ -62,10 +64,10 @@ function is called only if the search input is valid.
 
       searchGlobal: (e) =>
         if e.target.checkValidity()
-          @filters.put 'search', List.searchJSON.bind(null, e.target.value)
+          @filters.put 'search', _.partial(gclist.searchJSON, e.target.value)
         else
           @filters.remove 'search' if @filters.get 'search'
-        @items.replace @filter()
+        @items.replace gclist.filter(@filters, @_items)
 
 ### Advanced search
 
@@ -89,7 +91,7 @@ here for preventing default behavior.
           else
             @searches.put field, ''
             @filters.remove field if @filters.get field
-        @items.replace @filter()
+        @items.replace gclist.filter(@filters, @_items)
 
 ## List Views
 
@@ -201,14 +203,15 @@ activity.
 The `table`, with sortable columns into the header.
 
       table: ->
+        props = items: @items, sortFn: gclist.sort
         table { class: 'ui basic table' }, [
           thead [
             tr [
-              @sortableTableHeader field: 'label'
-              @sortableTableHeader field: 'code'
+              gclist.components.sortableTableHeader(_.defaults(props, field: 'label')).dom
+              gclist.components.sortableTableHeader(_.defaults props, field: 'code').dom
               th L('TIMESLOT')
-              @sortableTableHeader field: 'monitor'
-              @sortableTableHeader field: 'places'
+              gclist.components.sortableTableHeader(_.defaults props, field: 'monitor').dom
+              gclist.components.sortableTableHeader(_.defaults props, field: 'places').dom
               th L('PLACES_TAKEN')
               th { width: '10%' }, L 'ACTIONS'
             ]
@@ -223,7 +226,8 @@ The right sidebar is only composed by the global search component.
       sidebar: ->
         nav [
           menu { class: 'ui small vertical menu' },
-            List.searchBox @searchGlobal, { pattern: '.{4,}' }
+            gclist.components.search(
+              searchFn: @searchGlobal, inputAttr: { pattern: '.{4,}' }).dom
         ]
 
 ### Global DOM
