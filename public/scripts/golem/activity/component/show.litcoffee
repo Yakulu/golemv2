@@ -11,34 +11,45 @@ This module represents the show page for a given activity.
 As others, the class takes an optional callback as first argument, called with
 the whole DOM after all is initialized and a mandatory id, the unique
 identifier for the document stored in database. The function creates a partial
-`getMembersFromActivity` from the private function, allowing the callback to be
-not passed from function to function.
+`finish` method that will be called from the last function of this page
+rendering.
 
       launch: (callback, id) ->
-        show.getMembersFromActivity = _.partial show._getMembersFromActivity,
-          callback
-        show.getActivity id
+        finish = (callback, activity, members) ->
+          props = show.render activity: activity, members: members
+          callback props.$dom if callback
+        show.finish = _.partial finish, callback
+        show.getActivity id, show.setupActivity
+
+`render` makes the global rendering with the appropriate properties
+
+      render: (props) ->
+        show.components.show props
 
 `getActivity` checks the validity of the key present into the URL. If there is
 an error, it displays it and redirects the user to the list. If not, it creates
-an activity reactive object. It needs the `id` of the targetted activity.
+an activity reactive object. It needs the `id` of the targetted activity and
+the callback function that will be invoked with the activity model.
 
-      getActivity: (id) ->
+      getActivity: (id, callback) ->
         golem.db.get id, (err, res) =>
           if err
             notif.send(notif.warning
               content: L('ERROR_RECORD_NOT_FOUND'),
               displayCb: -> window.location.hash = '#/activity')
           else
-            show.setupActivity ns.model.activity(res)
+            callback ns.model.activity(res), show.getMembersFromActivity
 
 With `setupActivity`, data is retrieved for populating the show page, as the
-members subscribed for this activity.
+members subscribed for this activity. It calls the callback on activity.
 
-      setupActivity: (activity) ->
+      setupActivity: (activity, callback) ->
         document.title = golem.utils.title(L 'DETAILS' + activity.label.get())
         show.setMenus activity
-        show.getMembersFromActivity activity
+        if show.finish
+          callback activity, show.finish
+        else
+          callback activity
 
 The title and the secondary menu are created in accordance to the current
 activity.
@@ -51,29 +62,26 @@ activity.
           mi.list, mi.add, mi.show, mi.edit, mi.remove
         ]
 
-`getMembersFromActivity` is a private function that returns all members that
-have subscribed to the activity, allowing displaying their names and details if
-needed. It's not called directly but the launch function creates a partial
-version from this with a fixed callback.
+`getMembersFromActivity` is a function that returns all members that have
+subscribed to the activity, allowing displaying their names and details if
+needed. It takes a callback function to call on activity and members.
 
-      _getMembersFromActivity: (callback, activity) ->
+      getMembersFromActivity: (activity, callback) ->
         golem.model.getMembersFromActivity activity._id, (err, res) ->
           if err
             notif.send(notif.unexpected content: err)
             members = []
           else
             members = res.rows.map (r) -> new golem.Member r.doc
-          callback(show.views.launch(activity, members)) if callback
-
-
+          callback activity, members
 
 ## Views
 
 Views use composition : a technique allowing replacement of each component by
 another one. For achieving this, every view has a props object they take as
-argument and then returns. A special `dom` attribute is used to share the
+argument and then returns. A special `$dom` attribute is used to share the
 result, a jQuery DOM element or an array of them, of the precedent component.
-Each view should not update the props object, except for the `dom` property.
+Each view should not update the props object, except for the `$dom` property.
 
       views:
 
@@ -83,21 +91,21 @@ provided.
 
         activityMembers: (props) ->
           if props.members.length > 0
-            props.dom = ul { class: 'ui list' }, props.members.map (member) ->
+            props.$dom = ul { class: 'ui list' }, props.members.map (member) ->
               li [
                 a { href: '#/member/show/' + member._id.get() },
                   member.fullname()
               ]
           else
-            props.dom = p L 'NONE'
+            props.$dom = p L 'NONE'
           props
 
 `activity` consists of the main view, an inline list of fields and values.
 It is mainly based on the `activity` but also needs `members`.
 
         activity: (props) ->
-          {activity, members, dom} = props
-          props.dom = section { class: 'ui piled segment' }, [
+          {activity, members, $dom} = props
+          props.$dom = section { class: 'ui piled segment' }, [
             h2 activity.label.get()
             p activity.note.get()
             div { class: 'ui horizontal list' }, [
@@ -142,7 +150,7 @@ It is mainly based on the `activity` but also needs `members`.
               ]
             ]
             h3 L 'ACTIVITIES_MEMBERS'
-            dom
+            $dom
           ]
           props
 
@@ -150,24 +158,27 @@ It is mainly based on the `activity` but also needs `members`.
 associated members.
 
         layout: (props) ->
-          {activity, members, dom} = props
-          props.dom = [
+          {activity, members, $dom} = props
+          props.$dom = [
             section { class: 'sixteen wide column' }, [
               golem.menus.secondary
-              dom
+              $dom
             ]
           ]
           props
 
-`launch` is the function that composes all views, for global displaying. It's
-the initiator of the shares `props` object between views and it returns the
-global DOM object.
+## Components
 
-        launch: (activity, members) ->
+      components:
+
+`show` is unique component of this page, a function that composes all views,
+for global displaying. It's the first to receive a filled `props` object with
+`activity` and `members`. It will shares this object with views and returns it.
+
+        show: (props) ->
           v = show.views
           fn = _.compose v.layout, v.activity, v.activityMembers
-          props = fn activity: activity, members: members
-          props.dom
+          fn activity: props.activity, members: props.members
 
 
 ## Public API

@@ -67,7 +67,7 @@ them replace the main part of the GOLEM app by new elements.
           '/home': -> replaceMain g.home()
           '/auth': -> replaceMain g.auth()
           '/activity': ->
-            replaceMain new activity.component.List().view()
+            activity.component.list.launch replaceMain
           '/activity/add': ->
             new activity.component.Form replaceMain
           '/activity/edit/:id': (id) ->

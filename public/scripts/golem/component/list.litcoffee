@@ -28,6 +28,7 @@ All List components may need to show `items` and some kind of `filters` and
         searchAdvancedOn: rx.cell false
         searches: rx.map()
 
+
 ## Helpers
 
 ### Function Helpers
@@ -79,14 +80,14 @@ All are composable with the special `props` argument and `dom` computed result.
 `search` represents the DOM around the search elements.
 
         search: (props) ->
-          props.dom = [
+          props.$dom = [
             div { class: 'header item' }, [
               span L('SEARCH_GLOBAL')
               i { class: 'warning icon', title: L('SEARCH_GLOBAL_WARNING') }
             ]
             div { class: 'item' }, [
               div { class: 'ui small icon input' }, [
-                props.dom
+                props.$dom
                 i class: 'unhide icon'
               ]
             ]
@@ -105,7 +106,7 @@ property attributes.
             title: L 'SEARCH_ERROR_TOO_SHORT'
             keyup: searchFn
             blur: searchFn
-          props.dom = input inputAttr
+          props.$dom = input inputAttr
           props
 
 ### Components
@@ -139,7 +140,7 @@ and the `click` event for sorting.
 
         sortableTableHeader: (props) ->
           title = props.title or props.field.toUpperCase()
-          props.dom = th
+          props.$dom = th
             class: 'sortable'
             click: _.partial(props.sortFn, props.field, props.items),
             [
