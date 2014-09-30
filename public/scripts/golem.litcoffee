@@ -79,9 +79,9 @@ them replace the main part of the GOLEM app by new elements.
           '/member': ->
             member.component.list.launch replaceMain
           '/member/add': ->
-            new member.component.Form replaceMain
+            member.component.form.launch replaceMain
           '/member/edit/:id': (id) ->
-            new member.component.Form replaceMain, id
+            member.component.form.launch replaceMain, id
       #/activity[\/list]?/ -> replaceMain golem.activity.$list()
 
 After the initial DOM readyness, the function takes the most important part of

@@ -17,7 +17,27 @@ namespaced finish function if there is a callback to call.
           callback props.$dom
         ns.component.form.finish = _.partial finish, callback if callback
 
-## Render helper
+## Helpers
+
+## Launch
+
+The launch functions puts in place the secondary menu and initializes the
+model for the form, a blank one in the case of a new member, or a filled one
+when editing. It takes :
+
+- a `ns` namespace for the module
+- an optional `callback` function to be launched at the end of initialization
+- an optional `id`, in case of edit
+
+      launch: (ns, callback, id) ->
+        mi = ns.model.data.menuItems
+        golem.menus.secondaryItems.replace [mi.list, mi.add]
+        if id
+          props = ns.component.form.initEdit callback, id
+        else
+          props = ns.component.form.initNew callback
+
+### Render
 
 `render` launched the rendering when all data has been gathered. This function
 serves to define `finish` function if there is a callback.

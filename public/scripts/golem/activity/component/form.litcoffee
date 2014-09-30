@@ -10,23 +10,16 @@ by an objecy using `golem.component.form`.
 
     aform =
 
-## Initialization
+## Initialization and launch
 
-The launch function puts in place the secondary menu and initializes the model
-for the form, a blank one in the case of a new activity, or a filled one when
-editing. A callback can be passed as first argument, which be called when
-initialization is over with the main `views.form` function, returning the whole
-DOM.  The `id` is optional and refers to the document key in case of edition.
-Is also calls the common `init` form function, setting up a `finish` function
-when needed.
+The launch initializes the model for the form, a blank one in the case of a new
+activity, or a filled one when editing. A callback can be passed as first
+argument, which be called when initialization is over with the main
+`views.form` function, returning the whole DOM.  The `id` is optional and
+refers to the document key in case of edition. Is also calls the common `init`
+form function, setting up a `finish` function when needed.
 
-      launch: (callback, id) ->
-        mi = ns.model.data.menuItems
-        g.menus.secondaryItems.replace [mi.list, mi.add]
-        if id
-          props = aform.initEdit callback, id
-        else
-          props = aform.initNew callback
+      launch: (callback, id) -> gcform.launch ns, callback, id
 
       initNew: (callback) ->
         document.title = g.utils.title L 'ACTIVITIES_NEW'
@@ -40,7 +33,7 @@ filling the form.
       initEdit: (callback, id) ->
         mi = ns.model.data.menuItems
         props = {}
-        g.db.get id, (err, res) =>
+        g.db.get id, (err, res) ->
           warn = ->
             notif.send(
               notif.warning
@@ -58,8 +51,8 @@ filling the form.
               for act in ['show', 'edit', 'remove']
                 mi[act].url = "#{mi[act].baseUrl}/#{props.activity._id.get()}"
               g.menus.secondaryItems.splice 2, 0, mi.show, mi.edit, mi.remove
-          gcform.init ns, props, callback
-          aform.finish props
+              gcform.init ns, props, callback
+              aform.finish props
 
 ## Methods
 
