@@ -45,6 +45,6 @@ automatically runned on the initialization.
           content: 'ACTIVITIES_REMOVE_CONFIRM_MSG'
           route: '#/activity'
 
-## Public APi
+## Public API
 
     ns.component.Remove = Remove

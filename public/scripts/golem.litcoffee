@@ -69,15 +69,15 @@ them replace the main part of the GOLEM app by new elements.
           '/activity': ->
             activity.component.list.launch replaceMain
           '/activity/add': ->
-            new activity.component.Form replaceMain
+            activity.component.form.launch replaceMain
           '/activity/edit/:id': (id) ->
-            new activity.component.Form replaceMain, id
+            activity.component.form.launch replaceMain, id
           '/activity/show/:id': (id) ->
             activity.component.show.launch replaceMain, id
           '/activity/remove/:id': (id) ->
             new activity.component.Remove id
           '/member': ->
-            replaceMain new member.component.List().view()
+            member.component.list.launch replaceMain
           '/member/add': ->
             new member.component.Form replaceMain
           '/member/edit/:id': (id) ->

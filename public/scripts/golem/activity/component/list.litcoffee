@@ -18,18 +18,13 @@ constructor. See `golem.component.list` for that. And :
   request, for the sum of all subscribed members by activity;
 - replace `searches` with the known three fields that we'll use here.
 - then calls `setup` and the asynchronous `getActivities`.
-- finishing by setup up the finish function if there is a callback to call.
 
       launch: (callback) ->
-        props = gclist.init()
+        props = gclist.init ns, callback
         props.takenPlacesByActivity = rx.map()
         props.searches.update label: '', code: '', monitor: ''
         list.setup()
         list.getActivities props, list.getMembersFromActivity
-        finish = (callback, props) ->
-          props = list.render props
-          callback props.$dom
-        list.finish = _.partial finish, callback if callback
         
 
 With `setup`, we set the document's title and the secondary menu items.
@@ -71,13 +66,6 @@ display of the taken and remaining places for each and then calls the callback.
               _takenPlacesByActivity[aId] += 1
             props.takenPlacesByActivity.update _takenPlacesByActivity
             callback props
-
-## Rendering
-
-`render` launched the rendering when all data has been gathered. This function
-serves to define `finish` function if there is a callback.
-
-      render: (props) -> list.components.list props
 
 ## List methods
 
@@ -231,38 +219,26 @@ activity.
             ]
           ]
 
-### Table
+### Table header
 
 `thead` table header, with sortable columns.
 
         thead: (props) ->
-          sthprops =
+          sthProps =
             sortFn: props.sortFn
             items: props.items
           sth = gclist.components.sortableTableHeader
           props.$dom = thead [
               tr [
-                sth(_.defaults sthprops, field: 'label').$dom
-                sth(_.defaults sthprops, field: 'code').$dom
+                sth(_.defaults sthProps, field: 'label').$dom
+                sth(_.defaults sthProps, field: 'code').$dom
                 th L('TIMESLOT')
-                sth(_.defaults sthprops, field: 'monitor').$dom
-                sth(_.defaults sthprops, field: 'places').$dom
+                sth(_.defaults sthProps, field: 'monitor').$dom
+                sth(_.defaults sthProps, field: 'places').$dom
                 th L('PLACES_TAKEN')
                 th { width: '10%' }, L 'ACTIONS'
               ]
             ]
-          props
-
-`tbody` represents all activities, one per row.
-
-        tbody: (props) ->
-          props.$dom = tbody props.items.map _.partial(props.rowFn, props)
-          props
-
-The `table`, with sortable columns into the header.
-
-        table: (props) ->
-          props.$dom = table { class: 'ui basic table' }, props.$dom
           props
 
 ### Right Sidebar
@@ -323,12 +299,10 @@ them the `props` objects, updated to add mandatory functions in our situation.
           tableContent = (props) ->
             props.$dom = [
               v.thead(props).$dom
-              v.tbody(props).$dom
+              gclist.views.tbody(props).$dom
             ]
             props
-          #fn = _.compose v.layout, v.table, v.activity, v.place
-          fn = _.compose v.layout, v.table, tableContent
-          fn props
+          _.compose(v.layout, gclist.views.table, tableContent)(props)
 
 ## Public API
 

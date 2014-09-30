@@ -21,17 +21,32 @@ All List components may need to show `items` and some kind of `filters` and
 - `searches` is a reactive map containing searches values from the advanced
   search form. It's used in conjonction with `filters`.
 
-      init: ->
-        _items: []
-        items: rx.array()
-        filters: rx.map()
-        searchAdvancedOn: rx.cell false
-        searches: rx.map()
+The init function takes optional `ns` and `callback` arguments to create a
+namespaced finish function if there is a callback to call.
 
+      init: (ns, callback) ->
+        props =
+          _items: []
+          items: rx.array()
+          filters: rx.map()
+          searchAdvancedOn: rx.cell false
+          searches: rx.map()
+        finish = (callback, props) ->
+          props = list.render ns, props
+          callback props.$dom
+        ns.component.list.finish = _.partial finish, callback if callback
+        props
 
 ## Helpers
 
 ### Function Helpers
+
+#### render
+
+`render` launched the rendering when all data has been gathered. This function
+serves to define `finish` function if there is a callback.
+
+      render: (ns, props) -> ns.component.list.components.list props
 
 #### sort
 
@@ -107,6 +122,19 @@ property attributes.
             keyup: searchFn
             blur: searchFn
           props.$dom = input inputAttr
+          props
+
+
+`tbody` represents all activities, one per row.
+
+        tbody: (props) ->
+          props.$dom = tbody props.items.map _.partial(props.rowFn, props)
+          props
+
+`table` with sortable columns into the header.
+
+        table: (props) ->
+          props.$dom = table { class: 'ui basic table' }, props.$dom
           props
 
 ### Components

@@ -4,7 +4,25 @@
 
 This component offers common components and helpers for forms.
 
-    class golem.component.Form
+    form =
+
+## Initialization
+
+The init function takes optional `ns` and `callback` arguments to create a
+namespaced finish function if there is a callback to call.
+
+      init: (ns, props, callback) ->
+        finish = (callback, props) ->
+          props = form.render ns, props
+          callback props.$dom
+        ns.component.form.finish = _.partial finish, callback if callback
+
+## Render helper
+
+`render` launched the rendering when all data has been gathered. This function
+serves to define `finish` function if there is a callback.
+
+      render: (ns, props) -> ns.component.form.components.form props
 
 ## Views
 
@@ -14,30 +32,31 @@ menu too. Both takes a `cls` argument for extending the default class.
 `cancelButton` have an extra `clickFn` function that will be called when the
 button is clicked.
 
-      cancelButton: (cls, clickFn) ->
-        button
-          name: 'cancel'
-          class: "ui button #{cls}"
-          type: 'button'
-          click: clickFn
-          L 'CANCEL'
+      views:
+        cancelButton: (cls, clickFn) ->
+          button
+            name: 'cancel'
+            class: "ui button #{cls}"
+            type: 'button'
+            click: clickFn
+            L 'CANCEL'
 
-      sendInput: (cls) ->
-        input
-          id: 'activity-submit'
-          class: "ui teal submit button #{cls}"
-          type: 'submit'
-          form: 'activity-form'
-          value: (if @add then L 'SAVE' else L 'UPDATE')
+        sendInput: (cls) ->
+          input
+            id: 'activity-submit'
+            class: "ui teal submit button #{cls}"
+            type: 'submit'
+            form: 'activity-form'
+            value: (if @add then L 'SAVE' else L 'UPDATE')
 
-## Static properties
+## Helpers
 
 ### Date formatting
 
 Using moment.js and a little workaroung for DDMMYY random problems, given a
 string value, `dateFormat` returns a moment Date Object or `null` if invalid.
 
-      @dateFormat: (v) ->
+      dateFormat: (v) ->
         unless v
           null
         else
@@ -65,11 +84,11 @@ string value, `dateFormat` returns a moment Date Object or `null` if invalid.
 
 ### Submission
 
-`@submit` static property handles the form submission via the submission event
-and the model, unlifted before submissions. It displays success and error
-notifications and finally routes the user.
+`submit` function handles the form submission via the submission event and the
+model, unlifted before submissions. It displays success and error notifications
+and finally routes the user.
 
-      @submit: (e, item) ->
+      submit: (e, item) ->
         e.preventDefault()
         schema = item.schema.get()
         _submit = (verb) ->
@@ -90,9 +109,9 @@ notifications and finally routes the user.
 
 ### Validation
 
-`@validate` is a static property intended to build everything needed, around a
-form field, to display validation errors when needed and hide them when the
-field is conform. It relies on HTML5 and browser API. It takes :
+`validate` is a function intended to build everything needed, around a form
+field, to display validation errors when needed and hide them when the field is
+conform. It relies on HTML5 and browser API. It takes :
 
 - a validation `message` when error;
 - a validation `validCallback` called after the event on which is bound the
@@ -101,7 +120,7 @@ field is conform. It relies on HTML5 and browser API. It takes :
 It returns an object containing the validation `$elt` to add to the form and
 the `fn` function to launch for validation.
 
-      @validate : (message, validCallback) ->
+      validate : (message, validCallback) ->
         $elt = div
           class: 'ui red pointing above label'
           style: display: 'none'
@@ -120,7 +139,6 @@ the `fn` function to launch for validation.
         {$elt: $elt, fn: fn}
 
 **TODO** :
-- To Class
 - Simplify multifield only to an adding of existing $elements, passed by
   arguments, maybe with add/help buttons...
 
