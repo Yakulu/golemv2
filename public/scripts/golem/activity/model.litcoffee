@@ -1,6 +1,8 @@
-# GOLEM Activity class
+# GOLEM activity model
 
-An `Activity` takes a `props` object as argument, with :
+    model = {}
+
+An `activity` takes a `props` object as argument, with :
 
 - `label`, string required;
 - `code` string, an optional shortcut for the activity;
@@ -14,7 +16,7 @@ creates a new object with defaults, otherwise it checks if the identifier is
 provided. If yes, it returns the object, else it just overwrites eventual
 missing defaults. Lifting is then done to enable precise reactivity.
 
-    activity = (props) ->
+    model.activity = (props) ->
       defaults =
         schema: 'activity'
         creationDate: Date.now()
@@ -33,7 +35,7 @@ missing defaults. Lifting is then done to enable precise reactivity.
 `fullLabel` is a method helping to get a whole sentence representing an
 `activity`, passed as argument. It creates a dependent cell.
 
-    fullLabel = (activity) ->
+    model.fullLabel = (activity) ->
       bind ->
         if activity.code.get()
           "#{activity.code.get()} #{activity.label.get()}"
@@ -45,8 +47,9 @@ missing defaults. Lifting is then done to enable precise reactivity.
 Here are the items for the secondary menu. Module will pick into them for
 displaying.
 
-    menuitem = golem.menus.menuitem
-    menuItems =
+    model.data = {}
+    menuitem = golem.menus.item
+    model.data.menuItems =
       list: menuitem L('LIST'), '/activity', 'list'
       add: menuitem L('NEW'), '/activity/add', 'add sign'
       show: menuitem L('VIEW'), '/activity/show', 'search'
@@ -55,11 +58,4 @@ displaying.
 
 ## Public API
 
-Global shares
-
-    golem.module.activity.model =
-      activity: activity
-      fullLabel: fullLabel
-      data:
-        items: []
-        menuItems: menuItems
+    golem.module.activity.model = model

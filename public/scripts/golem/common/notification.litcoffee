@@ -135,4 +135,4 @@ The reactive DOM that iterates over the reactive array.
 
 ## Public API
 
-    golem.component.notification = n
+    golem.common.notification = n

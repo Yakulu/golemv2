@@ -1,9 +1,9 @@
-# Remove component
+# Remove common
 
 This module provides common actions around a `modal` component to remove a
 record from database.
 
-    notif = golem.component.notification
+    notif = golem.common.notification
 
 `approveCb` is the private callback provided by default if none has been given.
 It will remove from the database and display standard notifications
@@ -38,7 +38,7 @@ It will remove from the database and display standard notifications
           item = config.model res
           document.title = golem.utils.title(
             L('REMOVAL_OF') + item[config.nameField].get())
-          golem.component.common.modal
+          golem.common.widgets.modal
             title: L 'SURE'
             content: "<p>#{L(config.content)}</p>"
             approveCb: _.partial config.approveCb, item
@@ -46,4 +46,4 @@ It will remove from the database and display standard notifications
 
 ## Public API
 
-    golem.component.remove = remove
+    golem.common.remove = remove

@@ -1,8 +1,8 @@
 # Member Model
 
-## Member class
+    model = {}
 
-### Initialization
+## Initialization
 
 A `member` takes a `props` object with :
 
@@ -35,7 +35,7 @@ If `props` is empty and has no identifier, member is initialized only with
 defaults. If not, defaults are only fixed if not present. Lifting is done to
 enable precise reactivity.
 
-    member = (props) ->
+    model.member = (props) ->
       me = props or {}
       unless me._id
         me.schema ?= 'member'
@@ -51,25 +51,26 @@ enable precise reactivity.
         me.authorizations ?= activities: false, photos: false
       rx.lift me
 
-### Methods
+## Methods
 
 `fullname`, `fulladdress` and `fullguardian` are all on demand dependent cells
 helpers for displaying the merge of several fields.
 
-    fullname = (m) ->
+    model.fullname = (m) ->
       bind -> "#{m.firstname.get()} #{m.lastname.get()}"
     fullguardian = (m) ->
       bind -> "#{m.guardianFirstname.get()} #{m.guardianLastname.get()}"
     fulladdress = (m) ->
       bind -> [m.address.get(), m.postalCode.get(), m.city.get()].join ' '
 
-## MenuItems
+# MenuItems
 
 Here are the items for the secondary menu. Module will pick into them for
 displaying.
 
-    menuitem = golem.menus.menuitem
-    menuItems =
+    model.data = {}
+    menuitem = golem.menus.item
+    model.data.menuItems =
       list: menuitem L('LIST'), '/member', 'list'
       add: menuitem L('NEW'), '/member/add', 'add sign'
       show: menuitem L('VIEW'), '/member/show', 'search'
@@ -78,13 +79,6 @@ displaying.
       skills: menuitem L('SKILLS'), '/member/skills', 'briefcase'
       tags: menuitem L('TAGS'), '/member/tags', 'tags'
 
-## Public API
+# Public API
 
-    golem.module.member.model =
-      member: member
-      fullname: fullname
-      fulladdress: fulladdress
-      fullguardian: fullguardian
-      data:
-        items: []
-        menuItems: menuItems
+    golem.module.member.model = model

@@ -1,6 +1,6 @@
 # GOLEM Model
 
-    notif = golem.component.notification
+    notif = golem.common.notification
 
 ## getBySchema
 

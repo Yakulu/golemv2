@@ -1,6 +1,6 @@
 # Authentification
 
-    notif = golem.component.notification
+    notif = golem.common.notification
 
 ATM it's just a fake, specifically created for the MJC of Valentigney...
 So I won't comment it much.

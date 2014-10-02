@@ -3,6 +3,8 @@
 
 These components can be used everywhere in the GOLEM application.
 
+    widgets = {}
+
 ## Header expandable
 
 The `headerExpandable` is a component that is intended to show a header that
@@ -10,7 +12,7 @@ can be opened and closed with an icon. It just toggles a boolean, wich will be
 used to toggle the whole content. `headerExpandable` take a `config` object as
 argument with a `title`, a `class` and the boolean `active`. All are required.
 
-    headerExpandable = (c) ->
+    widgets.headerExpandable = (c) ->
       toggleActive = -> c.active.set(not c.active.get())
       h3 { class: "ui header #{c.class}" }, [
         span [
@@ -37,7 +39,7 @@ returning. It uses the modal module helper from SemanticUI.
 
 TODO: make usage of semantic JS optional (15kb min seems much for only that...)
 
-    modal = (config) ->
+    widgets.modal = (config) ->
       {@title, @content, @approveCb, @denyCb} = config
       $elt = div { class: 'ui basic modal' }, [
         div { class:'header' }, @title
@@ -61,6 +63,4 @@ TODO: make usage of semantic JS optional (15kb min seems much for only that...)
 
 ## Public API
 
-    golem.component.common =
-      headerExpandable: headerExpandable
-      modal: modal
+    golem.common.widgets = widgets

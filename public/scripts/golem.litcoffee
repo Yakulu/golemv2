@@ -29,12 +29,10 @@ Here is the first function to be called into this app. It sets the globals.
  
     window.golem = golem =
       config: {}
-      component: {}
+      common: {}
       module:
-        activity:
-          component: {}
-        member:
-          component: {}
+        activity: {}
+        member: {}
     window.bind = bind = rx.bind
     window.rxt = rxt = rx.rxt
     rx.rxt.importTags()
@@ -67,21 +65,21 @@ them replace the main part of the GOLEM app by new elements.
           '/home': -> replaceMain g.home()
           '/auth': -> replaceMain g.auth()
           '/activity': ->
-            activity.component.list.launch replaceMain
+            activity.list.launch replaceMain
           '/activity/add': ->
-            activity.component.form.launch replaceMain
+            activity.form.launch replaceMain
           '/activity/edit/:id': (id) ->
-            activity.component.form.launch replaceMain, id
+            activity.form.launch replaceMain, id
           '/activity/show/:id': (id) ->
-            activity.component.show.launch replaceMain, id
+            activity.show.launch replaceMain, id
           '/activity/remove/:id': (id) ->
-            activity.component.remove.launch id
+            activity.remove.launch id
           '/member': ->
-            member.component.list.launch replaceMain
+            member.list.launch replaceMain
           '/member/add': ->
-            member.component.form.launch replaceMain
+            member.form.launch replaceMain
           '/member/edit/:id': (id) ->
-            member.component.form.launch replaceMain, id
+            member.form.launch replaceMain, id
       #/activity[\/list]?/ -> replaceMain golem.activity.$list()
 
 After the initial DOM readyness, the function takes the most important part of
@@ -90,7 +88,7 @@ the layout and populates them.
       $('#golem-header').append headerView()
       $('#golem-mainmenu').append g.menus.main
       $('#golem-footer').append footerView()
-      $('#golem-notification').append g.component.notification.notifications
+      $('#golem-notification').append g.common.notification.notifications
       g.roots.main.append g.auth()
 
 
