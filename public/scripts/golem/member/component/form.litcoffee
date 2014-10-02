@@ -105,7 +105,7 @@ and take the values of the HTML fields, on change or on input.
             validation = gcform.validate L('LASTNAME_VALIDATION_MSG'),
               (e) -> props.member.lastname.set e.target.value
             props.$dom = div { class: 'six wide field' }, [
-              label { for: 'lastname' }, "#{L 'LASTNAME'} *"
+              label { for: 'lastname' }, "* #{L 'LASTNAME'}"
               input
                 type: 'text'
                 name: 'lastname'
@@ -125,7 +125,7 @@ and take the values of the HTML fields, on change or on input.
             validation = gcform.validate L('LASTNAME_VALIDATION_MSG'),
               (e) -> props.member.firstname.set e.target.value
             props.$dom = div { class: 'six wide field' }, [
-              label { for: 'firstname' }, "#{L 'FIRSTNAME'} *"
+              label { for: 'firstname' }, "* #{L 'FIRSTNAME'}"
               input
                 type: 'text'
                 name: 'firstname'
@@ -184,13 +184,18 @@ and take the values of the HTML fields, on change or on input.
                 name: 'birthday'
                 placeholder: L 'BIRTHDAY_PLACEHOLDER'
                 pattern: '\\d{2}/\\d{2}/\\d{4}'
-                value: (if props.member.birthday.get() then moment(props.member.birthday.get()).format('L') else '')
-                change: (e) =>
+                value: bind ->
+                  if props.member.birthday.get()
+                    moment(props.member.birthday.get()).format('L')
+                  else
+                    ''
+                change: (e) ->
                   v = e.target.value
                   v = gcform.dateFormat v
                   if v
                     props.member.birthday.set v.toString()
                     # If the person is minor, expand the fields
+                    # TODO: export from here, it's a simple formula !!
                     isMinor = v.isAfter(moment().subtract(18, 'years'))
                     if isMinor
                       props.minorExpanded = true

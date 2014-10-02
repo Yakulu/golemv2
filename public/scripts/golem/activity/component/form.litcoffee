@@ -77,7 +77,7 @@ validation created here for GOLEM.
             validation = gcform.validate L('LASTNAME_VALIDATION_MSG'),
               (e) -> props.activity.label.set e.target.value
             props.$dom = div { class: 'eight wide field small input' }, [
-              label { for: 'label' }, "#{L 'LABEL'} *"
+              label { for: 'label' }, "* #{L 'LABEL'}"
               input
                 type: 'text'
                 name: 'label'
