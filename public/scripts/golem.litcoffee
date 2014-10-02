@@ -75,7 +75,7 @@ them replace the main part of the GOLEM app by new elements.
           '/activity/show/:id': (id) ->
             activity.component.show.launch replaceMain, id
           '/activity/remove/:id': (id) ->
-            new activity.component.Remove id
+            activity.component.remove.launch id
           '/member': ->
             member.component.list.launch replaceMain
           '/member/add': ->
