@@ -4,6 +4,7 @@
     ns = g.module.member
     notif = g.common.notification
     gcform = g.common.form
+    gcw = g.common.widgets
 
 This component represents the member form, for adding and for editing entities.
 The functions employs the shared `golem.common.form`.
@@ -403,6 +404,18 @@ minor to participate to activities and being taking in photography.
         ]
       props
 
+`tags` is a rich field using chosen jQuery plugin for multiselection and
+autocompletion.
+
+    mform.views.fields.tags = (props) ->
+      props.$dom = div { class: 'field' }, [
+        fieldset { class: 'ui segment' }, [
+          legend L 'TAGS'
+          gcw.helpButton title: L('TAGS'), content: L('INFO_FORM_TAGS')
+        ]
+      ]
+      props
+
 #### Composable views
 
 `civility` contains all fields around the member's civility.
@@ -474,6 +487,7 @@ minor to participate to activities and being taking in photography.
         h3
           class: 'ui inverted center aligned blue header',
           L 'COMPLEMENTARY'
+        div { class: 'field' }, [mform.views.fields.tags(props).$dom]
         div { class: 'field' }, [mform.views.fields.note(props).$dom]
       ]
       props

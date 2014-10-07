@@ -60,6 +60,33 @@ TODO: make usage of semantic JS optional (15kb min seems much for only that...)
         onApprove: config.approveCb
       .modal 'show'
 
+## Help Button
+
+`helpButton` is a component needing a config object :
+
+- a required `title` string
+- a required HTML `content`
+- an optional `position` for the popup, defaults to `right center`
+
+It creates a jQuery button element on which the popup will be attached, after a
+click event. For the popup, it employs the Semantic jQuery popup plugin.
+Finally, it returns the created element.
+
+    widgets.helpButton = (config) ->
+      config.position ?= 'right center'
+      $elt = button { type: 'button', class: 'ui tiny button' }, [
+          i { class: 'help icon' }
+          L 'HELP'
+      ]
+      $elt.popup
+        title: config.title
+        content: config.content
+        on: 'click'
+        position: config.position
+        variation: 'inverted'
+      $elt
+
+
 ## Public API
 
     golem.common.widgets = widgets
