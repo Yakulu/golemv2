@@ -34,7 +34,7 @@ document's title. It also call the `finish` function, which will handle the
 
     mform.initNew = (callback) ->
       document.title = g.utils.title L 'MEMBERS_NEW'
-      props = member: ns.model.member(), add: true
+      props = member: ns.model.member(), add: true, minorExpanded: rx.cell false
       gcform.init ns, props, callback
       mform.finish props
 
@@ -44,7 +44,7 @@ property instance and change document title and secondary menu.
 
     mform.initEdit = (callback, id) ->
       mi = ns.model.data.menuItems
-      props = {}
+      props = minorExpanded: rx.cell false
       g.db.get id, (err, res) ->
         warn = ->
           notif.send(
@@ -200,7 +200,7 @@ and take the values of the HTML fields, on change or on input.
               if isMinor
                 props.minorExpanded = true
                 if props.add
-                  props.member.authorizations.set(activities: true, photos: true)
+                  props.member.authorizations.set activities: true, photos: true
             else
               props.member.birthday.set null
       ]
@@ -234,6 +234,175 @@ and take the values of the HTML fields, on change or on input.
       ]
       props
 
+`address` string field
+
+    mform.views.fields.address = (props) ->
+      props.$dom = div { class: 'field' }, [
+        label { for: 'address' }, "#{L 'ADDRESS'}"
+        input
+          type: 'text'
+          name: 'address'
+          placeholder: L 'ADDRESS'
+          maxlength: 150
+          value: props.member.address.get()
+          change: (e) -> props.member.address.set e.target.value
+      ]
+      props
+
+`postalCode` field, must be a 5 numeric char string
+
+    mform.views.fields.postalCode = (props) ->
+      validation = gcform.validate L('POSTAL_CODE_VALIDATION_MSG'),
+        (e) -> props.member.postalCode.set e.target.value
+      props.$dom = div { class: 'field' }, [
+        label { for: 'postalCode' }, "#{L 'POSTAL_CODE'}"
+        input
+          type: 'text'
+          name: 'postalCode'
+          placeholder: L 'POSTAL_CODE'
+          maxlength: 5
+          pattern: '^\\d{5}$'
+          value: props.member.postalCode.get()
+          keyup: validation.fn
+        validation.$elt
+      ]
+      props
+
+`city` string field
+
+    mform.views.fields.city = (props) ->
+      props.$dom = div { class: 'field' }, [
+        label { for: 'city' }, "#{L 'CITY'}"
+        input
+          type: 'text'
+          name: 'city'
+          placeholder: L 'CITY'
+          maxlength: 100
+          value: props.member.city.get()
+          change: (e) -> props.member.city.set e.target.value
+      ]
+      props
+
+`communicationModes` contains two checkbox fields for giving the authorization
+to be contacted by email or telephone.
+
+    mform.views.fields.communicationModes = (props) ->
+      cmodes = props.member.communicationModes.get()
+      props.$dom = [
+        div { class: 'field' }, L 'COMMUNICATION_MODES'
+        div { class: 'inline field' }, [
+          input
+            type: 'checkbox'
+            id: 'cmodes-mail'
+            name: 'cmodes-mail'
+            checked: cmodes.mail
+            change: (e) ->
+              cmodes.mail = e.target.checked
+              props.member.communicationModes.set cmodes
+          label { for: 'cmodes-mail' }, L 'MAIL'
+        ]
+        div { class: 'inline field' }, [
+          input
+            type: 'checkbox'
+            id: 'cmodes-tel'
+            name: 'cmodes-tel'
+            checked: cmodes.tel
+            change: (e) ->
+              cmodes.tel = e.target.checked
+              props.member.communicationModes.set cmodes
+          label { for: 'cmodes-tel' }, L 'TEL'
+        ]
+      ]
+      props
+
+`guardianLastname` is required only if the member is minor and uses realtime
+validation.
+
+    mform.views.fields.guardianLastname = (props) ->
+      validation = gcform.validate L('LASTNAME_VALIDATION_MSG'),
+        (e) -> props.member.guardianLastname.set e.target.value
+      props.$dom = div { class: 'three wide field' }, [
+        label { for: 'guardian-lastname' }, "* #{L 'LASTNAME'}"
+        input
+          type: 'text'
+          name: 'guardian-lastname'
+          placeholder: L 'LASTNAME'
+          pattern: '.{2,}'
+          maxlength: 100
+          required: 'required'
+          value: props.member.guardianLastname.get()
+          keyup: validation.fn
+        validation.$elt
+      ]
+      props
+
+`guardianFirstname` is required only if the member is minor and uses realtime
+
+    mform.views.fields.guardianFirstname = (props) ->
+      validation = gcform.validate L('LASTNAME_VALIDATION_MSG'),
+        (e) -> props.member.guardianFirstname.set e.target.value
+      props.$dom = div { class: 'three wide field' }, [
+        label { for: 'guardian-firstname' }, "* #{L 'FIRSTNAME'}"
+        input
+          type: 'text'
+          name: 'guardian-firstname'
+          placeholder: L 'FIRSTNAME'
+          pattern: '.{2,}'
+          maxlength: 100
+          required: 'required'
+          value: props.member.guardianFirstname.get()
+          keyup: validation.fn
+        validation.$elt
+      ]
+      props
+
+`authorizations` contains two checkbox fields for giving the permission to the
+minor to participate to activities and being taking in photography.
+
+    mform.views.fields.authorizations = (props) ->
+      auth = props.member.authorizations.get()
+      props.$dom = [
+        div { class: 'two wide field' }, L 'AUTHORIZATIONS'
+        div { class: 'three wide inline field' }, [
+          input
+            type: 'checkbox'
+            id: 'authorizations-activities'
+            name: 'authorizations-activities'
+            checked: auth.activities
+            change: (e) ->
+              auth.activities = e.target.checked
+              props.member.authorizations.set auth
+          label { for: 'authorizations-activities' }
+          , L 'ACTIVITIES_PARTICIPATION'
+        ]
+        div { class: 'three wide inline field' }, [
+          input
+            type: 'checkbox'
+            id: 'authorizations-photos'
+            name: 'authorizations-photos'
+            checked: auth.photos
+            change: (e) ->
+              auth.photos = e.target.checked
+              props.member.authorizations.set auth
+          label { for: 'authorizations-photos' }
+          , L 'AUTHORIZATIONS_PHOTOS'
+        ]
+      ]
+      props
+
+`note` optional long text description.
+
+    mform.views.fields.note = (props) ->
+      props.$dom = div { class:'field' }, [
+        label { for: 'note' }, L 'NOTE'
+        textarea
+          name: 'note'
+          value: props.member.note.get()
+          change: (e) -> props.member.note.set e.target.value
+        , props.member.note.get()
+        ]
+      props
+
 #### Composable views
 
 `civility` contains all fields around the member's civility.
@@ -260,6 +429,70 @@ and take the values of the HTML fields, on change or on input.
       ]
       props
 
+`contactDetails` contains all fields related to the member details.
+
+    mform.views.contactDetails = (props) ->
+      vf = mform.views.fields
+      props.$dom = div [
+        h3
+          class: 'ui inverted center aligned teal header',
+          L 'CONTACT_DETAILS'
+        div { class: 'three fields' }, [
+          vf.address(props).$dom
+          vf.postalCode(props).$dom
+          vf.city(props).$dom
+        ]
+        div { class: 'three fields' }, vf.communicationModes(props).$dom
+      ]
+      props
+
+`minor` contains all fields for the minor member.
+
+    mform.views.minor = (props) ->
+      vf = mform.views.fields
+      props.$dom = div [
+        golem.common.widgets.headerExpandable
+          class: 'inverted center aligned green'
+          title: L 'MINOR'
+          active: props.minorExpanded
+        div { class: 'fields' }, bind ->
+          if props.minorExpanded.get()
+            _.flatten [
+              vf.guardianLastname(props).$dom
+              vf.guardianFirstname(props).$dom
+              vf.authorizations(props).$dom
+            ]
+          else
+            ''
+      ]
+      props
+
+`complementary` are extra fields for improving member qualification.
+
+    mform.views.complementary = (props) ->
+      props.$dom = div [
+        h3
+          class: 'ui inverted center aligned blue header',
+          L 'COMPLEMENTARY'
+        div { class: 'field' }, [mform.views.fields.note(props).$dom]
+      ]
+      props
+
+`sections` represents all sections of the form.
+
+    mform.views.sections = (props) ->
+      props.$dom = [
+        h2 title
+        mform.views.civility(props).$dom
+        mform.views.contactDetails(props).$dom
+        mform.views.minor(props).$dom
+        mform.views.complementary(props).$dom
+        gcform.views.sendInput(props.add)
+        gcform.views.cancelButton(null, ->
+          window.location.hash = '#/member')
+      ]
+      props
+
 `form` represents the whole form for adding or editing a member.
 
     mform.views.form = (props) ->
@@ -267,12 +500,20 @@ and take the values of the HTML fields, on change or on input.
         id: 'member-form'
         class: 'ui small form'
         submit: mform.submit,
-        [props.$dom]
+        props.$dom
       props
 
-`sidebar`
+`sidebar` defines the contextual content. Here are only fixed position button
+for sending and cancelling the form. Usefull for finding these buttons easily.
 
-    mform.views.sidebar = (props) -> props.$dom = div(); return props
+    mform.views.sidebar = (props) ->
+      props.$dom = menu { class: 'ui buttons fixed-right' }, [
+        gcform.views.sendInput(props.add, 'fluid')
+        gcform.views.cancelButton('fluid', ->
+          window.location.hash = '#/member')
+      ]
+      props
+
 
 `layout` represents the whole DOM of the page, inclufing the form, the sidebar
 and some DOM around.
@@ -287,7 +528,6 @@ and some DOM around.
         section { class: 'twelve wide column' }, [
           golem.menus.secondary
           section { class: 'ui piled segment' }, [
-            h2 title
             props.$dom
           ]
         ]
@@ -305,8 +545,9 @@ and some DOM around.
 them the `props` objects, updated to add mandatory functions in our situation.
 
     mform.components.form = (props) ->
+      window.gProps = props
       v = mform.views
-      _.compose(v.layout, v.form, v.civility)(props)
+      _.compose(v.layout, v.form, v.sections)(props)
 
 ## Public API
 

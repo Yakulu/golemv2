@@ -62,13 +62,17 @@ button is clicked.
         click: clickFn
         L 'CANCEL'
 
-    cform.views.sendInput = (cls) ->
+    cform.views.sendInput = (add, cls) ->
       input
         id: 'activity-submit'
         class: "ui teal submit button #{cls}"
         type: 'submit'
         form: 'activity-form'
-        value: (if @add then L 'SAVE' else L 'UPDATE')
+        value: (if add then L 'SAVE' else L 'UPDATE')
+
+## Tags
+
+
 
 ## Helpers
 

@@ -192,19 +192,18 @@ the component activity.
             vf.monitor(props).$dom
           ]
           vf.note(props).$dom
-          gcform.views.sendInput()
+          gcform.views.sendInput(props.add)
           gcform.views.cancelButton(null, ->
             window.location.hash = '#/activity')
         ]
       props
 
-`sidebar` is a private property defining the contextual content. Here are only
-fixed position button for sending and cancelling the form. Usefull for finding
-these buttons easily.
+`sidebar` defines the contextual content. Here are only fixed position button
+for sending and cancelling the form. Usefull for finding these buttons easily.
 
     aform.views.sidebar = (props) ->
       props.$dom = menu { class: 'ui buttons fixed-right' }, [
-        gcform.views.sendInput('fluid')
+        gcform.views.sendInput(props.add, 'fluid')
         gcform.views.cancelButton('fluid', ->
           window.location.hash = '#/activity')
       ]

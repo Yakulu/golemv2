@@ -12,7 +12,9 @@ cp $SRC/underscore/underscore-min.js $DEST/ &&
 cp $SRC/semantic-ui/build/packaged/css/semantic.css $DEST/ &&
 cp $SRC/semantic-ui/build/minified/modules/dimmer.min.js $DEST/ &&
 cp $SRC/semantic-ui/build/minified/modules/modal.min.js $DEST/ &&
+cp $SRC/semantic-ui/build/minified/modules/popup.min.js $DEST/ &&
 cp $SRC/pouchdb/dist/pouchdb.min.js $DEST/ &&
 cp $SRC/lightrouter/dist/lightrouter.min.js $DEST/ &&
 cp $SRC/jquery/dist/jquery.min.js $DEST/ &&
+cp $SRC/chosen_v1.2.0/chosen.jquery.min.js $DEST/ &&
 cp $SRC/reactive-coffee/dist/reactive-coffee.js $DEST/

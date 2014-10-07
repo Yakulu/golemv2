@@ -40,10 +40,9 @@ returning. It uses the modal module helper from SemanticUI.
 TODO: make usage of semantic JS optional (15kb min seems much for only that...)
 
     widgets.modal = (config) ->
-      {@title, @content, @approveCb, @denyCb} = config
       $elt = div { class: 'ui basic modal' }, [
-        div { class:'header' }, @title
-        div { class:'content' }, rxt.rawHtml @content
+        div { class:'header' }, config.title
+        div { class:'content' }, rxt.rawHtml config.content
         div { class:'actions' }, [
           button
             class: 'ui negative button'
@@ -57,8 +56,8 @@ TODO: make usage of semantic JS optional (15kb min seems much for only that...)
       ]
       $elt.modal 'setting',
         closable: false
-        onDeny: @denyCb
-        onApprove: @approveCb
+        onDeny: config.denyCb
+        onApprove: config.approveCb
       .modal 'show'
 
 ## Public API
