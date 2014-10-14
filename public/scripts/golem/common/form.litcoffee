@@ -9,7 +9,8 @@ This common offers common components and helpers for forms.
 ## Initialization
 
 The init function takes optional `ns` and `callback` arguments to create a
-namespaced finish function if there is a callback to call.
+namespaced finish function if there is a callback to call. It uses `props` to
+pass to the views.
 
     cform.init = (ns, props, callback) ->
       finish = (callback, props) ->
@@ -70,9 +71,19 @@ button is clicked.
         form: 'activity-form'
         value: (if add then L 'SAVE' else L 'UPDATE')
 
-## Tags
+### Tags
 
+`tags`is a view that takes as argument the tags list, an array. It creates DOM
+select element. It returns the element.
 
+    cform.views.tags = (tags) ->
+      select
+        name: 'tags'
+        multiple: true, tags.map (t) ->
+          option
+            value: t
+            label: t
+            t
 
 ## Helpers
 

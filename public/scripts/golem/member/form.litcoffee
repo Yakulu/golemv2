@@ -20,10 +20,17 @@ the the presence of an `id`.
 It then initializes the model for the form, a blank one in the case of a new
 member, or a filled one when editing. A callback can be passed as first
 argument, which be called when initialization is over with the main `form`
-component, returning the whole DOM. The `id` is optional and refers to the
-document key in case of edition.
+component, returning the whole DOM and making post actions, here plugins
+instanciation (which needs inserted DOM). The `id` is optional and refers to
+the document key in case of edition.
 
-    mform.launch = (callback, id) -> gcform.launch ns, callback, id
+    mform.launch = (callback, id) ->
+      wrapFn = (arg) ->
+        callback arg
+        $('select[name=tags]').chosen()
+      gcform.launch ns, wrapFn, id
+
+**TODO**: faire de postActions un array qui se remplira pendant la form, avec peut-être un helper pour chosen (dont textes)
 
 ## Methods
 
@@ -412,6 +419,7 @@ autocompletion.
         fieldset { class: 'ui segment' }, [
           legend L 'TAGS'
           gcw.helpButton title: L('TAGS'), content: L('INFO_FORM_TAGS')
+          gcform.views.tags ['lol', 'mdr', 'alternatiba']
         ]
       ]
       props

@@ -46,7 +46,7 @@ Here is the first function to be called into this app. It sets the globals.
     g.activeUrl = rx.cell ''
 
 `replaceMain` is the function used to update aggressively the DOM and simulates
-a page to page navigation.
+a page to page navigation. It takes a `dom` parameter.
 
     $ ->
       g.roots =
