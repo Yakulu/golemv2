@@ -48,6 +48,11 @@ div.tagfield p div {
   margin: 1% !important;
 }
 
+select.tagfield {
+  width: 70%;
+  margin-left: 2%;
+}
+
 .golem-tag {
   text-transform: none !important;
 }

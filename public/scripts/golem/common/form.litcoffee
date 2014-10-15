@@ -79,11 +79,20 @@ select element. It returns the element.
     cform.views.tags = (tags) ->
       select
         name: 'tags'
+        class: 'tagfield'
         multiple: true, tags.map (t) ->
           option
             value: t
             label: t
             t
+
+    cform.views.tagsChosenify = (selector) ->
+      select = $ selector
+      select.chosen
+        no_results_text: L 'CHOSEN_NO_RESULTS_TAGS'
+        placeholder_text_multiple: L 'CHOSEN_PLACEHOLDER_TEXT_TAGS'
+      select.on 'chosen:no_results', (e, params) -> console.log e; console.log params
+
 
 ## Helpers
 

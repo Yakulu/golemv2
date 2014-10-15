@@ -27,7 +27,7 @@ the document key in case of edition.
     mform.launch = (callback, id) ->
       wrapFn = (arg) ->
         callback arg
-        $('select[name=tags]').chosen()
+        gcform.views.tagsChosenify 'select[name=tags]'
       gcform.launch ns, wrapFn, id
 
 **TODO**: faire de postActions un array qui se remplira pendant la form, avec peut-être un helper pour chosen (dont textes)
@@ -415,12 +415,10 @@ minor to participate to activities and being taking in photography.
 autocompletion.
 
     mform.views.fields.tags = (props) ->
-      props.$dom = div { class: 'field' }, [
-        fieldset { class: 'ui segment' }, [
-          legend L 'TAGS'
-          gcw.helpButton title: L('TAGS'), content: L('INFO_FORM_TAGS')
-          gcform.views.tags ['lol', 'mdr', 'alternatiba']
-        ]
+      props.$dom = fieldset { class: 'ui segment' }, [
+        legend L 'TAGS'
+        gcw.helpButton title: L('TAGS'), content: L('INFO_FORM_TAGS')
+        gcform.views.tags ['lol', 'mdr', 'alternatiba']
       ]
       props
 
