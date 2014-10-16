@@ -76,23 +76,70 @@ button is clicked.
 `tags`is a view that takes as argument the tags list, an array. It creates DOM
 select element. It returns the element.
 
-    cform.views.tags = (tags) ->
-      select
-        name: 'tags'
-        class: 'tagfield'
-        multiple: true, tags.map (t) ->
-          option
-            value: t
-            label: t
-            t
+**TODO** : tags.litcoffee ?
 
-    cform.views.tagsChosenify = (selector) ->
-      select = $ selector
-      select.chosen
-        no_results_text: L 'CHOSEN_NO_RESULTS_TAGS'
-        placeholder_text_multiple: L 'CHOSEN_PLACEHOLDER_TEXT_TAGS'
-      select.on 'chosen:no_results', (e, params) -> console.log e; console.log params
+    cform.views.tags = (config) ->
 
+      config.name ?= 'tags'
+      config.label ?= L 'TAGS'
+      config.placeholder ?= L 'TAGS_PLACEHOLDER'
+      config.content ?= L 'INFO_FORM_TAGS'
+      config.size ?= 25
+      config.current ?= rx.array []
+      config.color ?= 'purple'
+      tags = (t for t in config.tags.all() when t not in config.current.all())
+      tags = rx.array tags
+      # FIXME
+
+      add = ($input) ->
+        v = $input.val()
+        config.current.push v if v and v not in config.current.all()
+        tags.remove v
+        $input.val ''
+
+      remove = ($target) ->
+        v = $target.parent().text()
+        config.current.remove v
+        tags.push v
+
+      div { class: 'field tagfield' }, [
+        fieldset { class: 'ui segment' }, [
+          legend config.label
+          golem.common.widgets.helpButton
+            title: config.label
+            content: config.content
+          div { class: 'ui action input multitext' }, [
+            input
+              id: "#{config.name}-input"
+              name: config.name
+              type: 'text'
+              list: config.name
+              placeholder: config.placeholder
+              size: config.size
+              keydown: (e) ->
+                if e.keyCode is 13 # ENTER
+                  e.preventDefault()
+                  add $(e.target)
+            div
+              role: 'button'
+              class: "ui mini #{config.color} button"
+              click: (e) ->
+                $ipt = $ "##{config.name}-input"
+                add $ipt
+              , L 'OK'
+          ]
+        datalist { id: config.name }, tags.map (tag) ->
+          option { value: tag }
+        p config.current.map (tag) ->
+          div { class: "ui label #{config.color} golem-tag" }, [
+            tag
+            i
+              role: 'button'
+              class: 'delete icon'
+              click: (e) -> remove $(e.target)
+          ]
+        ]
+      ]
 
 ## Helpers
 

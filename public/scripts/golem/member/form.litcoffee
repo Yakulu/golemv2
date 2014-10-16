@@ -20,17 +20,11 @@ the the presence of an `id`.
 It then initializes the model for the form, a blank one in the case of a new
 member, or a filled one when editing. A callback can be passed as first
 argument, which be called when initialization is over with the main `form`
-component, returning the whole DOM and making post actions, here plugins
-instanciation (which needs inserted DOM). The `id` is optional and refers to
+component, returning the whole DOM. The `id` is optional and refers to
 the document key in case of edition.
 
     mform.launch = (callback, id) ->
-      wrapFn = (arg) ->
-        callback arg
-        gcform.views.tagsChosenify 'select[name=tags]'
-      gcform.launch ns, wrapFn, id
-
-**TODO**: faire de postActions un array qui se remplira pendant la form, avec peut-être un helper pour chosen (dont textes)
+      gcform.launch ns, callback, id
 
 ## Methods
 
@@ -411,15 +405,26 @@ minor to participate to activities and being taking in photography.
         ]
       props
 
-`tags` is a rich field using chosen jQuery plugin for multiselection and
-autocompletion.
+`tags` is a rich field using the tags widget for adding multiple labels and
+allowing removing them one by one.
 
     mform.views.fields.tags = (props) ->
-      props.$dom = fieldset { class: 'ui segment' }, [
-        legend L 'TAGS'
-        gcw.helpButton title: L('TAGS'), content: L('INFO_FORM_TAGS')
-        gcform.views.tags ['lol', 'mdr', 'alternatiba']
-      ]
+      props.$dom = gcform.views.tags
+        current: props.member.tags
+        tags: rx.array ['lol', 'mdr', 'alternatiba']
+      props
+
+`skills` uses the same field as tags, with different defaults.
+
+    mform.views.fields.skills = (props) ->
+      props.$dom = gcform.views.tags
+        current: props.member.skills
+        tags: rx.array []
+        name: 'skills'
+        label: L 'SKILLS'
+        placeholder: L 'SKILLS_NEW'
+        content: L 'INFO_FORM_SKILLS'
+        color: 'red'
       props
 
 #### Composable views
@@ -493,7 +498,10 @@ autocompletion.
         h3
           class: 'ui inverted center aligned blue header',
           L 'COMPLEMENTARY'
-        div { class: 'field' }, [mform.views.fields.tags(props).$dom]
+        div { class: 'two fields' }, [
+          div { class: 'field' }, [mform.views.fields.tags(props).$dom]
+          div { class: 'field' }, [mform.views.fields.skills(props).$dom]
+        ]
         div { class: 'field' }, [mform.views.fields.note(props).$dom]
       ]
       props
