@@ -98,6 +98,33 @@ module.component.list =
       @searchAdvancedOn = false
       gcl.filter @
 
+    @csvExport = =>
+      _items = @filteredItems or @items
+      items = (_.clone item for item in _items)
+      schema = [
+        'number', 'lastname', 'firstname', 'address', 'postalCode', 'city',
+        'birthday', 'gender', 'nationality', 'profession',
+        'mails', 'tels', 'communicationModes',
+        'authorizations', 'guardianLastname', 'guardianFirstname',
+        'skills', 'tags'
+      ]
+      for item in items
+        for field in schema
+          switch field
+            when 'birthday'
+              item[field] = if item.birthday then moment(item.birthday).format('L') else ''
+            when 'tels', 'mails'
+              values = ("#{v.label}: #{v.value}" for v in item[field])
+              item[field] = values.join ','
+            when 'communicationModes', 'authorizations'
+              keys = []
+              for k, v of item[field]
+                if v then keys.push k
+              item[field] = keys.join ','
+            else
+              item[field] ?= ''
+      gcl.csvExport items, schema, 'adherents'
+
     callback = (err, results) =>
       if err
         golem.widgets.common.notifications.errorUnexpected body: err
@@ -389,16 +416,22 @@ module.component.list =
           cls: 'inverted center aligned black'
         advancedSearchDom() if ctrl.searchAdvancedOn
         m 'h3',
-          class: 'ui inverted center aligned purple header', 
+          class: 'ui inverted center aligned purple header',
           [
             m 'span', [
               l.MEMBERS_LIST + ' '
+              m 'i',
+                title: l.CSV_EXPORT
+                class: 'text file outline icon'
+                style: cursor: 'pointer', display: 'inline'
+                onclick: ctrl.csvExport
               m 'i',
                 title: l.FILTERS_REMOVE
                 class: 'icon eraser'
                 style:
                   cursor: 'pointer'
                   visibility: eraserVisibility
+                  display: 'inline'
                 onclick: ctrl.filtersRemoveAll
           ]
         ]

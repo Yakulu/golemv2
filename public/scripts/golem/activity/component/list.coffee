@@ -39,6 +39,11 @@ module.component.list =
         gcl.filter @
       )
 
+    @csvExport = =>
+      items = @filteredItems or @items
+      schema = ['code', 'label', 'monitor', 'timeSlot', 'places', 'note']
+      gcl.csvExport items, schema, 'activites'
+
 
     callback = (err, results) =>
       if err
@@ -185,7 +190,18 @@ module.component.list =
           title: l.SEARCH_ADVANCED
           cls: 'inverted center aligned black'
         advancedSearchDom() if ctrl.searchAdvancedOn
-        m 'h3', { class: 'ui inverted center aligned purple header' }, l.ACTIVITIES_LIST
+        m 'h3',
+          class: 'ui inverted center aligned purple header',
+          [
+            m 'span', [
+              l.ACTIVITIES_LIST + ' '
+              m 'i',
+                title: l.CSV_EXPORT
+                class: 'text file outline icon'
+                style: cursor: 'pointer'
+                onclick: ctrl.csvExport
+            ]
+          ]
         mainContent
       ]
       m 'section', { class: 'four wide column' }, contextMenuContent

@@ -50,6 +50,7 @@ golem.config.locale =
   CONTACTS_NEW: 'Nouveau contact'
   CONTACTS_REMOVE_CONFIRM_MSG: 'Confirmez-vous vouloir supprimer ce contact ?'
   COST: 'Coût'
+  CSV_EXPORT: 'Exporter au format tableur'
   DATE: 'Date'
   DEFAULT: 'Par défaut'
   DEFAULT_ONLY: 'Par défaut seulement'

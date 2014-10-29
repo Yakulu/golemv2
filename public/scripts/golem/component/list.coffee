@@ -21,6 +21,18 @@ golem.component.list =
           return false unless fn item
         true
 
+  csvExport: (items, schema, filename) ->
+    csv = [("\"#{field}\"" for field in schema).join(';')]
+    for item in items
+      line = ("\"#{item[field]}\"" for field in schema)
+      csv.push line.join(';')
+    aNode = document.createElement 'a'
+    aNode.href = "data:text/csv;charset=utf-8,#{encodeURIComponent csv.join('\r\n')}"
+    aNode.target = '_blank'
+    aNode.download = "#{filename}.csv"
+    aNode.click()
+
+
   searchBox: (searchFn) ->
     head: m 'div', { class: 'header item' }, [
       m 'span', l.SEARCH_GLOBAL
