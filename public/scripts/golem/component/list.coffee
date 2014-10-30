@@ -30,7 +30,9 @@ golem.component.list =
     aNode.href = "data:text/csv;charset=utf-8,#{encodeURIComponent csv.join('\r\n')}"
     aNode.target = '_blank'
     aNode.download = "#{filename}.csv"
+    document.body.appendChild aNode
     aNode.click()
+    document.body.removeChild aNode
 
 
   searchBox: (searchFn) ->
