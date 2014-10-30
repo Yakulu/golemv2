@@ -101,15 +101,27 @@ module.component.list =
     @csvExport = =>
       _items = @filteredItems or @items
       items = (_.clone item for item in _items)
-      schema = [
-        'number', 'lastname', 'firstname', 'address', 'postalCode', 'city',
-        'birthday', 'gender', 'nationality', 'profession',
-        'mails', 'tels', 'communicationModes',
-        'authorizations', 'guardianLastname', 'guardianFirstname',
-        'skills', 'tags'
-      ]
+      schema =
+        number: l.MEMBER_NUMBER
+        lastname: l.LASTNAME
+        firstname: l.FIRSTNAME
+        address: l.ADDRESS
+        postalCode: l.POSTAL_CODE
+        city: l.CITY
+        birthday: l.BIRTHDAY
+        gender: l.GENDER
+        nationality: l.NATIONALITY
+        profession: l.PROFESSION
+        mails: l.MAILS
+        tels: l.TELS
+        communicationModes: l.COMMUNICATION_MODES
+        authorizations: l.AUTHORIZATIONS
+        guardian: l.CHILD_GUARDIAN
+        skills: l.SKILLS
+        tags: l.TAGS
       for item in items
-        for field in schema
+        item.guardian = "#{item.guardianLastname} #{item.guardianFirstname}" if item.guardianLastname
+        for field, locale of schema
           switch field
             when 'birthday'
               item[field] = if item.birthday then moment(item.birthday).format('L') else ''

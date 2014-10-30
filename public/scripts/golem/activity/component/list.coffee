@@ -41,7 +41,13 @@ module.component.list =
 
     @csvExport = =>
       items = @filteredItems or @items
-      schema = ['code', 'label', 'monitor', 'timeSlot', 'places', 'note']
+      schema =
+        code: l.CODE
+        label: l.LABEL
+        monitor: l.MONITOR
+        timeSlot: l.TIMESLOT
+        places: l.PLACES
+        note: l.NOTE
       gcl.csvExport items, schema, 'activites'
 
 

@@ -21,10 +21,10 @@ golem.component.list =
           return false unless fn item
         true
 
-  csvExport: (items, schema, filename) ->
-    csv = [("\"#{field}\"" for field in schema).join(';')]
+  csvExport: (items, schema, filename, csv = []) ->
+    csv.push [("\"#{locale}\"" for field, locale of schema).join(';')]
     for item in items
-      line = ("\"#{item[field]}\"" for field in schema)
+      line = ("\"#{item[field]}\"" for field, locale of schema)
       csv.push line.join(';')
     aNode = document.createElement 'a'
     aNode.href = "data:text/csv;charset=utf-8,#{encodeURIComponent csv.join('\r\n')}"

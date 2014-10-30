@@ -3,6 +3,29 @@ module.component.show =
   controller: ->
     l = golem.config.locale
     key = m.route.param 'activityId'
+
+    @csvExport = =>
+      activityName = "#{@activity.fullLabel()} - #{@activity.monitor}"
+      preCSV = ["\"#{activityName}\""]
+      items = (_.clone item for item in @members)
+      schema =
+        lastname: l.LASTNAME
+        firstname: l.FIRSTNAME
+        address: l.ADDRESS
+        postalCode: l.POSTAL_CODE
+        city: l.CITY
+        mails: l.MAILS
+        tels: l.TELS
+      for item in items
+        for field, locale of schema
+          switch field
+            when 'tels', 'mails'
+              values = ("#{v.label}: #{v.value}" for v in item[field])
+              item[field] = values.join ','
+            else
+              item[field] ?= ''
+      golem.component.list.csvExport items, schema, "#{@activity.code}-activity-members", preCSV
+
     m.startComputation()
     golem.model.db.get key, (err, res) =>
       if err
@@ -40,12 +63,26 @@ module.component.show =
         m 'ul', { class: 'ui list' }, ctrl.members.map (i) ->
           m 'li', [
             m 'a', { href: '#/member/show/' + i._id }, i.fullname()
+            m 'span', ' ' + i.fulladdress()
+            m 'span', do ->
+              if i.tels.length > 0
+                ' (tel ' + (v.value for v in i.tels when v.default) + ')'
+            m 'span', do ->
+              if i.mails.length > 0
+                ' (mail ' + (v.value for v in i.mails when v.default) + ')'
           ]
       else
         m 'p', l.NONE
 
     mainContent = m 'section', { class: 'ui piled segment' }, [
-      m 'h2', a.label
+      m 'h2', [
+        a.label + ' '
+        m 'i',
+          title: l.CSV_EXPORT
+          class: 'text file outline icon'
+          style: cursor: 'pointer'
+          onclick: ctrl.csvExport
+      ]
       m 'p', a.note
       m 'div', { class: 'ui horizontal list' }, [
         m 'div.item', [
