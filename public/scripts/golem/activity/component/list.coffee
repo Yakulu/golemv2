@@ -51,7 +51,8 @@ module.component.list =
         takenPlaces: l.PLACES_TAKEN
         note: l.NOTE
       for item in items
-        item.takenPlaces = @takenPlacesByActivity[item._id]
+        item.places ?= ''
+        item.takenPlaces = @takenPlacesByActivity[item._id] or 0
       gcl.csvExport items, schema, 'activites'
 
 
