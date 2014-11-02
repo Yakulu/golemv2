@@ -40,14 +40,18 @@ module.component.list =
       )
 
     @csvExport = =>
-      items = @filteredItems or @items
+      _items = @filteredItems or @items
+      items = (_.clone item for item in _items)
       schema =
         code: l.CODE
         label: l.LABEL
         monitor: l.MONITOR
         timeSlot: l.TIMESLOT
         places: l.PLACES
+        takenPlaces: l.PLACES_TAKEN
         note: l.NOTE
+      for item in items
+        item.takenPlaces = @takenPlacesByActivity[item._id]
       gcl.csvExport items, schema, 'activites'
 
 
