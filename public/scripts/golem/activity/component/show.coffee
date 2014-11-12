@@ -9,6 +9,7 @@ module.component.show =
       preCSV = ["\"#{activityName}\""]
       items = (_.clone item for item in @members)
       schema =
+        number: l.MEMBER_NUMBER
         lastname: l.LASTNAME
         firstname: l.FIRSTNAME
         address: l.ADDRESS
