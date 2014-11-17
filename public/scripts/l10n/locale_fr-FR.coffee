@@ -116,6 +116,7 @@ golem.config.locale =
   NATIONALITY: 'Nationalité'
   MAIL: 'Courriel'
   MAIL_PLACEHOLDER: 'Adresse mail valide'
+  MAILING: 'Envoi de courriels'
   MAILS: 'Courriels'
   MENU: 'Menu'
   MEMBER: 'Adhérent'

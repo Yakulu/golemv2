@@ -75,9 +75,14 @@ module.component.show =
       else
         m 'p', l.NONE
 
-    mainContent = m 'section', { class: 'ui piled segment' }, [
+    mainContent = m 'section', { class: 'ui piled segment golem-show' }, [
       m 'h2', [
         a.label + ' '
+        m 'a',
+          title: l.MAILING
+          style: display: 'inline'
+          href: golem.component.list.mailing ctrl.members
+          [ m 'i', class: 'mail outline icon' ]
         m 'i',
           title: l.CSV_EXPORT
           class: 'text file outline icon'

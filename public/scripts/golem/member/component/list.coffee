@@ -419,7 +419,7 @@ module.component.list =
       if _(ctrl.activeFilters).isEmpty() then 'hidden' else 'visible'
 
     return [
-      m 'section', { class: 'twelve wide column' }, [
+      m 'section', { class: 'twelve wide column golem-list' }, [
         new golem.menus.secondary.view()
         golem.widgets.common.headerExpandible
           ctrl: ctrl
@@ -432,6 +432,11 @@ module.component.list =
           [
             m 'span', [
               l.MEMBERS_LIST + ' '
+              m 'a',
+                title: l.MAILING
+                style: display: 'inline'
+                href: golem.component.list.mailing items
+                [ m 'i', class: 'mail outline icon' ]
               m 'i',
                 title: l.CSV_EXPORT
                 class: 'text file outline icon'

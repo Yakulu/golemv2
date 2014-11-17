@@ -21,6 +21,16 @@ golem.component.list =
           return false unless fn item
         true
 
+  mailing: (items) ->
+    mails = []
+    for item in items
+      if item.communicationModes.mail
+        for mail in item.mails
+          if mail.default
+            mails.push mail.value
+    mails = _.uniq(mails).join(',')
+    "mailto:mjcval@gmail.com?bcc=#{mails}"
+
   csvExport: (items, schema, filename, csv = []) ->
     csv.push [("\"#{locale}\"" for field, locale of schema).join(';')]
     for item in items
@@ -33,7 +43,6 @@ golem.component.list =
     document.body.appendChild aNode
     aNode.click()
     document.body.removeChild aNode
-
 
   searchBox: (searchFn) ->
     head: m 'div', { class: 'header item' }, [

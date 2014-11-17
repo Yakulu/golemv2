@@ -21,6 +21,16 @@ ul#contacts a, td.actions a {
   color: #157FCC;
 }
 
+.golem-list h3 span a {
+  text-decoration: none;
+  color: white;
+}
+
+.golem-show h2 a {
+  text-decoration: none;
+  color: black;
+}
+
 fieldset {
   border: 0;
 }
