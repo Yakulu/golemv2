@@ -10,7 +10,8 @@ golem.component.tags =
     removeMsg = config.removeMsg or l.TAGS_MANAGEMENT_REMOVE_MSG
     @helpMsg = config.helpMsg or l.TAGS_MANAGEMENT_HELP_MSG
     # Init
-    golem.menus.secondary.items = [mi.list, mi.add, mi.tags, mi.skills]
+    golem.menus.secondary.items = [mi.list, mi.add, mi.tags]
+    golem.menus.secondary.items.push mi.skills if config.skills
     document.title = golem.utils.title @title
     @tags = []
     m.startComputation()

@@ -1,4 +1,5 @@
 gm = golem.module
+###
 gm.contact.model =
   create: (props) ->
     props ?= {}
@@ -10,6 +11,23 @@ gm.contact.model =
     contact
   fullname: (c) -> "#{c.firstname} #{c.lastname}"
   fulladdress: gm.family.model.fulladdress
+###
+
+class golem.Contact extends golem.Doc
+
+  constructor: (props) ->
+    super props
+    unless @_id
+      props = {}
+      @[k] = v for k, v of gm.family.model.create()
+      @schema = 'contact'
+      @firstname = props.firstname or ''
+      @tags = props.tags or []
+      @communicationModes = props.communicationModes or mail: false, tel: false
+      delete @movements
+  fullname: -> "#{@firstname} #{@lastname}"
+  fulladdress: -> gm.family.model.fulladdress.call null, this
+
 ###
 contact.Contact = function (props) {
   this.schema = 'contact';

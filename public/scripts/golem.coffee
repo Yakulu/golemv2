@@ -67,6 +67,13 @@ golem.initRouting = ->
     '/contact/edit/:contactId': gm.contact.component.form
     '/contact/remove/:contactId': gm.contact.component.remove
     ###
+    '/contact': gm.contact.component.list
+    '/contact/list': gm.contact.component.list
+    '/contact/tags': gm.contact.component.tags
+    '/contact/show/:contactId': gm.contact.component.show
+    '/contact/remove/:contactId': gm.contact.component.remove
+    '/contact/add': gm.contact.component.form
+    '/contact/edit/:contactId': gm.contact.component.form
     '/member': gm.member.component.list
     '/member/list': gm.member.component.list
     '/member/tags': gm.member.component.tags

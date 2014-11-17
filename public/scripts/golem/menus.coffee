@@ -19,7 +19,7 @@ menus.main =
       l = golem.config.locale
       [
         new menus.Item(l.HOME, '/home', 'home')
-        new menus.Item(l.CONTACTS, '/contact', 'book', 'item disabled')
+        new menus.Item(l.CONTACTS, '/contact', 'book')
         #new menus.Item(l.FAMILIES, '/family', 'sitemap'),
         new menus.Item(l.MEMBERS, '/member', 'user')
         new menus.Item(l.MESSAGES, '/mail', 'mail', 'item disabled')

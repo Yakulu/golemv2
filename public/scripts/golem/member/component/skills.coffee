@@ -10,6 +10,7 @@ member.component.skills =
       getDocsKey: 'memberskills'
       helpMsg: l.SKILLS_MANAGEMENT_HELP_MSG
       removeMsg: l.SKILLS_MANAGEMENT_REMOVE_MSG
+      skills: true
 
   view: (ctrl) ->
     new golem.component.tags.view ctrl

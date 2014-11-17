@@ -6,7 +6,7 @@ class golem.Member extends golem.Doc
     super props
     unless @_id
       props = {}
-      @[k] = v for k, v of gm.contact.model.create()
+      @[k] = v for k, v of golem.Contact()
       @schema = 'member'
       @number = props.number or null
       @birthday = props.birthday or null
@@ -22,6 +22,6 @@ class golem.Member extends golem.Doc
       @skills = props.skills or []
       @activities = props.activities or []
 
-  fullname: -> gm.contact.model.fullname.call null, this
+  fullname: -> "#{@firstname} #{@lastname}"
   fulladdress: -> gm.family.model.fulladdress.call null, this
   fullguardian: -> "#{@guardianLastname} #{@guardianFirstname}"

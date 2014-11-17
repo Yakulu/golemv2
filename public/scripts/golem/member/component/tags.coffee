@@ -7,6 +7,7 @@ member.component.tags =
       title: l.TAGS_MANAGEMENT
       getTagsFn: member.data.getTags
       getDocsKey: 'member'
+      skills: true
 
   view: (ctrl) ->
     new golem.component.tags.view ctrl
