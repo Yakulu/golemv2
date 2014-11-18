@@ -6,7 +6,7 @@ class golem.Member extends golem.Doc
     super props
     unless @_id
       props = {}
-      @[k] = v for k, v of golem.Contact()
+      @[k] = v for k, v of new golem.Contact()
       @schema = 'member'
       @number = props.number or null
       @birthday = props.birthday or null
