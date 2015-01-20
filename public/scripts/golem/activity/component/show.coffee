@@ -15,11 +15,14 @@ module.component.show =
         address: l.ADDRESS
         postalCode: l.POSTAL_CODE
         city: l.CITY
+        birthday: l.BIRTHDAY
         mails: l.MAILS
         tels: l.TELS
       for item in items
         for field, locale of schema
           switch field
+            when 'birthday'
+              item[field] = if item.birthday then moment(item.birthday).format('L') else ''
             when 'tels', 'mails'
               values = ("#{v.label}: #{v.value}" for v in item[field])
               item[field] = values.join ','
