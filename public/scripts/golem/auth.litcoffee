@@ -1,5 +1,7 @@
 # Authentification
 
+    notif = golem.common.notification
+
 ATM it's just a fake, specifically created for the MJC of Valentigney...
 So I won't comment it much.
 
@@ -22,13 +24,11 @@ So I won't comment it much.
         login = $('[name=login]').val()
         password = $('[name=password]').val()
         if isAuthorized login, password
-          new golem.component.notification.Info content: 'Bienvenue sur GOLEM'
-          .send()
+          notif.send(notif.info content: 'Bienvenue sur GOLEM')
           golem.initRouting()
         else
-          new golem.component.notification.Error
-            content: 'Mot de passe ou identifiant invalides'
-          .send()
+          content = 'Mot de passe ou identifiant invalides'
+          notif.send(notif.error content: content)
 
       [
         section { class: 'sixteen wide column' }, [

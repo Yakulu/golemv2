@@ -3,6 +3,8 @@
 A very static version of home, full with HTML markup. It explains the history
 of the project and things like that ! And first, changing the document-s title.
 
+    title = -> document.title = golem.utils.title L 'HOME'
+
     homeView = """
             <section class='fourteen wide column'>
               <h2>Bienvenue</h2>
@@ -40,5 +42,5 @@ of the project and things like that ! And first, changing the document-s title.
 ## Public API
 
     golem.home = ->
-      document.title = golem.utils.title L 'HOME'
+      title()
       homeView

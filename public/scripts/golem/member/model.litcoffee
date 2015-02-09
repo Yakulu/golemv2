@@ -1,10 +1,10 @@
 # Member Model
 
-## Member class
+    model = {}
 
-### Initialization
+## Initialization
 
-A `Member` takes a `props` object with :
+A `member` takes a `props` object with :
 
 - `number`, optional home made identifier for the member;
 - `birthday` a JS Date Object, default to null;
@@ -31,59 +31,54 @@ A `Member` takes a `props` object with :
 - `activities`, an array of strings, the documents identifiers of subscribed
   Activities, default to empty.
 
-It inherits from `golem.Doc`. If no identifier is provided, then we create a
-new document and initalize all defaults, including the `schema` and the Date of
-creation of the instance.  Lifting is done to enable precise reactivity.
+If `props` is empty and has no identifier, member is initialized only with
+defaults. If not, defaults are only fixed if not present. Lifting is done to
+enable precise reactivity.
 
-    class golem.Member extends golem.Doc
-      constructor: (props) ->
-        super props
-        unless @_id
-          props ?= {}
-          @schema = 'member'
-          @creationDate = Date.now()
-          nullFields = ['firstname', 'lastname', 'number', 'birthday', 'gender',
-            'address', 'postalCode', 'city', 'nationality', 'profession',
-            'note', 'guardianLastname', 'guardianFirstname' ]
-          for field in nullFields
-            @[field] = props[field] or null
-          for field in ['tels', 'mails', 'tags', 'skills']
-            @[field] = props[field] or []
-          @communicationModes = props.communicationModes or
-            mail: false
-            tel: false
-          @authorizations = props.authorizations or
-            activities: false
-            photos: false
-          rx.lift @
+    model.member = (props) ->
+      me = props or {}
+      unless me._id
+        me.schema ?= 'member'
+        me.creationDate ?= Date.now()
+        nullFields = ['firstname', 'lastname', 'number', 'birthday', 'gender',
+          'address', 'postalCode', 'city', 'nationality', 'profession',
+          'note', 'guardianLastname', 'guardianFirstname' ]
+        for field in nullFields
+          me[field] ?= null
+        for field in ['tels', 'mails', 'tags', 'skills']
+          me[field] ?= []
+        me.communicationModes ?= mail: false, tel: false
+        me.authorizations ?= activities: false, photos: false
+      rx.lift me
 
-### Methods
+## Methods
 
-`fullname`, `fulladdress` and `fullguardian` are all helpers for displaying the
-merge of several fields.
+`fullname`, `fulladdress` and `fullguardian` are all on demand dependent cells
+helpers for displaying the merge of several fields.
 
-      fullname: -> "#{@firstname.get()} #{@lastname.get()}"
-      fullguardian: -> "#{@guardianFirstname.get()} #{@guardianLastname.get()}"
-      fulladdress: -> [@address.get(), @postalCode.get(), @city.get()].join ' '
+    model.fullname = (m) ->
+      bind -> "#{m.firstname.get()} #{m.lastname.get()}"
+    fullguardian = (m) ->
+      bind -> "#{m.guardianFirstname.get()} #{m.guardianLastname.get()}"
+    fulladdress = (m) ->
+      bind -> [m.address.get(), m.postalCode.get(), m.city.get()].join ' '
 
-## MenuItems
+# MenuItems
 
 Here are the items for the secondary menu. Module will pick into them for
 displaying.
 
-    Menu = golem.menus.Menu
-    menuItems =
-      list: new Menu L('LIST'), '/member', 'list'
-      add: new Menu L('NEW'), '/member/add', 'add sign'
-      show: new Menu L('VIEW'), '/member/show', 'search'
-      edit: new Menu L('EDIT'), '/member/edit', 'edit'
-      remove: new Menu L('DELETE'), '/member/remove', 'remove'
-      skills: new Menu L('SKILLS'), '/member/skills', 'briefcase'
-      tags: new Menu L('TAGS'), '/member/tags', 'tags'
+    model.data = {}
+    menuitem = golem.menus.item
+    model.data.menuItems =
+      list: menuitem L('LIST'), '/member', 'list'
+      add: menuitem L('NEW'), '/member/add', 'add sign'
+      show: menuitem L('VIEW'), '/member/show', 'search'
+      edit: menuitem L('EDIT'), '/member/edit', 'edit'
+      remove: menuitem L('DELETE'), '/member/remove', 'remove'
+      skills: menuitem L('SKILLS'), '/member/skills', 'briefcase'
+      tags: menuitem L('TAGS'), '/member/tags', 'tags'
 
-## Public API
+# Public API
 
-    golem.member.model =
-      data:
-        items: []
-        menuItems: menuItems
+    golem.module.member.model = model

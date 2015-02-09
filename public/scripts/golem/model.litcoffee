@@ -1,5 +1,7 @@
 # GOLEM Model
 
+    notif = golem.common.notification
+
 ## getBySchema
 
 This helper returns all the documents, data included, from a given `schema`. A
@@ -19,7 +21,7 @@ results.
 
 `getTags` returns tags or labels, according to the `field` argument by `type`,
 grouped with the `count` function and takes a mandatory callback function, as
-for `getBySchema`. `getTags` sends an `Unexpected` error if there is one.
+for `getBySchema`. `getTags` sends an `unexpected` error if there is one.
 Otherwise, it sorts results by DESC if `tags` are aksed, thanks to the value
 field.
 
@@ -31,7 +33,7 @@ field.
         endkey: [type, {}]
       , (err, res) ->
         if err
-          new golem.component.common.notifications.Unexpected(body: err).send()
+          notif.send(notif.unexpected content: err)
         else
           if field is 'tags'
             res.rows.sort (a, b) -> b.value - a.value
@@ -54,21 +56,9 @@ executed after the resukts are completed.
           include_docs: true
         , callback
 
-## Doc
-
-`Doc` represents a document. It transforms all items from the database record,
-given with the required argument, to members of the class, avoiding the
-expensive validation.
-
-    class golem.Doc
-      constructor: (props) ->
-        @[k] = v for k, v of props if props
-        rx.lift @
-
 ## Public API
 
     golem.model =
       getBySchema: getBySchema
       getTags: getTags
       getMembersFromActivity: getMembersFromActivity
-      Doc: golem.Doc

@@ -29,23 +29,24 @@ Here is the first function to be called into this app. It sets the globals.
  
     window.golem = golem =
       config: {}
-      component: {}
-      activity:
-        component: {}
-      member:
-        component: {}
+      common: {}
+      module:
+        activity: {}
+        member: {}
     window.bind = bind = rx.bind
     window.rxt = rxt = rx.rxt
     rx.rxt.importTags()
     window.T = T = rx.rxt.tags
     window.L = L = (str) -> golem.config.locale.get str
     g = golem
+    activity = g.module.activity
+    member = g.module.member
 
     g.router = new LightRouter
     g.activeUrl = rx.cell ''
 
 `replaceMain` is the function used to update aggressively the DOM and simulates
-a page to page navigation.
+a page to page navigation. It takes a `dom` parameter.
 
     $ ->
       g.roots =
@@ -64,21 +65,21 @@ them replace the main part of the GOLEM app by new elements.
           '/home': -> replaceMain g.home()
           '/auth': -> replaceMain g.auth()
           '/activity': ->
-            replaceMain new g.activity.component.List().view()
+            activity.list.launch replaceMain
           '/activity/add': ->
-            new g.activity.component.Form replaceMain
+            activity.form.launch replaceMain
           '/activity/edit/:id': (id) ->
-            new g.activity.component.Form replaceMain, id
+            activity.form.launch replaceMain, id
           '/activity/show/:id': (id) ->
-            new g.activity.component.Show replaceMain, id
+            activity.show.launch replaceMain, id
           '/activity/remove/:id': (id) ->
-            new g.activity.component.Remove id
+            activity.remove.launch id
           '/member': ->
-            replaceMain new g.member.component.List().view()
+            member.list.launch replaceMain
           '/member/add': ->
-            new g.member.component.Form replaceMain
+            member.form.launch replaceMain
           '/member/edit/:id': (id) ->
-            new g.member.component.Form replaceMain, id
+            member.form.launch replaceMain, id
       #/activity[\/list]?/ -> replaceMain golem.activity.$list()
 
 After the initial DOM readyness, the function takes the most important part of
@@ -87,7 +88,7 @@ the layout and populates them.
       $('#golem-header').append headerView()
       $('#golem-mainmenu').append g.menus.main
       $('#golem-footer').append footerView()
-      $('#golem-notification').append g.component.notification.notifications
+      $('#golem-notification').append g.common.notification.notifications
       g.roots.main.append g.auth()
 
 
@@ -96,6 +97,7 @@ FIXME, of course). This function is here to launch the router and attaches it
 to the `onhashchange` event. It also uses a cell to handle current module URL.
 
     golem.initRouting = ->
+      golem.activeUrl.set window.location.hash[1..]
       golem.router.run()
       window.onhashchange = ->
         golem.activeUrl.set window.location.hash[1..]

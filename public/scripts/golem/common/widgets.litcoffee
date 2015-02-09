@@ -3,6 +3,8 @@
 
 These components can be used everywhere in the GOLEM application.
 
+    widgets = {}
+
 ## Header expandable
 
 The `headerExpandable` is a component that is intended to show a header that
@@ -10,7 +12,7 @@ can be opened and closed with an icon. It just toggles a boolean, wich will be
 used to toggle the whole content. `headerExpandable` take a `config` object as
 argument with a `title`, a `class` and the boolean `active`. All are required.
 
-    headerExpandable = (c) ->
+    widgets.headerExpandable = (c) ->
       toggleActive = -> c.active.set(not c.active.get())
       h3 { class: "ui header #{c.class}" }, [
         span [
@@ -37,11 +39,10 @@ returning. It uses the modal module helper from SemanticUI.
 
 TODO: make usage of semantic JS optional (15kb min seems much for only that...)
 
-    modal = (config) ->
-      {@title, @content, @approveCb, @denyCb} = config
+    widgets.modal = (config) ->
       $elt = div { class: 'ui basic modal' }, [
-        div { class:'header' }, @title
-        div { class:'content' }, rxt.rawHtml @content
+        div { class:'header' }, config.title
+        div { class:'content' }, rxt.rawHtml config.content
         div { class:'actions' }, [
           button
             class: 'ui negative button'
@@ -55,12 +56,37 @@ TODO: make usage of semantic JS optional (15kb min seems much for only that...)
       ]
       $elt.modal 'setting',
         closable: false
-        onDeny: @denyCb
-        onApprove: @approveCb
+        onDeny: config.denyCb
+        onApprove: config.approveCb
       .modal 'show'
+
+## Help Button
+
+`helpButton` is a component needing a config object :
+
+- a required `title` string
+- a required HTML `content`
+- an optional `position` for the popup, defaults to `right center`
+
+It creates a jQuery button element on which the popup will be attached, after a
+click event. For the popup, it employs the Semantic jQuery popup plugin.
+Finally, it returns the created element.
+
+    widgets.helpButton = (config) ->
+      config.position ?= 'right center'
+      $elt = button { type: 'button', class: 'ui tiny button' }, [
+          i { class: 'help icon' }
+          L 'HELP'
+      ]
+      $elt.popup
+        title: config.title
+        content: config.content
+        on: 'click'
+        position: config.position
+        variation: 'inverted'
+      $elt
+
 
 ## Public API
 
-    golem.component.common =
-      headerExpandable: headerExpandable
-      modal: modal
+    golem.common.widgets = widgets
