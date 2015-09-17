@@ -62,7 +62,7 @@ module.component.list =
         @items = []
         m.endComputation()
       else
-        @items = results.rows.map (r) -> new golem.Activity r.doc
+        @items = (new golem.Activity r.doc for r in results.rows when r.doc.season is golem.config.season)
         golem.model.getMembersFromActivity null, (err, res) =>
           if err
             golem.widgets.common.notifications.errorUnexpected body: err

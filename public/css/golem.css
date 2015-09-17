@@ -2,6 +2,10 @@ header img {
   margin: 1%
 }
 
+header h1 span {
+  padding: 1em;
+}
+
 #main-menu a.disabled {
   color: #ccc;
 }

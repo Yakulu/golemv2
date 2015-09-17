@@ -8,6 +8,7 @@ class golem.Member extends golem.Doc
       props = {}
       @[k] = v for k, v of new golem.Contact()
       @schema = 'member'
+      @season = props.season or golem.config.season
       @number = props.number or null
       @birthday = props.birthday or null
       @gender = props.gender or null

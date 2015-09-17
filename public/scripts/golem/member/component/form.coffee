@@ -87,7 +87,7 @@ module.component.form =
         @activities = []
         golem.widgets.common.notifications.errorUnexpected body: err
       else
-        @activities = res.rows.map (r) -> new golem.Activity r.doc
+        @activities = (new golem.Activity r.doc for r in res.rows when r.doc.season is golem.config.season)
       golem.model.getLabels('tels',
         golem.model.getLabels.bind(this, 'mails',
           module.data.getTags.bind(this,

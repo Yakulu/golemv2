@@ -6,6 +6,7 @@ class golem.Activity extends golem.Doc
     unless @_id
       props = {}
       @schema = 'activity'
+      @season = props.season or golem.config.season
       @creationDate = Date.now()
       @label = props.label or ''
       @code = props.code or ''

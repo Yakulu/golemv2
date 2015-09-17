@@ -8,3 +8,4 @@ golem.module.activity.data =
     show: new menus.Item l.VIEW, '/activity/show', 'search'
     edit: new menus.Item l.EDIT, '/activity/edit', 'edit'
     remove: new menus.Item l.DELETE, '/activity/remove', 'remove'
+    duplicate: new menus.Item l.DUPLICATE, '/activity/duplicate', 'copy'

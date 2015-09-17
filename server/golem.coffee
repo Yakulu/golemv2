@@ -19,6 +19,15 @@ dbQueries =
           return
         ).toString()
 
+  members:
+    _id: '_design/members'
+    views:
+      byActivity:
+        map: ((doc) ->
+          if doc.schema and doc.schema is 'member'
+            emit([activity, doc.schema], null) for activity in doc.activities
+        ).toString()
+
   tags:
     _id: '_design/tags'
     views:
@@ -77,6 +86,7 @@ db.allDocs (err, response) ->
       dbQueries.all
       dbQueries.tags
       dbQueries.labels
+      dbQueries.members
     ]
     db.bulkDocs queries, (err, response) ->
       console.log 'db initialized'

@@ -11,6 +11,7 @@ member.data =
     show: new menus.Item l.VIEW, '/member/show', 'search'
     edit: new menus.Item l.EDIT, '/member/edit', 'edit'
     remove: new menus.Item l.DELETE, '/member/remove', 'remove'
+    duplicate: new menus.Item l.DUPLICATE, '/member/duplicate', 'copy'
   tags: []
   skills: []
 

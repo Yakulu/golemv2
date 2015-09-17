@@ -40,7 +40,7 @@ module.component.show =
         @activity = new golem.Activity res
         document.title = golem.utils.title(l.DETAILS) + @activity.label
         mi = module.data.menuItems
-        for action in ['show', 'edit', 'remove']
+        for action in ['show', 'edit', 'remove', 'duplicate']
           mi[action].url = "#{mi[action].baseUrl}/#{@activity._id}"
 
         golem.menus.secondary.items = [
@@ -50,6 +50,7 @@ module.component.show =
           mi.edit
           mi.remove
         ]
+        golem.menus.secondary.items.push(mi.duplicate) if golem.config.season is 2014
         golem.model.getMembersFromActivity @activity._id, (err, res) =>
           if err
             golem.widgets.common.notifications.errorUnexpected body: err

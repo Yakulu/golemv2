@@ -6,10 +6,11 @@ module.component.show =
     initController = =>
       document.title = golem.utils.title l.DETAILS + @member.fullname()
       mi = module.data.menuItems
-      ['show', 'edit', 'remove'].forEach (action) =>
+      ['show', 'edit', 'remove', 'duplicate'].forEach (action) =>
         mi[action].url = "#{mi[action].baseUrl}/#{@member._id}"
 
       golem.menus.secondary.items = [mi.list, mi.add, mi.show, mi.edit, mi.remove]
+      golem.menus.secondary.items.push(mi.duplicate) if golem.config.season is 2014
       m.endComputation()
 
     m.startComputation()

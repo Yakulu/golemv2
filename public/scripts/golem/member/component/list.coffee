@@ -61,7 +61,7 @@ module.component.list =
           when 'gender'
             @activeFilters[s.name] = (item) -> item[s.field] is s.value
           when 'isMinor'
-            @activeFilters[s.name] = (item) -> 
+            @activeFilters[s.name] = (item) ->
               s.value = false if _(s.value).isString()
               false unless item.birthday
               isMinor = moment(item.birthday).isAfter(moment().subtract(18, 'years'))
@@ -143,6 +143,7 @@ module.component.list =
         @items = []
       else
         @items = results.rows.map (r) -> new golem.Member r.doc
+        @items = (new golem.Member r.doc for r in results.rows when r.doc.season is golem.config.season)
       m.endComputation()
 
     # Init
