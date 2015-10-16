@@ -12,6 +12,7 @@ module.component.duplicate = golem.component.remove
     delete @item._rev
     @item.creationDate = Date.now()
     @item.number = null
+    @item.tags = []
     @item.activities = []
     @item.season = 2015
     golem.model.db.post @item, (err, res) =>
