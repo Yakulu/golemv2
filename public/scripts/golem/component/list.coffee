@@ -71,7 +71,7 @@ golem.component.list =
         class: 'eraser icon'
         title: l.FILTERS_REMOVE
       tagsClass = ' active'
-    return { head: m 'div', class: 'header item', l.FILTERS_ALL_SEASONS
+    return { head: m 'div', class: 'header item', l.FILTERS
     groups: m 'a', class: 'item', [
       m 'i', class: 'users icon'
       l.BY_GROUP
