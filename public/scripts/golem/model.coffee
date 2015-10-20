@@ -12,15 +12,16 @@ golem.model =
     tels: []
 
   getTags: (type, module, field, callback) ->
+    season = golem.config.season or 2015
     golem.model.db.query 'tags/count',
       group: true
-      startkey: [type]
+      startkey: [type, undefined]
       endkey: [type, {}]
     , (err, res) ->
       if err
         golem.widgets.common.notifications.errorUnexpected body: err
       else
-        golem.module[module].data[field] = res.rows
+        golem.module[module].data[field] = (r for r in res.rows when r.key[2] is season)
         # Sort by value DESC
         golem.module[module].data[field].sort (a, b) -> b.value - a.value
       callback err, res

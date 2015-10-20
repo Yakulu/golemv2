@@ -43,6 +43,7 @@ dbQueries =
               emit [
                 schema
                 doc[prop][i]
+                doc.season
               ]
               i++
             return

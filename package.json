@@ -1,6 +1,6 @@
 {
   "name": "golem",
-  "version": "0.3.5",
+  "version": "0.3.7",
   "private": "true",
   "description": "GOLEM signifie Gestion, Organisation Libres Et Modulaires. It can mean Good Old and Libre Entity Management or Group Organization with Libre, Especially Modular software.",
   "main": "golem.js",
